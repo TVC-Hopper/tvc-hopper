@@ -1,9 +1,37 @@
 cmake_minimum_required(VERSION 3.17)
 
-project(hopper VERSION 0.0 LANGUAGES C CXX ASM)
+project(hopper VERSION 0.0 LANGUAGES C ASM)
 
+option(BUILD_MIMXRT1010EVK_BSP "Build MIMRX1010-EVK BSP" ON)
+option(BUILD_FLIGHTCONTROLLER_BSP "Build flight controller BSP" OFF)
 
-add_executable(${PROJECT_NAME} src/main.c)
+add_compile_definitions(CPU_MIMXRT1011DAE5A)
+
+include(cmake/flags.cmake)
+
 
 add_subdirectory(drivers)
-target_link_libraries(${PROJECT_NAME} PUBLIC drivers)
+add_subdirectory(bsp)
+add_subdirectory(fslhal)
+
+add_executable(${PROJECT_NAME}.elf
+    #    device/startup_mimxrt1011.c
+    device/startup_MIMXRT1011.S
+    device/system_MIMXRT1011.c
+    src/main.c
+)
+
+target_include_directories(${PROJECT_NAME}.elf
+    PRIVATE
+        fslhal/include/fslhal
+        device
+        cmsis
+)
+
+target_link_libraries(${PROJECT_NAME}.elf PUBLIC bsp fslhal drivers)
+target_link_libraries(${PROJECT_NAME}.elf PRIVATE -Wl,--start-group)
+target_link_libraries(${PROJECT_NAME}.elf PRIVATE m)
+target_link_libraries(${PROJECT_NAME}.elf PRIVATE c)
+target_link_libraries(${PROJECT_NAME}.elf PRIVATE gcc)
+target_link_libraries(${PROJECT_NAME}.elf PRIVATE nosys)
+target_link_libraries(${PROJECT_NAME}.elf PRIVATE -Wl,--end-group)
