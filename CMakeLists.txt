@@ -9,7 +9,7 @@ add_compile_definitions(CPU_MIMXRT1011DAE5A)
 
 include(cmake/flags.cmake)
 
-
+add_subdirectory(freertos)
 add_subdirectory(drivers)
 add_subdirectory(bsp)
 add_subdirectory(fslhal)
@@ -23,12 +23,17 @@ add_executable(${PROJECT_NAME}.elf
 
 target_include_directories(${PROJECT_NAME}.elf
     PRIVATE
+        src
+
         fslhal/include/fslhal
         device
         cmsis
+
+        freertos/freertos_kernel/include
+        freertos/freertos_kernel/portable/GCC/ARM_CM4F
 )
 
-target_link_libraries(${PROJECT_NAME}.elf PUBLIC bsp fslhal drivers)
+target_link_libraries(${PROJECT_NAME}.elf PUBLIC bsp fslhal drivers freertos)
 target_link_libraries(${PROJECT_NAME}.elf PRIVATE -Wl,--start-group)
 target_link_libraries(${PROJECT_NAME}.elf PRIVATE m)
 target_link_libraries(${PROJECT_NAME}.elf PRIVATE c)

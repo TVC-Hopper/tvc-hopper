@@ -1,6 +1,4 @@
 build
-build-test
-build-release
-build-debug
+build-*
 
 .DS_Store
