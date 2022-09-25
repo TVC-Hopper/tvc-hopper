@@ -9,6 +9,8 @@ add_compile_definitions(CPU_MIMXRT1011DAE5A)
 
 include(cmake/flags.cmake)
 
+add_subdirectory(circbuf)
+add_subdirectory(spp)
 add_subdirectory(freertos)
 add_subdirectory(drivers)
 add_subdirectory(bsp)
@@ -33,7 +35,7 @@ target_include_directories(${PROJECT_NAME}.elf
         freertos/freertos_kernel/portable/GCC/ARM_CM4F
 )
 
-target_link_libraries(${PROJECT_NAME}.elf PUBLIC bsp fslhal drivers freertos)
+target_link_libraries(${PROJECT_NAME}.elf PUBLIC circbuf spp_client bsp fslhal drivers freertos)
 target_link_libraries(${PROJECT_NAME}.elf PRIVATE -Wl,--start-group)
 target_link_libraries(${PROJECT_NAME}.elf PRIVATE m)
 target_link_libraries(${PROJECT_NAME}.elf PRIVATE c)

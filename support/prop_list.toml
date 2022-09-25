@@ -1,0 +1,26 @@
+
+[[props]]
+name = "start"
+id = 0
+type = "BOOL"
+writeable = true
+
+[[props]]
+name = "stop"
+id = 1
+type = "BOOL"
+writeable = true
+
+[[props]]
+name = "status"
+id = 2
+type = "U32"
+readable = true
+
+[[props]]
+name = "telemetry"
+id = 3
+type = "ARR"
+size = 10
+readable = true
+
