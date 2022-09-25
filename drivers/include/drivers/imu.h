@@ -133,7 +133,7 @@ typedef struct IMU_s {
 /*
  * intialize the IMU
  */
-void IMU_Init(IMU_t *imu /* other args TBD */);
+int IMU_Init(IMU_t *imu /* other args TBD */);
 
 
 /////////////// Accelerometer Functions ///////////////
