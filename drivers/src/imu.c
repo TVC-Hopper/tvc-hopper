@@ -6,7 +6,7 @@
 /*
  * intialize the IMU
  */
-int IMU_Init(IMU_t *imu /* other args TBD */){return 0;}
+void IMU_Init(IMU_t *imu /* other args TBD */){}
 
 
 /////////////// Accelerometer Functions ///////////////

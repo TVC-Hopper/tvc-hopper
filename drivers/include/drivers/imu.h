@@ -3,6 +3,10 @@
 
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*
  * struct to register I2C callbacks
  * set by application
@@ -10,8 +14,8 @@
 
 typedef struct IMUCallbacks_s {
     
-    int (*onWrite)(uint16_t addr, uint8_t *bus_data, uint16_t size);
-    int (*onRead)(uint16_t addr, uint8_t *bus_data, uint16_t size);
+    void (*onWrite)(uint16_t addr, uint8_t *bus_data, uint16_t size);
+    uint8_t (*onRead)(uint16_t addr, uint8_t *bus_data, uint16_t size);
 
 } IMUCallbacks_t;
 
@@ -129,7 +133,7 @@ typedef struct IMU_s {
 /*
  * intialize the IMU
  */
-int IMU_Init(IMU_t *imu /* other args TBD */);
+void IMU_Init(IMU_t *imu /* other args TBD */);
 
 
 /////////////// Accelerometer Functions ///////////////
@@ -200,6 +204,8 @@ int IMU_WriteTempReg(IMU_t *imu, TempRegister_t reg, uint8_t data);
  */
 uint8_t IMU_ReadTempReg(IMU_t *imu, TempRegister_t reg);
 
-
+#ifdef __cplusplus
+}
+#endif
 
 #endif
