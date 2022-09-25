@@ -14,7 +14,7 @@ extern "C" {
 
 typedef struct IMUCallbacks_s {
     
-    void (*onWrite)(uint16_t addr, uint8_t *bus_data, uint16_t size);
+    uint8_t (*onWrite)(uint16_t addr, uint8_t *bus_data, uint16_t size);
     uint8_t (*onRead)(uint16_t addr, uint8_t *bus_data, uint16_t size);
 
 } IMUCallbacks_t;

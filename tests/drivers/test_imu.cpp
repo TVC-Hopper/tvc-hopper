@@ -20,20 +20,22 @@ uint16_t last_read_address;
 uint8_t last_read_bus_data[1024];
 uint16_t last_read_size;
 
-uint16_t response_data;
+uint16_t response_data[1024];
 
-void IMU_I2CWriteCallback(uint16_t addr, uint8_t *bus_data, uint16_t size) {
+uint8_t IMU_I2CWriteCallback(uint16_t addr, uint8_t *bus_data, uint16_t size) {
     last_write_address = addr;
     memcpy(last_write_bus_data, bus_data, size);
     last_write_size = size;
+
+    return 0;
 }
 
 uint8_t IMU_I2CReadCallback(uint16_t addr, uint8_t *bus_data, uint16_t size) {
     last_read_address = addr;
-    memcpy(last_read_bus_data, bus_data, size);
+    memcpy(bus_data, response_data, size);
     last_read_size = size;
 
-    return response_data;
+    return 0;
 }
 
 
