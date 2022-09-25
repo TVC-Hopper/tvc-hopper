@@ -19,12 +19,12 @@ void IMU_GetAccReading(IMU_t *imu){return;}
 /* 
  * write data to accelerometer reg
  */
-int IMU_WriteAccReg(IMU_t *imu, AccRegister_t reg, uint8_t data){return 0;}
+int IMU_WriteAccReg(IMU_t *imu, AccelRegister_t reg, uint8_t data){return 0;}
 
 /* 
  * read data from accelerometer reg
  */
-uint8_t IMU_ReadAccReg(IMU_t *imu, AccReg_t reg){return 0;}
+uint8_t IMU_ReadAccReg(IMU_t *imu, AccelRegister_t reg){return 0;}
 
 ///////////////// Gyroscope Functions /////////////////
 
@@ -53,12 +53,12 @@ void IMU_GetMagReading(IMU_t *imu){return;}
 /* 
  * write data to gyroscope reg
  */
-int IMU_WriteMagReg(IMU_t *imu, MagReg_t reg, uint8_t data){return 0;}
+int IMU_WriteMagReg(IMU_t *imu, MagRegister_t reg, uint8_t data){return 0;}
 
 /* 
  * read data from gyroscope reg
  */
-uint8_t IMU_ReadMagReg(IMU_t *imu, MagReg_t reg){return 0;}
+uint8_t IMU_ReadMagReg(IMU_t *imu, MagRegister_t reg){return 0;}
 
 ///////////// Temperature Sensor Functions //////////////
 
@@ -70,9 +70,9 @@ void IMU_GetTempReading(IMU_t *imu){return;}
 /* 
  * write data to gyroscope reg
  */
-int IMU_WriteTempReg(IMU_t *imu, TempReg_t reg, uint8_t data){return 0;}
+int IMU_WriteTempReg(IMU_t *imu, TempRegister_t reg, uint8_t data){return 0;}
 
 /* 
  * read data from gyroscope reg
  */
-uint8_t IMU_ReadTempReg(IMU_t *imu, TempReg_t reg){return 0;}
+uint8_t IMU_ReadTempReg(IMU_t *imu, TempRegister_t reg){return 0;}

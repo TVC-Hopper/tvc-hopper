@@ -164,7 +164,7 @@ int IMU_WriteGyroReg(IMU_t *imu, GyroRegister_t reg, uint8_t data);
 /* 
  * read data from gyroscope reg
  */
-uint8_t IMU_ReadGyroReg(IMU_t *imu, uint8_t reg);
+uint8_t IMU_ReadGyroReg(IMU_t *imu, GyroRegister_t reg);
 
 //////////////// Magnetometer Functions ////////////////
 
