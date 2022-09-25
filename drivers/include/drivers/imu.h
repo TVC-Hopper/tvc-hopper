@@ -8,28 +8,28 @@
  * set by application
  */
 
-typedef struct IMUcbk {
+typedef struct IMUCallbacks_s {
     
-    int (*onI2Cwrite)(uint16_t addr, uint8_t *bus_data, uint16_t size);
-    int (*onI2Cread)(uint16_t addr, uint8_t *bus_data, uint16_t size);
+    int (*onWrite)(uint16_t addr, uint8_t *bus_data, uint16_t size);
+    int (*onRead)(uint16_t addr, uint8_t *bus_data, uint16_t size);
 
-} IMUcbk_t;
+} IMUCallbacks_t;
 
 /* 
  * Accelerometer specific data
  */
-typedef struct Accelerometer {
-    uint8_t AccelAddr; //accelerometer device addr
+typedef struct Accelerometer_s {
+    uint8_t addr; //accelerometer device addr
     
-    float xComp; 
-    float yComp; 
-    float zComp;
-} Accel_t;
+    float x; 
+    float y; 
+    float z;
+} Accelerometer_t;
 
 /* 
  * Accelerometer register addresses
  */
-typedef enum {
+typedef enum AccelRegister_e {
     ACC_X = 0x00,
     ACC_Y = 0x01,
     ACC_Z = 0x02
@@ -37,23 +37,23 @@ typedef enum {
        .
        .
           */
-} AccReg_t;
+} AccelRegister_t;
 
 /* 
  * Gyroscope specific data
  */
-typedef struct Gyroscope {
-    uint8_t GyroAddr; //gyroscope device addr
+typedef struct Gyroscope_s {
+    uint8_t addr; //gyroscope device addr
 
-    float xComp; 
-    float yComp; 
-    float zComp;
-} Gyro_t;
+    float x; 
+    float y; 
+    float z;
+} Gyroscope_t;
 
 /* 
  * Gyroscope register addresses
  */
-typedef enum {
+typedef enum GyroRegister_e {
     GYR_X = 0x00,
     GYR_Y = 0x01,
     GYR_Z = 0x02
@@ -61,23 +61,23 @@ typedef enum {
        .
        .
           */
-} GyroReg_t;
+} GyroRegister_t;
 
 /* 
  * Magnetometer specific data
  */
-typedef struct Magnetometer {
-    uint8_t MagAddr; //Magnetometer device addr
+typedef struct Magnetometer_s {
+    uint8_t addr; //Magnetometer device addr
     
-    float xComp; 
-    float yComp; 
-    float zCOmp;
-} Mag_t;
+    float x; 
+    float y; 
+    float z;
+} Magnetometer_t;
 
 /* 
  * Magnetomoeter register addresses
  */
-typedef enum {
+typedef enum MagRegister_e {
     MAG_X = 0x00,
     MAG_Y = 0x01,
     MAG_Z = 0x02
@@ -85,42 +85,42 @@ typedef enum {
        .
        .
           */
-} MagReg_t;
+} MagRegister_t;
 
 /* 
  * Temperature Sensor specific data
  */
-typedef struct TempSensor {
-    uint8_t TempSenseAddr; //Temperature sensor device addr
+typedef struct TempSensor_s {
+    uint8_t addr; //Temperature sensor device addr
     
     float degK;
     
-} TempSense_t;
+} TempSensor_t;
 
 /* 
  * Temperature register addresses
  */
-typedef enum {
+typedef enum TempRegister_e {
     TEMP_K = 0x00,
     /* .
        .
        .
           */
-} TempReg_t;
+} TempRegister_t;
 ;
 /* 
  * IMU data
  */
-typedef struct IMU {
+typedef struct IMU_s {
     
     /* Callbacks */
-    IMUcbk_t i2cCallBacks;
+    IMUCallbacks_t callbacks;
     
     /* Sensor Data */
-    Accel_t Acc;
-    Gyro_t Gyro;
-    Mag_t Mag;
-    TempSense_t Tsense;
+    Accelerometer_t accel;
+    Gyroscope_t gyro;
+    Magnetometer_t mag;
+    TempSensor_t tsense;
 
 } IMU_t;
 
@@ -129,7 +129,7 @@ typedef struct IMU {
 /*
  * intialize the IMU
  */
-int IMU_init(IMU_t *imu /* other args TBD */);
+int IMU_Init(IMU_t *imu /* other args TBD */);
 
 
 /////////////// Accelerometer Functions ///////////////
@@ -137,68 +137,68 @@ int IMU_init(IMU_t *imu /* other args TBD */);
 /* 
  * update x,y,z components of acceleration
  */
-void IMU_getAccReading(IMU_t *imu);
+void IMU_GetAccReading(IMU_t *imu);
 
 /* 
  * write data to accelerometer reg
  */
-int IMU_writeAccReg(IMU_t *imu, uint8_t reg, AccReg_t data);
+int IMU_WriteAccReg(IMU_t *imu, AccelRegister_t reg, uint8_t data);
 
 /* 
  * read data from accelerometer reg
  */
-uint8_t IMU_readAccReg(IMU_t *imu, AccReg_t reg);
+uint8_t IMU_ReadAccReg(IMU_t *imu, AccelRegister_t reg);
 
 ///////////////// Gyroscope Functions /////////////////
 
 /* 
  * update x,y,z components of Angular Velocity
  */
-void IMU_getGyroReading(IMU_t *imu);
+void IMU_GetGyroReading(IMU_t *imu);
 
 /* 
  * write data to gyroscope reg
  */
-int IMU_writeGyroReg(IMU_t *imu, uint8_t reg, GyroReg_t data);
+int IMU_WriteGyroReg(IMU_t *imu, GyroRegister_t reg, uint8_t data);
 
 /* 
  * read data from gyroscope reg
  */
-uint8_t IMU_readGyroReg(IMU_t *imu, uint8_t reg);
+uint8_t IMU_ReadGyroReg(IMU_t *imu, uint8_t reg);
 
 //////////////// Magnetometer Functions ////////////////
 
 /* 
  * update x,y,z components of magnetic field
  */
-void IMU_getMagReading(IMU_t *imu);
+void IMU_GetMagReading(IMU_t *imu);
 
 /* 
  * write data to gyroscope reg
  */
-int IMU_writeMagReg(IMU_t *imu, MagReg_t reg, uint8_t data);
+int IMU_WriteMagReg(IMU_t *imu, MagRegister_t reg, uint8_t data);
 
 /* 
  * read data from gyroscope reg
  */
-uint8_t IMU_readMagReg(IMU_t *imu, MagReg_t reg);
+uint8_t IMU_ReadMagReg(IMU_t *imu, MagRegister_t reg);
 
 ///////////// Temperature Sensor Functions //////////////
 
 /* 
  * update x,y,z components of magnetic field
  */
-void IMU_getTempReading(IMU_t *imu);
+void IMU_GetTempReading(IMU_t *imu);
 
 /* 
  * write data to gyroscope reg
  */
-int IMU_writeTempReg(IMU_t *imu, TempReg_t reg, uint8_t data);
+int IMU_WriteTempReg(IMU_t *imu, TempRegister_t reg, uint8_t data);
 
 /* 
  * read data from gyroscope reg
  */
-uint8_t IMU_readTempReg(IMU_t *imu, TempReg_t reg);
+uint8_t IMU_ReadTempReg(IMU_t *imu, TempRegister_t reg);
 
 
 

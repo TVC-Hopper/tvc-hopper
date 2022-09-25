@@ -3,16 +3,16 @@
 
 #include <stdint.h>
 
-typedef struct ServoCbk {
+typedef struct ServoCallbacks_s {
     
-    void (*onPWMwrite)(uint16_t pulseWidth_us);
+    void (*onNewDutyCycle)(uint16_t pulseWidth_us);
 
-} ServoCbk_t;
+} ServoCallbacks_t;
 
 
-typedef struct Servo {
+typedef struct Servo_s {
     
-    ServoCbk_t pwmCbk;
+    ServoCallbacks_t callbacks;
 
     uint16_t lastWrite_us;
     uint8_t lastWrite_deg;
@@ -22,14 +22,14 @@ typedef struct Servo {
 
 } Servo_t;
 
-void ServoInit(Servo_t* Servo, uint16_t pulseWidth0deg_us, uint16_t pulseWidth180deg_us);
+void Servo_Init(Servo_t* Servo, uint16_t pulseWidth0deg_us, uint16_t pulseWidth180deg_us);
 
-uint16_t returnLastWriteDeg(Servo_t *Servo);
+uint16_t Servo_GetLastWriteDeg(Servo_t *Servo);
 
-uint16_t returnLastWriteMicros(Servo_t *Servo);
+uint16_t Servo_GetLastWriteMicros(Servo_t *Servo);
 
-uint16_t writePosDeg(Servo_t *Servo, uint8_t deg);
+uint16_t Servo_WritePosDeg(Servo_t *Servo, uint8_t deg);
 
-uint16_t writePosMicros(Servo_t *Servo, uint16_t micros);
+uint16_t Servo_WritePosMicros(Servo_t *Servo, uint16_t micros);
 
 #endif
