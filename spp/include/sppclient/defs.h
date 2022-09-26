@@ -24,7 +24,7 @@ typedef struct SppClientEngineInitParams_s {
     uint16_t property_count;
     uint16_t property_list_id;
     uint8_t address_length;
-    SppPropertyDefinition_t* properties;
+    const SppPropertyDefinition_t* properties;
     SppClientCallbacks_t callbacks;
     void* instance_data;
 } SppClientEngineInitParams_t;

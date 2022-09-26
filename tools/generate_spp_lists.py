@@ -49,8 +49,8 @@ class PropertyDefinition:
         pid = f"PROP_{self.pname}_ID"
         ptype = f"SPP_PROP_T_{self.ptype}"
         pflags = str(self.pflags)
-        pname = self.pname + "\0"
-        name_length = len(pname)
+        pname = self.pname + "\\0"
+        name_length = len(pname) - 1
 
         return (
             "    {\n"
@@ -60,16 +60,27 @@ class PropertyDefinition:
             "\n"
             f"        .size        = {self.psize},"
             "\n"
-            f"        .flags       = {pflags},"
+            "        .flags       = {"
+            f"{pflags}"
+            "},"
             "\n"
-            f"        .name        = {pname},"
+            f"        .name        = \"{pname}\","
             "\n"
             f"        .name_length = {name_length},"
             "\n"
             "    },\n"
         )
 
-HDR_FRONT = """
+NOTICE = """
+/*
+ * WARNING: AUTO-GENERATED CODE DO NOT MODIFY
+ *
+ *
+ *  To make changes to properties, edit support/prop_list.toml.
+ *  To make changes to the format of this file, edit tools/generate_spp_lists.py
+ */\n\n"""
+
+HDR_FRONT = NOTICE + """
 #ifndef SPP_PROPERTY_LIST_GENERATED_H
 #define SPP_PROPERTY_LIST_GENERATED_H
 
@@ -128,29 +139,30 @@ def generate_table(prop_list):
     header_file = HDR_FRONT
     property_count = len(prop_list)
 
-    for p in prop_list:
-        header_file += f"#define ((uint16_t) PROP_{p.pname}_ID)\n"
 
-    header_file += ("\n\nconst SppPropertyDefinition_t property_list["
-            f"{property_count}"
-            "];\n"
-            )
+
+    header_file += f"#define SPP_PROP_COUNT {property_count}" + "\n\n"
+
+    for p in prop_list:
+        header_file += f"#define PROP_{p.pname}_ID ((uint16_t) {p.pid})" + "\n"
+
+    header_file += ("\n\nconst SppPropertyDefinition_t* SppGetPropertyList();\n\n")
 
     header_file += HDR_END + "\n"
 
 
-    source_file = "#include \"spp_property_list.h\""
+    source_file = NOTICE + "#include \"spp_property_list.h\""
+
 
     source_file += (
-            "\n\nextern const SppPropertyDefinition_t property_list["
-            f"{property_count}"
-            "] = {\n"
+            "\n\nstatic const SppPropertyDefinition_t property_list[SPP_PROP_COUNT] = {\n"
             )
 
     for p in prop_list:
         source_file += str(p)
 
     source_file += "};\n\n\n"
+    source_file += "\n\nextern const SppPropertyDefinition_t* SppGetPropertyList() { return property_list; }\n\n"
 
 
 

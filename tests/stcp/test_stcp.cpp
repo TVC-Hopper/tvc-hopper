@@ -5,24 +5,24 @@
 
 #include <stcp/stcp.h>
 
-extern uint32_t Crc32(uint8_t *buffer, uint16_t length);
+extern uint32_t StcpCrc32(uint8_t *buffer, uint16_t length);
 
 TEST_CASE("crc32", "[stcp]")
 {
     std::string buffer = "hello";
-    REQUIRE(Crc32((uint8_t *)buffer.c_str(), 5) == 907060870);
+    REQUIRE(StcpCrc32((uint8_t *)buffer.c_str(), 5) == 907060870);
     buffer = "testtest";
-    REQUIRE(Crc32((uint8_t *)buffer.c_str(), 8) == 3966352177);
+    REQUIRE(StcpCrc32((uint8_t *)buffer.c_str(), 8) == 3966352177);
     buffer = "\xFA\xFA";
-    REQUIRE(Crc32((uint8_t *)buffer.c_str(), 2) == 4074897610);
+    REQUIRE(StcpCrc32((uint8_t *)buffer.c_str(), 2) == 4074897610);
 }
 
 TEST_CASE("escape1", "[stcp]")
 {
     std::string buffer = "\x7A";
-    std::string correct = "\x7A\x7A";
+    std::string correct = "\x7A\x7B\x7A\x7F\x7F";
     uint16_t size = (uint16_t)buffer.length();
-    uint8_t *output = Escape((uint8_t *)buffer.c_str(), &size);
+    uint8_t *output = StcpEscape((uint8_t *)buffer.c_str(), &size);
 
     REQUIRE(size == correct.length());
 
@@ -35,9 +35,9 @@ TEST_CASE("escape1", "[stcp]")
 TEST_CASE("escape2", "[stcp]")
 {
     std::string buffer = "\x7Ahihello\x7A\x7A";
-    std::string correct = "\x7A\x7Ahihello\x7A\x7A\x7A\x7A";
+    std::string correct = "\x7A\x7B\x7Ahihello\x7B\x7A\x7B\x7A\x7F\x7F";
     uint16_t size = (uint16_t)buffer.length();
-    uint8_t *output = Escape((uint8_t *)buffer.c_str(), &size);
+    uint8_t *output = StcpEscape((uint8_t *)buffer.c_str(), &size);
 
     REQUIRE(size == correct.length());
 
@@ -50,9 +50,9 @@ TEST_CASE("escape2", "[stcp]")
 TEST_CASE("escape3", "[stcp]")
 {
     std::string buffer = "\x7Ahi\x7Ahello\x7A";
-    std::string correct = "\x7A\x7Ahi\x7A\x7Ahello\x7A\x7A";
+    std::string correct = "\x7a\x7B\x7Ahi\x7B\x7Ahello\x7B\x7A\x7F\x7F";
     uint16_t size = (uint16_t)buffer.length();
-    uint8_t *output = Escape((uint8_t *)buffer.c_str(), &size);
+    uint8_t *output = StcpEscape((uint8_t *)buffer.c_str(), &size);
 
     REQUIRE(size == correct.length());
 

@@ -6,42 +6,41 @@ BUILD_FSNOR_DIR=build-release-fsnor
 DEBUG_FSNOR_DIR=build-debug-fsnor
 TEST_BUILD_DIR=build-test
 
+.PHONY:
+generate_spp_headers:
+	python tools/generate_spp_lists.py support/prop_list.toml src/modules/spp_property_list
+
+
 .PHONY: clean
 clean:
 	rm -rf $(BUILD_DIR)
 	rm -rf $(BUILD_FSNOR_DIR)
-	rm -rf $(DEBUG_FSNORE_DIR)
+	rm -rf $(DEBUG_FSNOR_DIR)
 	rm -rf $(DEBUG_DIR)
 	rm -rf $(TEST_BUILD_DIR)
 
-.PHONY: cmakeclean
-cmakeclean:
-	$(MAKE) -C$(BUILD_DIR) clean
-	$(MAKE) -C$(TEST_BUILD_DIR) clean
-
 .PHONY: release
-release:
-	cmake -DCMAKE_TOOLCHAIN_FILE=cmake/toolchain-arm-none-eabi.cmake -DCMAKE_BUILD_TYPE=release -B$(BUILD_DIR)
-	$(MAKE) -C$(BUILD_DIR)
+release: generate_spp_headers
+	cmake -DCMAKE_TOOLCHAIN_FILE=cmake/toolchain-arm-none-eabi.cmake -DCMAKE_BUILD_TYPE=release -B$(BUILD_DIR) -GNinja
+	ninja -C$(BUILD_DIR)
 
-.PHONY: debug
-debug:
-	cmake -DCMAKE_TOOLCHAIN_FILE=cmake/toolchain-arm-none-eabi.cmake -DCMAKE_BUILD_TYPE=debug -B$(DEBUG_DIR)
-	$(MAKE) -C$(DEBUG_DIR)
+debug: generate_spp_headers
+	cmake -DCMAKE_TOOLCHAIN_FILE=cmake/toolchain-arm-none-eabi.cmake -DCMAKE_BUILD_TYPE=debug -B$(DEBUG_DIR) -GNinja
+	ninja -C$(DEBUG_DIR)
 
 .PHONY: flexspi_nor_debug
-flexspi_nor_debug:
-	cmake -DCMAKE_TOOLCHAIN_FILE=cmake/toolchain-arm-none-eabi.cmake -DCMAKE_BUILD_TYPE=flexspi_nor_debug -B$(DEBUG_FSNOR_DIR)
-	$(MAKE) -C$(DEBUG_FSNOR_DIR)
+flexspi_nor_debug: generate_spp_headers
+	cmake -DCMAKE_TOOLCHAIN_FILE=cmake/toolchain-arm-none-eabi.cmake -DCMAKE_BUILD_TYPE=flexspi_nor_debug -B$(DEBUG_FSNOR_DIR) -GNinja
+	ninja -C$(DEBUG_FSNOR_DIR)
 
 .PHONY: flexspi_nor_release
-flexspi_nor_release:
-	cmake -DCMAKE_TOOLCHAIN_FILE=cmake/toolchain-arm-none-eabi.cmake -DCMAKE_BUILD_TYPE=flexspi_nor_release -B$(BUILD_FSNOR_DIR)
-	$(MAKE) -C$(BUILD_FSNOR_DIR)
+flexspi_nor_release: generate_spp_headers
+	cmake -DCMAKE_TOOLCHAIN_FILE=cmake/toolchain-arm-none-eabi.cmake -DCMAKE_BUILD_TYPE=flexspi_nor_release -B$(BUILD_FSNOR_DIR) -GNinja
+	ninja -C$(BUILD_FSNOR_DIR)
 
 
 .PHONY: test
 test:
-	cmake -B$(TEST_BUILD_DIR) -Stests
-	$(MAKE) -C$(TEST_BUILD_DIR)
+	cmake -B$(TEST_BUILD_DIR) -Stests -GNinja
+	ninja -C$(TEST_BUILD_DIR)
 	./${TEST_BUILD_DIR}/tests
