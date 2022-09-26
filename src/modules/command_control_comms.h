@@ -9,7 +9,7 @@
 
 void CommandControlComms_Init();
 
-void CommandControlsComms_Task(void* task_args);
+void CommandControlComms_Task(void* task_args);
 
 
 #endif
