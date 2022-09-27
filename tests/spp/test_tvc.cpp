@@ -196,7 +196,7 @@ static void OnStatusResponse(SPP_STATUS_T status, void* instance_data) {
     // STUB
 }
 
-static void OnStreamResponse(SppStream_t* stream, void* instance_data) {
+static void OnStreamResponse(uint32_t timestamp, SppStream_t* stream, void* instance_data) {
     // STUB
 }
 

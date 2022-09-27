@@ -16,7 +16,7 @@ typedef struct SppHostCallbacks_s {
     SPP_STATUS_T (*SendMessage)(uint8_t* msg, uint16_t len, void* instance_data);
     SPP_STATUS_T (*OnValueResponse)(SppAddress_t *client, uint16_t id, void* value, void* instance_data);
     void (*OnStatusResponse)(SPP_STATUS_T status, void* instance_data);
-    void (*OnStreamResponse)(SppStream_t* stream, void* instance_data);
+    void (*OnStreamResponse)(uint32_t timestamp, SppStream_t* stream, void* instance_data);
 } SppHostCallbacks_t;
 
 typedef struct SppHostEngineInitParams_s {

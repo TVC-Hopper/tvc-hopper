@@ -92,7 +92,7 @@
 
 #define SPP_HOST_ADDRESS_DEFAULT_IDX    0
 
-#define SPP_STREAM_MAX_COUNT            8
+#define SPP_STREAM_MAX_COUNT            16
 
 #define SPP_STATE_READY                     ((uint8_t)0)
 #define SPP_STATE_CONNECTING                ((uint8_t)1)
@@ -147,6 +147,7 @@ typedef struct SppStream_s {
     uint8_t stream_type;
     void* value;
     uint32_t period;
+    uint32_t elapsed_time;
 } SppStream_t;
 
 #ifdef __cplusplus

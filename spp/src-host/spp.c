@@ -270,9 +270,12 @@ SPP_STATUS_T SppHostProcessMessage(SppHostEngine_t* host, uint8_t* message, uint
         uint8_t stream_id = message[body_idx++];
 
         SppStream_t* stream = host->streams[stream_id];
+        uint32_t timestamp;
+        memcpy(&timestamp, message + body_idx, sizeof(timestamp));
+        body_idx += sizeof(timestamp);
         stream->value = &message[body_idx];
 
-        host->callbacks.OnStreamResponse(stream, host->instance_data);
+        host->callbacks.OnStreamResponse(timestamp, stream, host->instance_data);
 
     } else {
         return SPP_STATUS_UNKNOWN_MSG_ID;

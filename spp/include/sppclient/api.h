@@ -19,6 +19,8 @@ void SppClientStart(SppClientEngine_t* client);
 
 SPP_STATUS_T SppClientProcessMessage(SppClientEngine_t* client, uint8_t* message, uint16_t len);
 
+void SppProcessStreams(SppClientEngine_t* client, uint32_t timestamp, uint32_t elapsed_time);
+
 
 #ifdef __cplusplus
 }
