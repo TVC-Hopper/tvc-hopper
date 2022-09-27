@@ -141,6 +141,13 @@ def generate_table(prop_list):
 
 
 
+    host_hdr_file = "#ifndef TELEMETRY_COMMS_SPP_HOST_H\n#define TELEMETRY_COMMS_SPP_HOST_H\n\n#include <stdint.h>\n\n"
+
+    for p in prop_list:
+        host_hdr_file += f"#define PROP_{p.pname}_ID ((uint16_t) {p.pid})" + "\n"
+
+    host_hdr_file += "\n\n#endif"
+
     header_file += f"#define SPP_PROP_COUNT {property_count}" + "\n\n"
 
     for p in prop_list:
@@ -166,25 +173,25 @@ def generate_table(prop_list):
 
 
 
-    return source_file, header_file
+    return source_file, header_file, host_hdr_file
 
 
-def write_header(source, header, destination):
-    with open(destination + ".c", "w+") as f:
-        f.write(source)
-
-    with open(destination + ".h", "w+") as f:
-        f.write(header)
+def write_file(file, destination):
+    with open(destination, "w+") as f:
+        f.write(file)
 
 
 if __name__ == "__main__":
     if len(sys.argv) < 3:
-        print("Usage: generate_spp_lists.py <source> <destination>")
+        print("Usage: generate_spp_lists.py <source> <client destination> <host destination>")
 
     source_toml = sys.argv[1]
-    destination = sys.argv[2]
+    client_dest = sys.argv[2]
+    host_dest = sys.argv[3]
     prop_list = read_properties(source_toml)
-    source, header = generate_table(prop_list)
-    write_header(source, header, destination)
+    source, header, host_hdr = generate_table(prop_list)
+    write_file(source, client_dest + ".c")
+    write_file(header, client_dest + ".h")
+    write_file(host_hdr, host_dest + ".h")
     
 
