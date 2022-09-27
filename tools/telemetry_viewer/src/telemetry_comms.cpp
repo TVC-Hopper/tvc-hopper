@@ -12,6 +12,8 @@
 #include "rs232.h"
 
 TelemetryComms* TelemetryComms::instance_ = nullptr;
+uint8_t default_addr = 0x0;
+SppAddress_t default_client{ &default_addr };
 
 static bool areAddressesEqual(SppAddress_t* a, SppAddress_t* b, void* instance_data);
 static StcpStatus_t handleStcpPacket(void* bytes, uint16_t len, void* instance_data);
@@ -19,17 +21,57 @@ static SPP_STATUS_T sendSPPPacket(uint8_t *bytes, uint16_t len, void* instance_d
 static StcpStatus_t sendStcpPacket(void *bytes, uint16_t len, void* instance_data);
 static SPP_STATUS_T onValueResponse(SppAddress_t *client, uint16_t id, void* value, void* instance_data);
 static void onStatusResponse(SPP_STATUS_T status, void* instance_data);
-static void onStreamResponse(SppStream_t* stream, void* instance_data);
+static void onStreamResponse(uint32_t timestamp, SppStream_t* stream, void* instance_data);
 static void onIncomingMsg(const std::string &clientIP, const char * msg, size_t size);
 static void onClientDisconnected(const std::string &ip, const std::string &msg);
 
 void onIncomingMsg(const std::string &clientIP, const char * msg, size_t size) {
-    std::string msgStr = msg;
-    std::cout << "listener got client msg: " << msgStr << "\n";
+    SppHostEngine_t* spp = TelemetryComms::getInstance()->getSpp();
+    std::string msg_str = msg;
+    size_t cmd_end = msg_str.find('/');
+    std::string cmd = msg_str.substr(0, cmd_end);
+    std::string body = msg_str.substr(cmd_end + 1, msg_str.length());
+    int id_end = body.find('/');
+    std::string id_str = body.substr(0, id_end);
+    uint16_t id = std::stoi(id_str);
+
+    if (cmd == "str") {
+        uint16_t period = std::stoi(body.substr(id_end + 1, body.length()));
+        std::cout << "stream request " << id << " " << period << std::endl;
+        SppStream_t* s = TelemetryComms::getInstance()->getNextStream();
+        SppHostStartStream(spp, &default_client, id, period, SPP_STREAM_READ, s);
+    } else if (cmd == "get") {
+        std::cout << "get request " << id << std::endl;
+        SppHostGetValue(spp, &default_client, id);
+    } else if (cmd == "set") {
+        std::string value_str = body.substr(id_end + 1, body.length());
+        std::cout << "set request " << id << " " << value_str << std::endl;
+        SppPropertyDefinition_t *def;
+        SppHostGetDefinition(spp, &default_client, id, &def);
+
+        uint8_t value[def->size];
+
+        if (def->type == SPP_PROP_T_BOOL) {
+            value[0] = std::stoi(value_str);
+        } else if (def->type == SPP_PROP_T_U32) {
+            uint32_t value_tmp = std::stoul(value_str);
+            memcpy(value, &value_tmp, sizeof(value_tmp));
+        } else if (def->type == SPP_PROP_T_I32) {
+            int32_t value_tmp = std::stoi(value_str);
+            memcpy(value, &value_tmp, sizeof(value_tmp));
+        }
+            
+        
+        SppHostSetValue(spp, &default_client, id, value);
+    }
 }
 
 void onClientDisconnected(const std::string &ip, const std::string &msg) {
     std::cout << "Client: " << ip << " disconnected. Reason: " << msg << "\n";
+}
+
+SppStream_t* TelemetryComms::getNextStream() {
+    return &streams_[stream_count_++];
 }
 
 void TelemetryComms::acceptClient() {
@@ -77,7 +119,7 @@ void onStatusResponse(SPP_STATUS_T status, void* instance_data) {
     // STUB
 }
 
-void onStreamResponse(SppStream_t* stream, void* instance_data) {
+void onStreamResponse(uint32_t timestamp, SppStream_t* stream, void* instance_data) {
     // STUB
 }
 

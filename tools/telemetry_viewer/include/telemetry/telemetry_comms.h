@@ -20,6 +20,8 @@ public:
     SppHostEngine_t* getSpp();
     StcpEngine_t* getStcp();
 
+    SppStream_t* getNextStream();
+
 private:
     void acceptClient();
 
@@ -36,6 +38,8 @@ private:
     const uint8_t address_raw = 0x0;
     SppPropertyDefinition_t prop_defs_buffer[BUFFER_SIZE];
     uint8_t address_buffer[SPP_CONNECTIONS_MAX];
+    SppStream_t streams_[SPP_STREAM_MAX_COUNT];
+    size_t stream_count_{0};
 
     int comport_;
     int baud_;
