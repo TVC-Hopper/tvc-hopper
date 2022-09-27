@@ -17,6 +17,15 @@ write(t, packet)
 packet = "set/0/1";
 write(t, packet)
 
+% get value
+% get/id
+packet = "val/0";
+write(t, packet)
+
+pause(1);
+read(t)
+
+
 % close connection
 clear t
 

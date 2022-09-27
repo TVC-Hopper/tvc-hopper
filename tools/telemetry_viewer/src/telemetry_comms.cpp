@@ -2,6 +2,7 @@
 
 #include <stdint.h>
 #include <iostream>
+#include <sstream>
 
 
 #include <spphost/defs.h>
@@ -43,6 +44,25 @@ void onIncomingMsg(const std::string &clientIP, const char * msg, size_t size) {
     } else if (cmd == "get") {
         std::cout << "get request " << id << std::endl;
         SppHostGetValue(spp, &default_client, id);
+    } else if (cmd =="val") {
+        std::cout << "value request " << id << std::endl;
+        PropValue* value = TelemetryComms::getInstance()->getValue(id);
+        std::ostringstream oss;
+
+        if (value->def->type == SPP_PROP_T_BOOL) {
+            oss << *((bool*)value->buffer.get());
+        } else if (value->def->type == SPP_PROP_T_U32) {
+            oss << *((uint32_t*)value->buffer.get());
+        } else if (value->def->type == SPP_PROP_T_I32) {
+            oss << *((int32_t*)value->buffer.get());
+        } else if (value->def->type == SPP_PROP_T_I16) {
+            oss << *((uint16_t*)value->buffer.get());
+        } else if (value->def->type == SPP_PROP_T_I16) {
+            oss << *((int16_t*)value->buffer.get());
+        }
+        
+        std::string response = "val/" + oss.str();
+        TelemetryComms::getInstance()->getServer()->sendToAllClients(response.c_str(), response.length());
     } else if (cmd == "set") {
         std::string value_str = body.substr(id_end + 1, body.length());
         std::cout << "set request " << id << " " << value_str << std::endl;
@@ -70,8 +90,16 @@ void onClientDisconnected(const std::string &ip, const std::string &msg) {
     std::cout << "Client: " << ip << " disconnected. Reason: " << msg << "\n";
 }
 
+TcpServer* TelemetryComms::getServer() {
+    return &server_;
+}
+
 SppStream_t* TelemetryComms::getNextStream() {
     return &streams_[stream_count_++];
+}
+
+PropValue* TelemetryComms::getValue(uint16_t id) {
+    return &prop_values_[id];
 }
 
 void TelemetryComms::acceptClient() {

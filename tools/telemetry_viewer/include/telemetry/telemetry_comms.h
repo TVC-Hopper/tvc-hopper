@@ -5,8 +5,15 @@
 #include <spphost/api.h>
 #include <stcp/stcp.h>
 
+#include <unordered_map>
+
 #include "tcp_server.h"
 #include "rs232.h"
+
+struct PropValue {
+    SppPropertyDefinition_t* def;
+    std::unique_ptr<uint8_t> buffer;
+};
 
 
 class TelemetryComms {
@@ -19,8 +26,10 @@ public:
 
     SppHostEngine_t* getSpp();
     StcpEngine_t* getStcp();
+    TcpServer* getServer();
 
     SppStream_t* getNextStream();
+    PropValue* getValue(uint16_t id);
 
 private:
     void acceptClient();
@@ -33,6 +42,8 @@ private:
 
     TcpServer server_;
     server_observer_t listener_;
+
+    std::unordered_map<uint16_t, PropValue> prop_values_;
 
     static const int BUFFER_SIZE = 100;
     const uint8_t address_raw = 0x0;
