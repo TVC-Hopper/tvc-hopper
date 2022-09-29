@@ -11,6 +11,7 @@
 
 /**
  * @brief Servo Initialization parameters
+ *  onNewDutyCycle : ptr to PWM callback
  *  pulseWidth0deg_us : pulsewidth in microseconds corresponding to 0 deg
  *  pulseWidth180deg_us : pulsewidth in microseconds corresponding to 180 deg
  *  deadband : half deadband width
@@ -18,7 +19,7 @@
  *  applyDB : apply deadband compensation
  */
 typedef struct ServoInit{
-
+    void (*onNewDutyCycle)(uint32_t);
     uint32_t pulseWidth0deg_us;
     uint32_t pulseWidth180deg_us;
     uint8_t deadband;
@@ -31,7 +32,7 @@ typedef struct ServoInit{
  * @brief Servo callbacks
  * onNewDutyCycle : set pulsewidth in microseconds
  */
-typedef struct ServoCallbacks_s {
+typedef struct ServoCallbacks {
 
     void (*onNewDutyCycle)(uint32_t pulseWidth_us);
 

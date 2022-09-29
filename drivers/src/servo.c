@@ -5,6 +5,7 @@
 
 uint8_t Servo_Init(Servo_t* Servo, ServoInit_t* ServoInit){
     if (ServoInit->pulseWidth0deg_us < ServoInit->pulseWidth180deg_us) {return BAD_MIN_MAX_THRESH;}
+    Servo->callbacks.onNewDutyCycle = ServoInit->onNewDutyCycle;
     float width = ServoInit->pulseWidth0deg_us - ServoInit->pulseWidth180deg_us;
     Servo->pulseWidthMin_us = ServoInit->pulseWidth0deg_us;
     Servo->pulseWidthMax_us = ServoInit->pulseWidth180deg_us;
