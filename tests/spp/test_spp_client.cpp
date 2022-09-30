@@ -17,33 +17,41 @@ static uint16_t prop_1_value = 10;
 static float prop_2_value = 11.1;
 static uint16_t prop_3_value[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 static SppPropertyDefinition_t plist[3] = {
     {
-        .id = SPP_PROP_1_ID,
-        .type = SPP_PROP_T_U16,
-        .size = sizeof(uint16_t),
-        .flags = SPP_FLAG_READABLE | SPP_FLAG_WRITEABLE,
-        .name = "Prop_1\0",
-        .name_length = 7,
+        SPP_PROP_1_ID,
+        SPP_PROP_T_U16,
+        sizeof(uint16_t),
+        {SPP_FLAG_READABLE | SPP_FLAG_WRITEABLE},
+        "Prop_1\0",
+        7,
     },
     {
-        .id = SPP_PROP_2_ID,
-        .type = SPP_PROP_T_FLOAT,
-        .size = sizeof(float),
-        .flags = SPP_FLAG_READABLE | SPP_FLAG_WRITEABLE,
-        .name = "Prop_2\0",
-        .name_length = 7,
+        SPP_PROP_2_ID,
+        SPP_PROP_T_FLOAT,
+        sizeof(float),
+        {SPP_FLAG_READABLE | SPP_FLAG_WRITEABLE},
+        "Prop_2\0",
+        7,
     },
     {
-        .id = SPP_PROP_3_ID,
-        .type = SPP_PROP_T_ARR,
-        .size = 10 * sizeof(uint16_t),
-        .flags = SPP_FLAG_READABLE | SPP_FLAG_WRITEABLE,
-        .name = "Prop_3\0",
-        .name_length = 7,
+        SPP_PROP_3_ID,
+        SPP_PROP_T_ARR,
+        10 * sizeof(uint16_t),
+        {SPP_FLAG_READABLE | SPP_FLAG_WRITEABLE},
+        "Prop_3\0",
+        7,
     },
 };
 
+#ifdef __cplusplus
+}
+#endif
 
 static SPP_STATUS_T SetValue(uint16_t id, void* value, void* instance_data) {
     switch (id) {

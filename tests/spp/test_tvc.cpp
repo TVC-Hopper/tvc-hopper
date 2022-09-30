@@ -19,33 +19,41 @@ static bool start = false;
 static bool stop = false;
 static uint32_t telem[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 static SppPropertyDefinition_t plist[3] = {
     {
-        .id = SPP_PROP_START_ID,
-        .type = SPP_PROP_T_BOOL,
-        .size = sizeof(stop),
-        .flags = SPP_FLAG_READABLE | SPP_FLAG_WRITEABLE,
-        .name = "start\0",
-        .name_length = 6,
+        SPP_PROP_START_ID,
+        SPP_PROP_T_BOOL,
+        sizeof(stop),
+        {SPP_FLAG_READABLE | SPP_FLAG_WRITEABLE},
+        "start\0",
+        6,
     },
     {
-        .id = SPP_PROP_STOP_ID,
-        .type = SPP_PROP_T_BOOL,
-        .size = sizeof(start),
-        .flags = SPP_FLAG_READABLE | SPP_FLAG_WRITEABLE,
-        .name = "stop\0",
-        .name_length = 5,
+        SPP_PROP_STOP_ID,
+        SPP_PROP_T_BOOL,
+        sizeof(start),
+        {SPP_FLAG_READABLE | SPP_FLAG_WRITEABLE},
+        "stop\0",
+        5,
     },
     {
-        .id = SPP_PROP_TELEM_ID,
-        .type = SPP_PROP_T_ARR,
-        .size = 10 * sizeof(uint32_t),
-        .flags = SPP_FLAG_READABLE,
-        .name = "t\0",
-        .name_length = 2,
+        SPP_PROP_TELEM_ID,
+        SPP_PROP_T_ARR,
+        10 * sizeof(uint32_t),
+        SPP_FLAG_READABLE,
+        "t\0",
+        2,
     },
 };
 
+#ifdef __cplusplus
+}
+#endif
 
 static SPP_STATUS_T SetValue(uint16_t id, void* value, void* instance_data) {
     switch (id) {
