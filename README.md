@@ -34,7 +34,7 @@ make clean
 make debug
 
 # release build
-make build
+make release 
 
 # flexspi nor debug build
 make flexspi_nor_debug
