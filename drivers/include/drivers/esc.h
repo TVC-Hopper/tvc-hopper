@@ -10,9 +10,7 @@
  * onNewDutyCycle : set pulsewidth in microseconds
  */
 typedef struct EscCallbacks {
-
   void (*onNewDutyCycle)(uint32_t pulseWidth_us);
-
 } EscCallbacks_t;
 
 /**
@@ -25,14 +23,12 @@ typedef struct EscCallbacks {
  * curLUTidx : current idx in Lut
  */
 typedef struct Esc{
-  
   EscCallbacks_t callbacks;
   uint32_t currentDutyCycle_us;
   uint32_t pwmPeriod_us;
   uint32_t linearizationLUT[SIZE_LUT];
   float motorStartDutyCycle;
   uint16_t curLUTidx;
-
 }Esc_t;
 
 /**
@@ -49,7 +45,7 @@ void Esc_init(Esc_t* Esc, uint8_t motorStartDutyCycle, void (*onNewDutyCycle)(ui
  * @brief write duty cycle of motor
  * 
  * @param Esc ptr to Esc_t object
- * @param dutyCycle duty cycle in percent must be between 0 and 1.0
+ * @param dutyCycle duty cycle in percent, must be between 0 and 1.0
  */
 void Esc_writeDutyCycle(Esc_t* Esc, float dutyCycle);
 
@@ -62,7 +58,7 @@ void Esc_writeDutyCycle(Esc_t* Esc, float dutyCycle);
 void Esc_writeDutyCycle_us(Esc_t* Esc, uint32_t dutyCycle_us);
 
 /**
- * @brief populate Lut with 
+ * @brief populate Lut with values in arr
  * 
  * @param Esc ptr to Esc_t object
  * @param arr array containg desired lut valuse in micros
@@ -119,7 +115,7 @@ uint16_t Esc_decLutIdx(Esc_t* Esc);
 uint16_t  Esc_setLutIdx(Esc_t* Esc, uint16_t idx);
 
 /**
- * @brief sets centry at cur lut idx to current Duty Cycle
+ * @brief sets entry at cur lut idx to current Duty Cycle
  * 
  * @param Esc ptr to Esc_t object
  */
@@ -141,7 +137,7 @@ void Esc_resetLutIdx(Esc_t* Esc);
 uint32_t Esc_getCurLutEntry(Esc_t* Esc);
 
 /**
- * @brief increments cur lut idx by step and write DutyCycle entry at that idx
+ * @brief increments cur lut idx by step, and writes DutyCycle entry at that idx
  * 
  * @param Esc ptr to Esc_t object
  * @param step num lut entries by which to increase
