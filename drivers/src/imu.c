@@ -188,8 +188,8 @@ void _IMU_GyroInit(IMU_t* imu, GyroInit_t* gyro){
 #define WRITE_REG_MSG_LEN 2
 
 //initialize gyroscope driver object
-uint8_t IMU_init(IMU_t* imu, AccelInit_t* accInit, GyroInit_t* gyroInit, SD01State_t sd01){
-  if (sd01 == SDO1_HIGH){
+uint8_t IMU_init(IMU_t* imu, AccelInit_t* accInit, GyroInit_t* gyroInit, IMUinit_t* imuInit){
+  if (imuInit->sd01 == SDO1_HIGH){
     imu->Acc.devAddr = 0x19;
     imu->Gyro.devAddr = 0x69;
   }
@@ -197,6 +197,9 @@ uint8_t IMU_init(IMU_t* imu, AccelInit_t* accInit, GyroInit_t* gyroInit, SD01Sta
     imu->Acc.devAddr = 0x18;
     imu->Gyro.devAddr = 0x68;
   }
+  imu->Callbacks.onDelay_us = imuInit->onDelay_us;
+  imu->Callbacks.onI2Cwrite = imuInit->onI2Cwrite;
+  imu->Callbacks.onI2Cread = imuInit->onI2Cread;
 
   imu->Callbacks.onDelay_us(30000);
   IMU_powerUpAcc(imu);

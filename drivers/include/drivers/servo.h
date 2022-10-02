@@ -48,7 +48,7 @@ typedef struct ServoCallbacks {
  *  writeMicros : function pointer to microsecond write method
  *                write with or without deadband compensation
  */
-typedef struct Servo_s {
+typedef struct Servo {
     ServoCallbacks_t callbacks;
 
     uint32_t lastWrite_us;
@@ -61,7 +61,7 @@ typedef struct Servo_s {
     float degToMicros;
     float microsToDeg;
 
-    uint32_t (*writeMicros)(Servo_t* Servo, uint32_t micros);
+    bool applyDB;
 } Servo_t;
 
 /**
@@ -120,14 +120,7 @@ uint32_t applyDeadband(Servo_t* Servo, uint32_t micros);
  * @param Servo ptr to object of type Servo_t
  * @param micros position commanded in microseconds
  */
-void Servo_WriteMicrosDB(Servo_t* Servo, uint32_t micros);
+void Servo_WriteMicros(Servo_t* Servo, uint32_t micros);
 
-/**
- * @brief write new position without deadband compensation
- * 
- * @param Servo ptr to object of type Servo_t
- * @param micros position commanded in microseconds
- */
-void Servo_WriteMicrosNoDB(Servo_t* Servo, uint32_t micros);
 
 #endif

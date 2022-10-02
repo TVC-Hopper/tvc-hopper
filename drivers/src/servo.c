@@ -4,17 +4,25 @@
 #include <stdbool.h>
 
 uint8_t Servo_Init(Servo_t* Servo, ServoInit_t* ServoInit){
+    float width = 0;
+    
     if (ServoInit->pulseWidth0deg_us < ServoInit->pulseWidth180deg_us) {return BAD_MIN_MAX_THRESH;}
+    else {}
+    
     Servo->callbacks.onNewDutyCycle = ServoInit->onNewDutyCycle;
-    float width = ServoInit->pulseWidth0deg_us - ServoInit->pulseWidth180deg_us;
+    
+    width = ServoInit->pulseWidth0deg_us - ServoInit->pulseWidth180deg_us;
+    
     Servo->pulseWidthMin_us = ServoInit->pulseWidth0deg_us;
     Servo->pulseWidthMax_us = ServoInit->pulseWidth180deg_us;
     Servo->degToMicros = width / DEGREES_MAX;
     Servo->microsToDeg = 1 / Servo->degToMicros;
-    if (ServoInit->applyDB){Servo->writeMicros = &Servo_WriteMicrosDB;}
-    else {Servo->writeMicros = &Servo_WriteMicrosNoDB;}
+    
+    if (ServoInit->applyDB){Servo->applyDB = true;}
+    else {Servo->applyDB =  false;}
+    
     Servo_WritePosDeg(Servo, ServoInit->posStart_deg);
-
+    return 0;
 }
 
 uint8_t Servo_GetLastWriteDeg(Servo_t* Servo){return Servo->lastWrite_deg;}
@@ -48,7 +56,7 @@ void Servo_WritePosDeg(Servo_t *Servo, uint8_t deg){
     else {micros = Servo->pulseWidthMin_us + Servo->degToMicros * deg;}
     Servo->lastWrite_deg = deg;
     Servo->lastWrite_us = micros;
-    Servo->writeMicros(Servo, micros);
+    Servo_WriteMicros(Servo, micros);
 }
 
 void Servo_WritePosMicros(Servo_t *Servo, uint32_t micros){
@@ -63,15 +71,13 @@ void Servo_WritePosMicros(Servo_t *Servo, uint32_t micros){
     else {micros = Servo->microsToDeg * micros;}
     Servo->lastWrite_deg = micros * Servo->microsToDeg;
     Servo->lastWrite_us = micros;
-    Servo->writeMicros(Servo, micros);
+    Servo_WriteMicros(Servo, micros);
 }
 
 
-void Servo_WriteMicrosDB(Servo_t* Servo, uint32_t micros){
-    micros = applyDeadband(Servo, micros);
-    Servo->callbacks.onNewDutyCycle(micros);
-}
-
-void Servo_WriteMicrosNoDB(Servo_t* Servo, uint32_t micros){
+void Servo_WriteMicros(Servo_t* Servo, uint32_t micros){
+    if (Servo->applyDB){
+        micros = applyDeadband(Servo, micros);
+    }
     Servo->callbacks.onNewDutyCycle(micros);
 }

@@ -4,7 +4,57 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+/**************************************************************/
+/* accelerometer and gyroscope interrupt configuration params */
+/**************************************************************/
 
+/**
+ * @brief imu interrupt pin configuration parameters
+ *        set pin as push-pull or open drain
+ */
+typedef enum{
+  PUSH_PULL, 
+  OPEN_DRAIN
+} IntPpOd_t;
+
+/**
+ * @brief imu interrupt pin configuration parameters
+ *        configure pin as active high or active low
+ */
+typedef enum{
+  ACT_HIGH, 
+  ACT_LOW
+} IntLvl_t;
+
+/**
+ * @brief accelerometer interrupt pin select
+ */
+typedef enum{
+  INT1 = 0x04, 
+  INT2 = 0x40
+} AccIntPins_t;
+
+/**
+ * @brief gyroscope interrupt pin select
+ */
+typedef enum{
+  INT3 = 0x01, 
+  INT4 = 0x80
+} GyroIntPins_t;
+
+/**
+ * @brief interrupt pin initialization parameters
+ * IntPin : desired interrupt pin
+ * pin : set pin as input
+ * PpOd : set pin as push pull or open drain
+ * activeLvl : set active logic level of pin
+ */
+typedef struct IntInit{
+  uint8_t IntPin;
+  bool pinIsInput;
+  uint8_t PpOd;
+  uint8_t activeLvl;
+} IntInit_t;
 /*********************************************************/
 /* accelerometer device object and associated parameters */
 /*********************************************************/
@@ -198,9 +248,9 @@ typedef enum {
     FIFO_WM_EN        = 0x1E,
     FIFO_EXT_INT_S    = 0x34,
     GYRO_SELF_TEST    = 0x3C,
-    FIFO_CONFIG_0     = 0x3D,
-    FIFO_CONFIG_1     = 0x3E,
-    FIFO_DATA         = 0x3F
+    FIFO_CONFIG_0_G   = 0x3D,
+    FIFO_CONFIG_1_G   = 0x3E,
+    FIFO_DATA_G       = 0x3F
 } GyroReg_t;
 
 #define GYRO_INT_IO_CONF_MASK  0b00001111
@@ -209,57 +259,7 @@ typedef enum {
 #define GYRO_TEST_READY_MASK   0b00000010
 #define GYRO_TEST_STATUS_MASK  0b00010000
 
-/**************************************************************/
-/* accelerometer and gyroscope interrupt configuration params */
-/**************************************************************/
 
-/**
- * @brief imu interrupt pin configuration parameters
- *        set pin as push-pull or open drain
- */
-typedef enum{
-  PUSH_PULL, 
-  OPEN_DRAIN
-} IntPpOd_t;
-
-/**
- * @brief imu interrupt pin configuration parameters
- *        configure pin as active high or active low
- */
-typedef enum{
-  ACT_HIGH, 
-  ACT_LOW
-} IntLvl_t;
-
-/**
- * @brief accelerometer interrupt pin select
- */
-typedef enum{
-  INT1 = 0x04, 
-  INT2 = 0x40
-} AccIntPins_t;
-
-/**
- * @brief gyroscope interrupt pin select
- */
-typedef enum{
-  INT3 = 0x01, 
-  INT4 = 0x80
-} GyroIntPins_t;
-
-/**
- * @brief interrupt pin initialization parameters
- * IntPin : desired interrupt pin
- * pin : set pin as input
- * PpOd : set pin as push pull or open drain
- * activeLvl : set active logic level of pin
- */
-typedef struct IntInit{
-  uint8_t IntPin;
-  bool pinIsInput;
-  uint8_t PpOd;
-  uint8_t activeLvl;
-} IntInit_t;
 
 /*************************************/
 /* IMU driver object data parameters */
@@ -315,6 +315,20 @@ typedef enum {
     SDO1_LOW  = 0,
     SDO1_HIGH
 } SD01State_t;
+
+/**
+ * @brief structure to initialize i2c addresses and callbacks
+ * sd01 : sd01 pin state
+ * onDelay_us : ptr to delay callback
+ * onI2Cwrite : ptr to i2c write callback
+ * onI2Cread : ptr to i2c read callback
+ */
+typedef struct IMUinit{
+  SD01State_t sd01;
+  void (*onDelay_us)(uint32_t micros);
+  uint8_t (*onI2Cwrite)(uint8_t devAddr, uint8_t *bus_data, uint16_t size);
+  uint8_t (*onI2Cread)(uint8_t devAddr, uint8_t *bus_data, uint16_t size);
+}IMUinit_t;
 
 /**
  * @brief IMU driver object
@@ -522,10 +536,10 @@ void _IMU_GyroInit(IMU_t* imu, GyroInit_t* gyroInit);
  * @param imu ptr to object of type IMU_t
  * @param Acc structure containing accelerometer initialization params
  * @param gyro structure containing gyroscope initialization params
- * @param sd01 sd01 pin state (determines accelerometer and gyroscope device address)
+ * @param Imuinit structure containing callbacks and sd01 pin state
  * @return error code, 0 if success, see gyro and acc error funcs for non zero bit meanings
  */
-uint8_t IMU_init(IMU_t* imu, AccelInit_t* Acc, GyroInit_t* gyro, SD01State_t sd01);
+uint8_t IMU_init(IMU_t* imu, AccelInit_t* Acc, GyroInit_t* gyro, IMUinit_t* imuInit);
 
 /**
  * @brief convert raw data measurement to LSBs
