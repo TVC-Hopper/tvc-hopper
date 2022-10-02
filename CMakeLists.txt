@@ -35,7 +35,7 @@ target_include_directories(${PROJECT_NAME}.elf
 
         fslhal/include/fslhal
         device
-        cmsis
+        CMSIS
         stcp/include
         spp/include
 
