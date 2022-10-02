@@ -13,6 +13,12 @@ but also with custom tools, build needs, flashing, and testing.
 - `arm-none-eabi-gcc` (>=10.3.1)
 - MCUXpresso Config Tools v12
 - `catch2` (v3)
+    ```
+    $ git clone https://github.com/catchorg/Catch2.git
+    $ cd Catch2
+    $ cmake -Bbuild -H. -DBUILD_TESTING=OFF
+    $ sudo cmake --build build/ --target install
+    ```
 - `ninja` (`sudo apt install ninja-build`)
 
 For Windows users, it is recommended to set up WSL for this toolchain.
