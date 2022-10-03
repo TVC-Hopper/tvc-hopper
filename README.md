@@ -12,6 +12,7 @@ but also with custom tools, build needs, flashing, and testing.
 - `cmake` (>=3.17)
 - `arm-none-eabi-gcc` (>=10.3.1)
 - MCUXpresso Config Tools v12
+- MCUXpresso IDE
 - `catch2` (v3)
     ```
     $ git clone https://github.com/catchorg/Catch2.git
@@ -19,9 +20,26 @@ but also with custom tools, build needs, flashing, and testing.
     $ cmake -Bbuild -H. -DBUILD_TESTING=OFF
     $ sudo cmake --build build/ --target install
     ```
-- `ninja` (`sudo apt install ninja-build`)
+- `ninja` (`sudo apt install ninja-build` or `pip install ninja`)
 
 For Windows users, it is recommended to set up WSL for this toolchain.
+
+### Programming and Debugging
+
+#### Debugging
+
+Currently, only the debug target is supported for the development board. Hopefully adding other support later.
+
+To debug, use MCUXpresso IDE to open the project located at `support/tvc_ide_build` and use the `tvc_debug` target.
+This target should be configured with the relative path to `build-debug/hopper.elf` if the project is cloned using git.
+Build the project using the regular command line interface (`make debug`) to generate `hopper.elf`.
+Debug as normal using the IDE's GDB interface.
+
+This will be the normal method of debugging and testing you'll use on the System on a Board.
+
+#### Programming Flight Controller
+
+TBD. This may be difficult to get working.
 
 ### Build targets
 
@@ -89,7 +107,7 @@ to connect the incoming data with the appropriate packet parser.
 
 ## License
 
-TBD
+Some parts under MIT, some under GPLv3.
 
 ## Testing
 
