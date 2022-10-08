@@ -138,7 +138,8 @@ SPP_STATUS_T SppClientProcessMessage(SppClientEngine_t* client, uint8_t* message
         SppPropertyDefinition_t *pd;
         SppGetDefinition(client, id, &pd);
 
-        uint16_t get_resp_msg_len = SPP_MSG_HDR_SIZE(addr_len) + pd->size;
+        // +5 for token. status, size, id (2)
+        uint16_t get_resp_msg_len = SPP_MSG_HDR_SIZE(addr_len) + pd->size + SPP_MSG_GET_RESPONSE_BASE_SIZE;
         uint8_t get_resp_msg[get_resp_msg_len];
         body_idx = SppFillMessageHeader(addr_len, get_resp_msg, &client->host_address, &client->client_address, SPP_MSG_GET_RESPONSE_ID);
         get_resp_msg[body_idx++] = token;

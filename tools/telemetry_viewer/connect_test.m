@@ -7,6 +7,15 @@ t = tcpclient("127.0.0.1", 65123);
 packet = "get/0";
 write(t, packet)
 
+packet = "get/1";
+write(t, packet)
+
+packet = "get/2";
+write(t, packet)
+
+packet = "get/3";
+write(t, packet)
+
 % stream request
 % str/id/period
 % packet = "str/0/50";

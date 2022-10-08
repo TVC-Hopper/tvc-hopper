@@ -26,7 +26,7 @@
 #define SPP_MSG_GET_REQUEST_ID              ((uint8_t)0xB0)
 #define SPP_MSG_GET_REQUEST_SIZE            (3)
 #define SPP_MSG_GET_RESPONSE_ID             ((uint8_t)0xB1)
-#define SPP_MSG_GET_RESPONSE_BASE_SIZE      (3)
+#define SPP_MSG_GET_RESPONSE_BASE_SIZE      (5)
 #define SPP_MSG_SET_REQUEST_ID              ((uint8_t)0xB2)
 #define SPP_MSG_SET_REQUEST_BASE_SIZE       (4)
 #define SPP_MSG_SET_RESPONSE_ID             ((uint8_t)0xB3)

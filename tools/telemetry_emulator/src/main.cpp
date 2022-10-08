@@ -47,7 +47,7 @@ static SppAddress_t address = { &addr_raw };
 static bool prop_start = false;
 static bool prop_stop = false;
 static uint32_t prop_status = 0;
-static uint8_t prop_telem[10] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+static uint8_t prop_telem[10] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j'};
 
 
 int main() {
@@ -96,6 +96,7 @@ int main() {
 static void onIncomingMsg(const uint8_t * msg, size_t size) {
     std::cout << "got response" << std::endl;
     for (int i = 0; i < size; ++i) printf("\\x%.2x", msg[i]);
+    std::cout << std::endl;
     StcpHandleMessage(&stcp, (uint8_t*)msg, size);
 }
 
@@ -211,22 +212,23 @@ static SPP_STATUS_T GetValue(uint16_t id, void* value, void* instance_data) {
     switch(id) {
         case PROP_start_ID:
         {
-            memcpy(value, &prop_start, sizeof(bool));
+            memcpy(value, &prop_start, sizeof(prop_start));
             break;
         }
         case PROP_stop_ID:
         {
-            memcpy(value, &prop_stop, sizeof(bool));
+            memcpy(value, &prop_stop, sizeof(prop_stop));
             break;
         }
         case PROP_status_ID:
         {
-            memcpy(value, &prop_status, sizeof(uint32_t));
+            memcpy(value, &prop_status, sizeof(prop_status));
             break;
         }
         case PROP_telemetry_ID:
         {
-            memcpy(value, prop_telem, 10);
+            std::cout << sizeof(prop_telem) << std::endl;
+            memcpy(value, prop_telem, sizeof(prop_telem));
             break;
         }
         default:
@@ -245,8 +247,12 @@ static StcpStatus_t HandleStcpPacket(void* buffer, uint16_t length, void* instan
 }
 
 static SPP_STATUS_T SppSendPacket(uint8_t* bytes, uint16_t len, void* instance_data) {
-   StcpWrite(&stcp, bytes, len);
 
-   return SPP_STATUS_OK;
+    for (int i = 0; i < len; ++i) printf("\\x%.2x", bytes[i]);
+    std::cout << std::endl;
+    
+    StcpWrite(&stcp, bytes, len);
+
+    return SPP_STATUS_OK;
 }
 
