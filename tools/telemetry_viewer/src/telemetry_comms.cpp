@@ -3,6 +3,9 @@
 #include <stdint.h>
 #include <iostream>
 #include <sstream>
+#include <future>
+#include <utility>
+#include <thread>
 
 
 #include <spphost/defs.h>
@@ -13,7 +16,7 @@
 #include "rs232.h"
 
 TelemetryComms* TelemetryComms::instance_ = nullptr;
-uint8_t default_addr = 0x0;
+uint8_t default_addr = 0x1;
 SppAddress_t default_client{ &default_addr };
 
 static bool areAddressesEqual(SppAddress_t* a, SppAddress_t* b, void* instance_data);
@@ -35,10 +38,19 @@ void onIncomingMsg(const std::string &clientIP, const uint8_t * msg, size_t size
 
     if (cmd == "emdat") {
         std::cout << "got emdat" << std::endl;
-        for (int i = 0; i < size; ++i) printf("\\x%.2x", msg[i]);
-        std::cout << std::endl << size << std::endl;
-        StcpEngine_t* stcp = TelemetryComms::getInstance()->getStcp();
-        StcpHandleMessage(stcp, (uint8_t*)(msg + cmd.length() + 1), size - cmd.length() - 1);
+        size_t start = cmd.length() + 1;
+        for (size_t i = start; i < size - 1; ++i) {
+            if (msg[i] == STCP_FOOTER && msg[i + 1] == STCP_FOOTER) {
+                for (int j = start; j <= i + 1; ++j) printf("\\x%.2x", msg[j]);
+                std::cout << std::endl << size << std::endl;
+                StcpEngine_t* stcp = TelemetryComms::getInstance()->getStcp();
+                std::cout << (int)StcpHandleMessage(stcp, (uint8_t*)(msg + start), (i + 2 - start)) << std::endl;
+
+                start = i + 1;
+                i++; // skip last footer
+            }
+        }
+
         return;
     }
 
@@ -55,7 +67,7 @@ void onIncomingMsg(const std::string &clientIP, const uint8_t * msg, size_t size
         SppHostStartStream(spp, &default_client, id, period, SPP_STREAM_READ, s);
     } else if (cmd == "get") {
         std::cout << "get request " << id << std::endl;
-        SppHostGetValue(spp, &default_client, id);
+        std::cout << (int)SppHostGetValue(spp, &default_client, id) << std::endl;
     } else if (cmd =="val") {
         std::cout << "value request " << id << std::endl;
         PropValue* value = TelemetryComms::getInstance()->getValue(id);
@@ -243,6 +255,11 @@ TelemetryComms::TelemetryComms() {
     server_.subscribe(listener_);
 }
 
+
+void connectViewer(std::promise<int>&& fd) {
+    fd.set_value(TelemetryComms::getInstance()->acceptClient());
+}
+
 void TelemetryComms::start() {
     // start with emulator connection
     is_data_src_emulated_ = true;
@@ -250,8 +267,13 @@ void TelemetryComms::start() {
     // accept emulator
     emulator_fd_ = acceptClient();
 
+    std::promise<int> viewer_fd_promise;
+    std::future<int> fd_future = viewer_fd_promise.get_future();
+
     // accept GUI
-    //viewer_fd_ = acceptClient();
+    std::thread viewer_thread(connectViewer, std::move(viewer_fd_promise));
+    viewer_fd_ = fd_future.get();
+    viewer_thread.join();
 }
 
 void TelemetryComms::start(int comport, int baud) {
@@ -298,6 +320,7 @@ StcpStatus_t handleStcpPacket(void* bytes, uint16_t len, void* instance_data) {
 
 StcpStatus_t sendStcpPacket(void *bytes, uint16_t len, void* instance_data) {
     TelemetryComms* tc = TelemetryComms::getInstance();
+    std::cout << "sending stcp" << std::endl;
 
     if (tc->isEmulated()) {
        tc->getServer()->sendToClient(tc->getEmulatorSock(), (uint8_t*)bytes, len);
@@ -310,6 +333,7 @@ StcpStatus_t sendStcpPacket(void *bytes, uint16_t len, void* instance_data) {
 }
 
 SPP_STATUS_T sendSPPPacket(uint8_t *bytes, uint16_t len, void* instance_data) {
+    std::cout << "sending spp" << std::endl;
     StcpEngine_t* stcp = TelemetryComms::getInstance()->getStcp();
     StcpWrite(stcp, bytes, len);
     return SPP_STATUS_OK;

@@ -94,6 +94,8 @@ int main() {
 
 // observer callback. will be called for every new message received by the server
 static void onIncomingMsg(const uint8_t * msg, size_t size) {
+    std::cout << "got response" << std::endl;
+    for (int i = 0; i < size; ++i) printf("\\x%.2x", msg[i]);
     StcpHandleMessage(&stcp, (uint8_t*)msg, size);
 }
 

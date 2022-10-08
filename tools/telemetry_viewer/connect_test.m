@@ -9,13 +9,13 @@ write(t, packet)
 
 % stream request
 % str/id/period
-packet = "str/0/50";
-write(t, packet)
+% packet = "str/0/50";
+% write(t, packet)
 
 % set request
 % set/id/value
-packet = "set/0/1";
-write(t, packet)
+% packet = "set/0/1";
+% write(t, packet)
 
 % get value
 % get/id

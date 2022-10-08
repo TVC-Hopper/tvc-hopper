@@ -37,7 +37,6 @@ public:
     SppStream_t* getNextStream();
     PropValue* getValue(uint16_t id);
 
-private:
     int acceptClient();
 
 
