@@ -8,7 +8,7 @@ set(CMAKE_CXX_STANDARD 11)
 add_subdirectory(../../circbuf circbuf)
 add_subdirectory(../../stcp stcp)
 add_subdirectory(../../spp spp)
-add_subdirectory(tcp_server_client-master)
+add_subdirectory(../tcp_server_client-master tcp_server_client-master)
 
 add_library(telemetry 
     src/telemetry_comms.cpp
@@ -18,7 +18,7 @@ add_library(telemetry
 target_include_directories(telemetry
     PRIVATE
         include/telemetry
-        tcp_server_client-master/include
+        ../tcp_server_client-master/include
         ../../spp/include
         ../../stcp/include
     INTERFACE
@@ -35,7 +35,8 @@ add_executable(telemetry_server
 target_include_directories(telemetry_server
     PRIVATE
         include/telemetry
-        tcp_server_client-master/include
+        ../../spp/include
+        ../tcp_server_client-master/include
 )
 
 target_link_libraries(telemetry_server PUBLIC telemetry)

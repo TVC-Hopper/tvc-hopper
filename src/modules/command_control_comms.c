@@ -78,42 +78,54 @@ static SPP_STATUS_T SetValue(uint16_t id, void* value, void* instance_data) {
     switch(id) {
         case PROP_start_ID:
         {
+            break;
         }
         case PROP_stop_ID:
         {
+            break;
         }
         case PROP_status_ID:
         {
+            break;
         }
         case PROP_telemetry_ID:
         {
+            break;
         }
         default:
         {
             return SPP_STATUS_UNKNOWN_PROPERTY;
         }
     }
+
+    return SPP_STATUS_OK;
 }
 
 static SPP_STATUS_T GetValue(uint16_t id, void* value, void* instance_data) {
     switch(id) {
         case PROP_start_ID:
         {
+            break;
         }
         case PROP_stop_ID:
         {
+            break;
         }
         case PROP_status_ID:
         {
+            break;
         }
         case PROP_telemetry_ID:
         {
+            break;
         }
         default:
         {
             return SPP_STATUS_UNKNOWN_PROPERTY;
         }
     }
+
+    return SPP_STATUS_OK;
 }
 
 static StcpStatus_t HandleStcpPacket(void* buffer, uint16_t length, void* instance_data) {

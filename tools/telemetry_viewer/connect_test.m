@@ -19,8 +19,8 @@ write(t, packet)
 
 % get value
 % get/id
-packet = "val/0";
-write(t, packet)
+% packet = "val/0";
+% write(t, packet)
 
 pause(1);
 read(t)

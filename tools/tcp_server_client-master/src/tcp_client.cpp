@@ -64,7 +64,7 @@ void TcpClient::setAddress(const std::string& address, int port) {
 }
 
 
-pipe_ret_t TcpClient::sendMsg(const char * msg, size_t size) {
+pipe_ret_t TcpClient::sendMsg(const uint8_t * msg, size_t size) {
     const size_t numBytesSent = send(_sockfd.get(), msg, size, 0);
 
     if (numBytesSent < 0 ) { // send failed
@@ -89,7 +89,7 @@ void TcpClient::subscribe(const client_observer_t & observer) {
  * from clients with IP address identical to
  * the specific observer requested IP
  */
-void TcpClient::publishServerMsg(const char * msg, size_t msgSize) {
+void TcpClient::publishServerMsg(const uint8_t * msg, size_t msgSize) {
     std::lock_guard<std::mutex> lock(_subscribersMtx);
     for (const auto &subscriber : _subscibers) {
         if (subscriber.incomingPacketHandler) {
@@ -126,7 +126,7 @@ void TcpClient::receiveTask() {
             continue;
         }
 
-        char msg[MAX_PACKET_SIZE];
+        uint8_t msg[MAX_PACKET_SIZE];
         const size_t numOfBytesReceived = recv(_sockfd.get(), msg, MAX_PACKET_SIZE, 0);
 
         if(numOfBytesReceived < 1) {

@@ -21,6 +21,7 @@ public:
     static TelemetryComms* getInstance();
 
     void start(int comport, int baud);
+    void start();
 
     int getComport();
 
@@ -28,11 +29,16 @@ public:
     StcpEngine_t* getStcp();
     TcpServer* getServer();
 
+    bool isEmulated();
+
+    int getEmulatorSock();
+    int getViewerSock();
+
     SppStream_t* getNextStream();
     PropValue* getValue(uint16_t id);
 
 private:
-    void acceptClient();
+    int acceptClient();
 
 
 private:
@@ -51,6 +57,10 @@ private:
     uint8_t address_buffer[SPP_CONNECTIONS_MAX];
     SppStream_t streams_[SPP_STREAM_MAX_COUNT];
     size_t stream_count_{0};
+
+    bool is_data_src_emulated_;
+    int emulator_fd_ = 0;
+    int viewer_fd_ = 0;
 
     int comport_;
     int baud_;

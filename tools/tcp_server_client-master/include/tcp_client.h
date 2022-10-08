@@ -35,7 +35,7 @@ private:
     void initializeSocket();
     void startReceivingMessages();
     void setAddress(const std::string& address, int port);
-    void publishServerMsg(const char * msg, size_t msgSize);
+    void publishServerMsg(const uint8_t * msg, size_t msgSize);
     void publishServerDisconnected(const pipe_ret_t & ret);
     void receiveTask();
     void terminateReceiveThread();
@@ -44,7 +44,7 @@ public:
     TcpClient();
     ~TcpClient();
     pipe_ret_t connectTo(const std::string & address, int port);
-    pipe_ret_t sendMsg(const char * msg, size_t size);
+    pipe_ret_t sendMsg(const uint8_t * msg, size_t size);
 
     void subscribe(const client_observer_t & observer);
     bool isConnected() const { return _isConnected; }

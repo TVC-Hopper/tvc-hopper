@@ -23,18 +23,30 @@ static StcpStatus_t sendStcpPacket(void *bytes, uint16_t len, void* instance_dat
 static SPP_STATUS_T onValueResponse(SppAddress_t *client, uint16_t id, void* value, void* instance_data);
 static void onStatusResponse(SPP_STATUS_T status, void* instance_data);
 static void onStreamResponse(uint32_t timestamp, SppStream_t* stream, void* instance_data);
-static void onIncomingMsg(const std::string &clientIP, const char * msg, size_t size);
-static void onClientDisconnected(const std::string &ip, const std::string &msg);
+static void onIncomingMsg(const std::string &clientIP, const uint8_t * msg, size_t size);
+static void onClientDisconnected(const std::string &ip, const uint8_t * msg, size_t len);
 
-void onIncomingMsg(const std::string &clientIP, const char * msg, size_t size) {
+void onIncomingMsg(const std::string &clientIP, const uint8_t * msg, size_t size) {
+    std::cout << clientIP << std::endl;
     SppHostEngine_t* spp = TelemetryComms::getInstance()->getSpp();
-    std::string msg_str = msg;
+    std::string msg_str = (char*)msg;
     size_t cmd_end = msg_str.find('/');
     std::string cmd = msg_str.substr(0, cmd_end);
+
+    if (cmd == "emdat") {
+        std::cout << "got emdat" << std::endl;
+        for (int i = 0; i < size; ++i) printf("\\x%.2x", msg[i]);
+        std::cout << std::endl << size << std::endl;
+        StcpEngine_t* stcp = TelemetryComms::getInstance()->getStcp();
+        StcpHandleMessage(stcp, (uint8_t*)(msg + cmd.length() + 1), size - cmd.length() - 1);
+        return;
+    }
+
     std::string body = msg_str.substr(cmd_end + 1, msg_str.length());
     int id_end = body.find('/');
     std::string id_str = body.substr(0, id_end);
     uint16_t id = std::stoi(id_str);
+
 
     if (cmd == "str") {
         uint16_t period = std::stoi(body.substr(id_end + 1, body.length()));
@@ -47,22 +59,27 @@ void onIncomingMsg(const std::string &clientIP, const char * msg, size_t size) {
     } else if (cmd =="val") {
         std::cout << "value request " << id << std::endl;
         PropValue* value = TelemetryComms::getInstance()->getValue(id);
-        std::ostringstream oss;
 
-        if (value->def->type == SPP_PROP_T_BOOL) {
+        uint16_t type = value->def->type;
+
+        std::ostringstream oss;
+        oss << id << "/";
+
+        if (type == SPP_PROP_T_BOOL) {
             oss << *((bool*)value->buffer.get());
-        } else if (value->def->type == SPP_PROP_T_U32) {
+        } else if (type == SPP_PROP_T_U32) {
             oss << *((uint32_t*)value->buffer.get());
-        } else if (value->def->type == SPP_PROP_T_I32) {
+        } else if (type == SPP_PROP_T_I32) {
             oss << *((int32_t*)value->buffer.get());
-        } else if (value->def->type == SPP_PROP_T_I16) {
+        } else if (type == SPP_PROP_T_I16) {
             oss << *((uint16_t*)value->buffer.get());
-        } else if (value->def->type == SPP_PROP_T_I16) {
+        } else if (type == SPP_PROP_T_I16) {
             oss << *((int16_t*)value->buffer.get());
         }
         
         std::string response = "val/" + oss.str();
-        TelemetryComms::getInstance()->getServer()->sendToAllClients(response.c_str(), response.length());
+        TelemetryComms* tc = TelemetryComms::getInstance();
+        tc->getServer()->sendToClient(tc->getViewerSock(), (uint8_t*)response.c_str(), response.length());
     } else if (cmd == "set") {
         std::string value_str = body.substr(id_end + 1, body.length());
         std::cout << "set request " << id << " " << value_str << std::endl;
@@ -86,8 +103,19 @@ void onIncomingMsg(const std::string &clientIP, const char * msg, size_t size) {
     }
 }
 
-void onClientDisconnected(const std::string &ip, const std::string &msg) {
-    std::cout << "Client: " << ip << " disconnected. Reason: " << msg << "\n";
+void onClientDisconnected(const std::string &ip, const uint8_t* msg, size_t len) {
+    std::cout << "Client: " << ip << " disconnected. Reason: " << (char*)msg << "\n";
+}
+int TelemetryComms::getEmulatorSock() {
+    return emulator_fd_;
+}
+
+int TelemetryComms::getViewerSock() {
+    return viewer_fd_;
+}
+
+bool TelemetryComms::isEmulated() {
+    return is_data_src_emulated_;
 }
 
 TcpServer* TelemetryComms::getServer() {
@@ -99,18 +127,22 @@ SppStream_t* TelemetryComms::getNextStream() {
 }
 
 PropValue* TelemetryComms::getValue(uint16_t id) {
+    // TODO
     return &prop_values_[id];
 }
 
-void TelemetryComms::acceptClient() {
+int TelemetryComms::acceptClient() {
     try {
         std::cout << "waiting for incoming client...\n";
-        std::string clientIP = server_.acceptClient(0);
-        std::cout << "accepted new client with IP: " << clientIP << "\n" <<
+        Client* c = server_.acceptClient(0);
+        std::cout << "accepted new client with IP: " << c->getIp()<< "\n" <<
                   "== updated list of accepted clients ==" << "\n";
         server_.printClients();
+
+        return c->getSock();
     } catch (const std::runtime_error &error) {
         std::cout << "Accepting client failed: " << error.what() << "\n";
+        return -1;
     }
 }
 
@@ -120,18 +152,26 @@ SPP_STATUS_T onValueResponse(SppAddress_t *client, uint16_t id, void* value, voi
     switch(id) {
         case PROP_start_ID:
         {
+            std::cout << *((bool*)value) << std::endl;
             break;
         }
         case PROP_stop_ID:
         {
+            std::cout << *((bool*)value) << std::endl;
             break;
         }
         case PROP_status_ID:
         {
+            std::cout << *((uint32_t*)value) << std::endl;
             break;
         }
         case PROP_telemetry_ID:
         {
+            uint8_t* data = (uint8_t*)value;
+            for (int i = 0; i < 10; ++i) {
+                std::cout << data[i] << " ";
+            }
+            std::cout << std::endl;
             break;
         }
         default:
@@ -161,52 +201,66 @@ TelemetryComms* TelemetryComms::getInstance() {
 
 
 TelemetryComms::TelemetryComms() {
-        address = SppAddress_t{ (void*)&address_raw };
+
+    address = SppAddress_t{ (void*)&address_raw };
 
 
-        SppHostEngineInitParams_t ip;
-        ip.callbacks = SppHostCallbacks_t{
-            areAddressesEqual,
-            sendSPPPacket,
-            onValueResponse,
-            onStatusResponse,
-            onStreamResponse
-        };
-        ip.address_buffer = address_buffer;
-        ip.address_length = sizeof(uint8_t);
-        ip.defs_buffer = prop_defs_buffer;
-        ip.defs_buffer_size = BUFFER_SIZE;
-        ip.host_address = address;
-        ip.instance_data = nullptr;
+    SppHostEngineInitParams_t ip;
+    ip.callbacks = SppHostCallbacks_t{
+        areAddressesEqual,
+        sendSPPPacket,
+        onValueResponse,
+        onStatusResponse,
+        onStreamResponse
+    };
+    ip.address_buffer = address_buffer;
+    ip.address_length = sizeof(uint8_t);
+    ip.defs_buffer = prop_defs_buffer;
+    ip.defs_buffer_size = BUFFER_SIZE;
+    ip.host_address = address;
+    ip.instance_data = nullptr;
 
-        SppHostEngineInit(&ip, &spp_);
+    SppHostEngineInit(&ip, &spp_);
 
-        stcp_.callbacks = StcpCallbacks_t{
-            .Send = sendStcpPacket,
-            .HandleMessage = handleStcpPacket
-        };
+    stcp_.callbacks = StcpCallbacks_t{
+        .Send = sendStcpPacket,
+        .HandleMessage = handleStcpPacket
+    };
 
-        stcp_.instance_data = nullptr;
+    stcp_.instance_data = nullptr;
 
-        pipe_ret_t start_ret = server_.start(65123);
-        if (start_ret.isSuccessful()) {
-            std::cout << "Server setup succeeded\n";
-        } else {
-            std::cout << "ERROR: server setup failed: " << start_ret.message() << "\n";
-        }
+    pipe_ret_t start_ret = server_.start(65123);
+    if (start_ret.isSuccessful()) {
+        std::cout << "Server setup succeeded\n";
+    } else {
+        std::cout << "ERROR: server setup failed: " << start_ret.message() << "\n";
+    }
 
-        listener_.incomingPacketHandler = onIncomingMsg;
-        listener_.disconnectionHandler = onClientDisconnected;
-        listener_.wantedIP = "127.0.0.1";
-        server_.subscribe(listener_);
+    listener_.incomingPacketHandler = onIncomingMsg;
+    listener_.disconnectionHandler = onClientDisconnected;
+    listener_.wantedIP = "127.0.0.1";
 
+    server_.subscribe(listener_);
+}
+
+void TelemetryComms::start() {
+    // start with emulator connection
+    is_data_src_emulated_ = true;
+
+    // accept emulator
+    emulator_fd_ = acceptClient();
+
+    // accept GUI
+    //viewer_fd_ = acceptClient();
 }
 
 void TelemetryComms::start(int comport, int baud) {
+    // start with hardware connection
+    is_data_src_emulated_ = false;
     comport_ = comport;
     baud_ = baud;
 
-    char mode[]={'8','N','1',0};
+    char mode[] = {'8', 'N', '1', 0};
 
     if (RS232_OpenComport(comport, baud, mode, 0)) {
         std::cout << "ERROR: failed to open com port " << comport << std::endl;
@@ -218,7 +272,9 @@ void TelemetryComms::start(int comport, int baud) {
 }
 
 TelemetryComms::~TelemetryComms() {
-    RS232_CloseComport(comport_);
+    if (!is_data_src_emulated_) {
+        RS232_CloseComport(comport_);
+    }
     delete instance_;
 }
 
@@ -241,8 +297,14 @@ StcpStatus_t handleStcpPacket(void* bytes, uint16_t len, void* instance_data) {
 }
 
 StcpStatus_t sendStcpPacket(void *bytes, uint16_t len, void* instance_data) {
-    int com = TelemetryComms::getInstance()->getComport();
-    RS232_SendBuf(com, (uint8_t*)bytes, len);
+    TelemetryComms* tc = TelemetryComms::getInstance();
+
+    if (tc->isEmulated()) {
+       tc->getServer()->sendToClient(tc->getEmulatorSock(), (uint8_t*)bytes, len);
+    } else {
+        int com = tc->getComport();
+        RS232_SendBuf(com, (uint8_t*)bytes, len);
+    }
 
     return STCP_STATUS_SUCCESS;
 }

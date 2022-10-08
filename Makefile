@@ -6,10 +6,13 @@ BUILD_FSNOR_DIR=build-release-fsnor
 DEBUG_FSNOR_DIR=build-debug-fsnor
 TEST_BUILD_DIR=build-test
 BUILD_TELEM_SERVER_DIR=build-telem
+BUILD_TELEM_EMULATOR_DIR=build-telem-em
 
 .PHONY:
 generate_spp_headers:
 	python tools/generate_spp_lists.py support/prop_list.toml src/modules/spp_property_list tools/telemetry_viewer/include/telemetry/spp_property_list
+	cp src/modules/spp_property_list.c tools/telemetry_emulator/src
+	cp src/modules/spp_property_list.h tools/telemetry_emulator/src
 
 
 .PHONY: clean
@@ -44,6 +47,16 @@ flexspi_nor_release: generate_spp_headers
 telemetry_server:
 	cmake -B$(BUILD_TELEM_SERVER_DIR) -Stools/telemetry_viewer -GNinja
 	ninja -C$(BUILD_TELEM_SERVER_DIR)
+
+.PHONY: telemetry_emulator
+telemetry_emulator:
+	cmake -B$(BUILD_TELEM_EMULATOR_DIR) -Stools/telemetry_emulator -GNinja
+	ninja -C$(BUILD_TELEM_EMULATOR_DIR)
+
+
+.PHONY: start_telemetry_emulator
+start_telemetry_emulator:
+	./$(BUILD_TELEM_EMULATOR_DIR)/telemetry_emulator
 
 .PHONY: start_telemetry_server
 start_telemetry_server:
