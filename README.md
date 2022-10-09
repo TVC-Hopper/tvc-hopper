@@ -51,24 +51,21 @@ The build supports 3 different targets:
 - FlexSPI NOR flash release: loaded to external flash memory, no debug symols
 - Tests: build and run tests
 
-```
-make clean
 
-# debug build
-make debug
+### `make` targets
 
-# release build
-make release 
+- `clean`: remove all build artifacts
+- `debug`: debug build
+- `release`: release build
+- `flexspi_nor_debug`: debug build for flexspi nor flash
+- `flexspi_nor_release`: release build for flexspi nor flash
+- `test`: build and run unit tests
+- `generate_spp_headers`: regenerate or update SPP property lists in various directories
+- `telemetry_server`: build telemetry server
+- `telemetry_emulator`: build telemetry emulator for testing
+- `start_telemetry_server`: starts telemetry server
+- `start_telemetry_emulator`: starts telemetry emulator (start from different terminal)
 
-# flexspi nor debug build
-make flexspi_nor_debug
-
-# flexspi nor release build
-make flexspi_nor_release
-
-# build, run tests
-make test
-```
 
 ## Design and Architecture
 
@@ -115,6 +112,18 @@ Unit tests are run using Catch2, a standard C/C++ unit test framework.
 The unit tests are focused on only testing the drivers and application code.
 
 All tests are located in `tests` directory
+
+### Telemetry Viewer
+
+Start the server using `make start_telemetry_server`.
+Use MATLAB, switch working directory to `tools/telemetry_viewer`. Run the script to plot incoming data.
+To add new data, modify the server and the matlab script to accept and plot new values.
+
+#### Data emulation
+
+Modify `tools/telemetry_emulator/src/main.cpp` to generate whatever telemetry data you'd like, may need to update property
+lists.
+Open a terminal and run `make telemetry_emulator start_telemetry_emulator`.
 
 
 
