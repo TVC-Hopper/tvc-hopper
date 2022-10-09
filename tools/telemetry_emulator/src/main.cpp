@@ -5,6 +5,7 @@
 #include <chrono>
 #include <thread>
 #include <sstream>
+#include <cmath>
 
 #include <iostream>
 #include <csignal>
@@ -81,12 +82,18 @@ int main() {
 
     using namespace std::chrono;
     uint32_t last = duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
+
+    double i = 0;
 	while(1)
 	{
         uint32_t now = duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
         SppProcessStreams(&spp, now, now - last);
         last = now;
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        i += 0.0015;
+        prop_telem[0] = (int)(10 * sin(i)) + 15;
+        prop_telem[1] = (int)(5 * sin(i)) + 10;
+        prop_telem[2] = (int)(20 * sin(i)) + 21;
 	}
 
 	return 0;

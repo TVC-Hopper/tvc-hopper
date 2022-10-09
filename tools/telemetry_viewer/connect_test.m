@@ -1,44 +1,47 @@
 
+tv = TelemetryViewerClient("127.0.0.1", 65123);
 
-t = tcpclient("127.0.0.1", 65123);
-%%
-
-% get request
-% get/id
-% packet = "get/0";
-% write(t, packet)
-% 
-% packet = "get/1";
-% write(t, packet)
-% 
-% packet = "get/2";
-% write(t, packet)
-% 
-% packet = "get/3";
-% write(t, packet)
-
-% stream request
-% str/id/period
-packet = "str/3/500";
-write(t, packet)
-%%
-
-% set request
-% set/id/value
-% packet = "set/0/1";
-% write(t, packet)
-
-% get value
-% get/id
-packet = "val/3";
-write(t, packet)
-read(t)
-
-
-
+tv.StartStream(3, 20);
 
 %%
 
-% close connection
-clear t
+f = figure;
+hx = animatedline('Color', 'r', 'LineWidth', 1);
+hy = animatedline('Color', 'g', 'LineWidth', 1);
+hz = animatedline('Color', 'b', 'LineWidth', 1);
+xlabel('time');
+ylabel('position');
+legend('x', 'y', 'z');
 
+%%
+
+sz = 0;
+t0 = 0;
+
+while (t0 == 0)
+    tv.RequestValue(3);
+    [id, sz, tstamp, value] = tv.ReadValue(@TelemetryViewerClient.ParseU8Array);
+
+    t0 = tstamp;
+    pause(0.1);
+end
+
+
+while (true)
+    tv.RequestValue(3);
+    [id, sz, tstamp, value] = tv.ReadValue(@TelemetryViewerClient.ParseU8Array);
+    
+%     fprintf('%d %d %d', id, sz, tstamp);
+    
+    if ~isempty(value)
+%         disp(value);
+
+        t = tstamp - t0;
+        addpoints(hx, t, value(1));
+        addpoints(hy, t, value(2));
+        addpoints(hz, t, value(3));
+        drawnow;
+    end
+
+    pause(0.02)
+end

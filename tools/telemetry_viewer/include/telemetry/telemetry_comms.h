@@ -13,6 +13,7 @@
 struct PropValue {
     std::mutex mx{};
     SppPropertyDefinition_t* def{nullptr};
+    uint32_t timestamp;
     std::vector<uint8_t> buffer;
 };
 

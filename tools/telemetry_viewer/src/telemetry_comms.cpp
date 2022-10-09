@@ -7,6 +7,8 @@
 #include <utility>
 #include <thread>
 
+#include <iomanip>
+
 #include <mutex>
 
 
@@ -74,28 +76,30 @@ void onIncomingMsg(const std::string &clientIP, const uint8_t * msg, size_t size
         uint16_t type = value->def->type;
 
         std::ostringstream oss;
-        oss << id << "/";
+        oss << std::setfill('0') << std::setw(4) << std::hex << id;
+        oss << std::setfill('0') << std::setw(2) << std::hex << static_cast<int>(value->def->size);
+        oss << std::setfill('0') << std::setw(2) << std::hex << (value->timestamp);
 
         std::unique_lock<std::mutex> ul(value->mx);
         if (type == SPP_PROP_T_BOOL) {
-            oss << *((bool*)&value->buffer[0]);
+            oss << std::setfill('0') << std::setw(1) << std::hex << *((bool*)&value->buffer[0]);
         } else if (type == SPP_PROP_T_U32) {
-            oss << *((uint32_t*)&value->buffer[0]);
+            oss << std::setfill('0') << std::setw(8) << std::hex << *((uint32_t*)&value->buffer[0]);
         } else if (type == SPP_PROP_T_I32) {
-            oss << *((int32_t*)&value->buffer[0]);
+            oss << std::setfill('0') << std::setw(8) << std::hex << *((int32_t*)&value->buffer[0]);
         } else if (type == SPP_PROP_T_I16) {
-            oss << *((uint16_t*)&value->buffer[0]);
+            oss << std::setfill('0') << std::setw(4) << std::hex <<  *((uint16_t*)&value->buffer[0]);
         } else if (type == SPP_PROP_T_I16) {
-            oss << *((int16_t*)&value->buffer[0]);
+            oss << std::setfill('0') << std::setw(4) << std::hex <<  *((int16_t*)&value->buffer[0]);
         } else if (type == SPP_PROP_T_ARR) {
             for (auto &i : value->buffer) {
-                oss << i;
+                oss << std::setfill('0') << std::setw(2) << std::hex << static_cast<int>(i);
             }
             std::cout << "arr: " << oss.str() << std::endl;
         }
         ul.unlock();
         
-        std::string response = "val/" + oss.str();
+        std::string response = oss.str();
         TelemetryComms* tc = TelemetryComms::getInstance();
         tc->getServer()->sendToClient(tc->getViewerSock(), (uint8_t*)response.c_str(), response.length());
     } else if (cmd == "set") {
@@ -148,6 +152,7 @@ PropValue* TelemetryComms::getValue(uint16_t id) {
     if (prop_values_.find(id) == prop_values_.end()) {
         SppHostGetDefinition(getSpp(), &default_client, id, &prop_values_[id].def);
         prop_values_[id].buffer = std::vector<uint8_t>(prop_values_[id].def->size, 0);
+        prop_values_[id].timestamp = 0;
     }
     return &prop_values_[id];
 }
@@ -170,26 +175,30 @@ int TelemetryComms::acceptClient() {
 SPP_STATUS_T onValueResponse(SppAddress_t *client, uint16_t id, void* value, void* instance_data) {
 
     PropValue *pv = TelemetryComms::getInstance()->getValue(id);
+    
+    if (instance_data) {
+        std::lock_guard<std::mutex> lg(pv->mx);
+        pv->timestamp = *((uint32_t*)instance_data);
+        memcpy(&pv->buffer[0], (uint8_t*)value, pv->def->size);
+    } else {
+        std::lock_guard<std::mutex> lg(pv->mx);
+        memcpy(&pv->buffer[0], (uint8_t*)value, pv->def->size);
+    }
+
     switch(id) {
         case PROP_start_ID:
         {
             std::cout << *((bool*)value) << std::endl;
-            std::lock_guard<std::mutex> lg(pv->mx);
-            memcpy(&pv->buffer[0], (uint8_t*)value, pv->def->size);
             break;
         }
         case PROP_stop_ID:
         {
             std::cout << *((bool*)value) << std::endl;
-            std::lock_guard<std::mutex> lg(pv->mx);
-            memcpy(&pv->buffer[0], (uint8_t*)value, pv->def->size);
             break;
         }
         case PROP_status_ID:
         {
             std::cout << *((uint32_t*)value) << std::endl;
-            std::lock_guard<std::mutex> lg(pv->mx);
-            memcpy(&pv->buffer[0], (uint8_t*)value, pv->def->size);
             break;
         }
         case PROP_telemetry_ID:
@@ -199,8 +208,6 @@ SPP_STATUS_T onValueResponse(SppAddress_t *client, uint16_t id, void* value, voi
                 std::cout << data[i] << " ";
             }
             std::cout << std::endl;
-            std::lock_guard<std::mutex> lg(pv->mx);
-            memcpy(&pv->buffer[0], (uint8_t*)value, pv->def->size);
             break;
         }
         default:
@@ -218,7 +225,7 @@ void onStatusResponse(SPP_STATUS_T status, void* instance_data) {
 
 void onStreamResponse(uint32_t timestamp, SppStream_t* stream, void* instance_data) {
     std::cout << timestamp << " ";
-    onValueResponse(nullptr, stream->def->id, stream->value, instance_data);
+    onValueResponse(nullptr, stream->def->id, stream->value, &timestamp);
 }
 
 TelemetryComms* TelemetryComms::getInstance() {
