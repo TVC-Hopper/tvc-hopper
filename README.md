@@ -119,6 +119,26 @@ Start the server using `make start_telemetry_server`.
 Use MATLAB, switch working directory to `tools/telemetry_viewer`. Run the script to plot incoming data.
 To add new data, modify the server and the matlab script to accept and plot new values.
 
+The telemetry server operates an SPP host instance that streams data from the client (either vehicle or emulated). The MATLAB visualization/viewer client connects to the server and reads data to plot.
+
+#### Server API
+
+-`id`: property id
+-`period`: period in milliseconds
+-`value`: property value
+
+***Requests***
+
+- `get/<id>`: Request property value from SPP client
+- `val/<id>`: Request property value from telemetry server
+- `str/<id>/<period>`: Start stream
+- `set/<id>/<value>`: Set property value
+- `emdat/<id>/<value>`: Provide emulated data
+
+***Response***
+Where integer is number of characters (1/2 byte)
+- Value response: `<id:4><size:2><timestamp:8><value:size*2>`
+
 #### Data emulation
 
 Modify `tools/telemetry_emulator/src/main.cpp` to generate whatever telemetry data you'd like, may need to update property
