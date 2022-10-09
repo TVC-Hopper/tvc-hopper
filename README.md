@@ -123,9 +123,9 @@ The telemetry server operates an SPP host instance that streams data from the cl
 
 #### Server API
 
--`id`: property id
--`period`: period in milliseconds
--`value`: property value
+- `id`: property id
+- `period`: period in milliseconds
+- `value`: property value
 
 ***Requests***
 
