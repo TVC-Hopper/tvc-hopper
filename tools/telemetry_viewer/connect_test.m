@@ -19,8 +19,9 @@ t = tcpclient("127.0.0.1", 65123);
 
 % stream request
 % str/id/period
-packet = "str/3/50";
+packet = "str/3/500";
 write(t, packet)
+%%
 
 % set request
 % set/id/value
@@ -29,11 +30,12 @@ write(t, packet)
 
 % get value
 % get/id
-% packet = "val/0";
-% write(t, packet)
+packet = "val/3";
+write(t, packet)
+read(t)
 
-% pause(1);
-% read(t)
+
+
 
 %%
 

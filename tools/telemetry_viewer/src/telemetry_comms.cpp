@@ -78,15 +78,20 @@ void onIncomingMsg(const std::string &clientIP, const uint8_t * msg, size_t size
 
         std::unique_lock<std::mutex> ul(value->mx);
         if (type == SPP_PROP_T_BOOL) {
-            oss << *((bool*)value->buffer.get());
+            oss << *((bool*)&value->buffer[0]);
         } else if (type == SPP_PROP_T_U32) {
-            oss << *((uint32_t*)value->buffer.get());
+            oss << *((uint32_t*)&value->buffer[0]);
         } else if (type == SPP_PROP_T_I32) {
-            oss << *((int32_t*)value->buffer.get());
+            oss << *((int32_t*)&value->buffer[0]);
         } else if (type == SPP_PROP_T_I16) {
-            oss << *((uint16_t*)value->buffer.get());
+            oss << *((uint16_t*)&value->buffer[0]);
         } else if (type == SPP_PROP_T_I16) {
-            oss << *((int16_t*)value->buffer.get());
+            oss << *((int16_t*)&value->buffer[0]);
+        } else if (type == SPP_PROP_T_ARR) {
+            for (auto &i : value->buffer) {
+                oss << i;
+            }
+            std::cout << "arr: " << oss.str() << std::endl;
         }
         ul.unlock();
         
@@ -140,6 +145,10 @@ SppStream_t* TelemetryComms::getNextStream() {
 }
 
 PropValue* TelemetryComms::getValue(uint16_t id) {
+    if (prop_values_.find(id) == prop_values_.end()) {
+        SppHostGetDefinition(getSpp(), &default_client, id, &prop_values_[id].def);
+        prop_values_[id].buffer = std::vector<uint8_t>(prop_values_[id].def->size, 0);
+    }
     return &prop_values_[id];
 }
 
@@ -166,18 +175,21 @@ SPP_STATUS_T onValueResponse(SppAddress_t *client, uint16_t id, void* value, voi
         {
             std::cout << *((bool*)value) << std::endl;
             std::lock_guard<std::mutex> lg(pv->mx);
+            memcpy(&pv->buffer[0], (uint8_t*)value, pv->def->size);
             break;
         }
         case PROP_stop_ID:
         {
             std::cout << *((bool*)value) << std::endl;
             std::lock_guard<std::mutex> lg(pv->mx);
+            memcpy(&pv->buffer[0], (uint8_t*)value, pv->def->size);
             break;
         }
         case PROP_status_ID:
         {
             std::cout << *((uint32_t*)value) << std::endl;
             std::lock_guard<std::mutex> lg(pv->mx);
+            memcpy(&pv->buffer[0], (uint8_t*)value, pv->def->size);
             break;
         }
         case PROP_telemetry_ID:
@@ -188,6 +200,7 @@ SPP_STATUS_T onValueResponse(SppAddress_t *client, uint16_t id, void* value, voi
             }
             std::cout << std::endl;
             std::lock_guard<std::mutex> lg(pv->mx);
+            memcpy(&pv->buffer[0], (uint8_t*)value, pv->def->size);
             break;
         }
         default:
@@ -261,9 +274,6 @@ TelemetryComms::TelemetryComms() {
 }
 
 
-void connectViewer(std::promise<int>&& fd) {
-}
-
 void TelemetryComms::start() {
     // start with emulator connection
     is_data_src_emulated_ = true;
@@ -277,10 +287,6 @@ void TelemetryComms::start() {
     while(1) {
         viewer_fd_ = TelemetryComms::getInstance()->acceptClient();
     }
-    // accept GUI
-    // std::thread viewer_thread(connectViewer, std::move(viewer_fd_promise));
-    // viewer_fd_ = fd_future.get();
-    // viewer_thread.join();
 }
 
 void TelemetryComms::start(int comport, int baud) {

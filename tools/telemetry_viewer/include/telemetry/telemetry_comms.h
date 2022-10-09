@@ -11,9 +11,9 @@
 #include "rs232.h"
 
 struct PropValue {
-    std::mutex mx;
-    SppPropertyDefinition_t* def;
-    std::unique_ptr<uint8_t> buffer;
+    std::mutex mx{};
+    SppPropertyDefinition_t* def{nullptr};
+    std::vector<uint8_t> buffer;
 };
 
 
