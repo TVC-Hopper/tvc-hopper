@@ -86,7 +86,7 @@ int main() {
         uint32_t now = duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
         SppProcessStreams(&spp, now, now - last);
         last = now;
-        std::this_thread::sleep_for(std::chrono::milliseconds(5));
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
 	}
 
 	return 0;
@@ -95,8 +95,6 @@ int main() {
 // observer callback. will be called for every new message received by the server
 static void onIncomingMsg(const uint8_t * msg, size_t size) {
     std::cout << "got response" << std::endl;
-    for (int i = 0; i < size; ++i) printf("\\x%.2x", msg[i]);
-    std::cout << std::endl;
     StcpHandleMessage(&stcp, (uint8_t*)msg, size);
 }
 
@@ -167,8 +165,6 @@ static SPP_STATUS_T StcpSendPacket(void* buffer, uint16_t len, void* instance_da
     if (!sendRet.isSuccessful()) {
         std::cout << "Failed to send message: " << sendRet.message() << "\n";
     } else {
-        for (int i = 0; i < len + 6; ++i) printf("\\x%.2x", msg[i]);
-        std::cout << std::endl << (len + 6) << std::endl;
         std::cout << "message was sent successfuly\n";
     }
 
@@ -248,9 +244,6 @@ static StcpStatus_t HandleStcpPacket(void* buffer, uint16_t length, void* instan
 
 static SPP_STATUS_T SppSendPacket(uint8_t* bytes, uint16_t len, void* instance_data) {
 
-    for (int i = 0; i < len; ++i) printf("\\x%.2x", bytes[i]);
-    std::cout << std::endl;
-    
     StcpWrite(&stcp, bytes, len);
 
     return SPP_STATUS_OK;

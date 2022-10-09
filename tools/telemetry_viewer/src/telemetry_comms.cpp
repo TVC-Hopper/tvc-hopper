@@ -7,6 +7,8 @@
 #include <utility>
 #include <thread>
 
+#include <mutex>
+
 
 #include <spphost/defs.h>
 #include <spphost/api.h>
@@ -30,23 +32,20 @@ static void onIncomingMsg(const std::string &clientIP, const uint8_t * msg, size
 static void onClientDisconnected(const std::string &ip, const uint8_t * msg, size_t len);
 
 void onIncomingMsg(const std::string &clientIP, const uint8_t * msg, size_t size) {
-    std::cout << clientIP << std::endl;
     SppHostEngine_t* spp = TelemetryComms::getInstance()->getSpp();
     std::string msg_str = (char*)msg;
     size_t cmd_end = msg_str.find('/');
     std::string cmd = msg_str.substr(0, cmd_end);
 
     if (cmd == "emdat") {
-        std::cout << "got emdat" << std::endl;
         size_t start = cmd.length() + 1;
         for (size_t i = start; i < size - 1; ++i) {
             if (msg[i] == STCP_FOOTER && msg[i + 1] == STCP_FOOTER) {
-                for (int j = start; j <= i + 1; ++j) printf("\\x%.2x", msg[j]);
-                std::cout << std::endl << size << std::endl;
                 StcpEngine_t* stcp = TelemetryComms::getInstance()->getStcp();
-                std::cout << (int)StcpHandleMessage(stcp, (uint8_t*)(msg + start), (i + 2 - start)) << std::endl;
+                SPP_STATUS_T ret = StcpHandleMessage(stcp, (uint8_t*)(msg + start), (i + 2 - start));
+                std::cout << "Got msg, ret=" << (int)ret << std::endl;
 
-                start = i + 1;
+                start = i + cmd.length() + 3;
                 i++; // skip last footer
             }
         }
@@ -77,6 +76,7 @@ void onIncomingMsg(const std::string &clientIP, const uint8_t * msg, size_t size
         std::ostringstream oss;
         oss << id << "/";
 
+        std::unique_lock<std::mutex> ul(value->mx);
         if (type == SPP_PROP_T_BOOL) {
             oss << *((bool*)value->buffer.get());
         } else if (type == SPP_PROP_T_U32) {
@@ -88,6 +88,7 @@ void onIncomingMsg(const std::string &clientIP, const uint8_t * msg, size_t size
         } else if (type == SPP_PROP_T_I16) {
             oss << *((int16_t*)value->buffer.get());
         }
+        ul.unlock();
         
         std::string response = "val/" + oss.str();
         TelemetryComms* tc = TelemetryComms::getInstance();
@@ -139,7 +140,6 @@ SppStream_t* TelemetryComms::getNextStream() {
 }
 
 PropValue* TelemetryComms::getValue(uint16_t id) {
-    // TODO
     return &prop_values_[id];
 }
 
@@ -159,22 +159,25 @@ int TelemetryComms::acceptClient() {
 }
 
 SPP_STATUS_T onValueResponse(SppAddress_t *client, uint16_t id, void* value, void* instance_data) {
-    std::cout << "host got prop " << id << std::endl;
 
+    PropValue *pv = TelemetryComms::getInstance()->getValue(id);
     switch(id) {
         case PROP_start_ID:
         {
             std::cout << *((bool*)value) << std::endl;
+            std::lock_guard<std::mutex> lg(pv->mx);
             break;
         }
         case PROP_stop_ID:
         {
             std::cout << *((bool*)value) << std::endl;
+            std::lock_guard<std::mutex> lg(pv->mx);
             break;
         }
         case PROP_status_ID:
         {
             std::cout << *((uint32_t*)value) << std::endl;
+            std::lock_guard<std::mutex> lg(pv->mx);
             break;
         }
         case PROP_telemetry_ID:
@@ -184,6 +187,7 @@ SPP_STATUS_T onValueResponse(SppAddress_t *client, uint16_t id, void* value, voi
                 std::cout << data[i] << " ";
             }
             std::cout << std::endl;
+            std::lock_guard<std::mutex> lg(pv->mx);
             break;
         }
         default:
@@ -200,7 +204,8 @@ void onStatusResponse(SPP_STATUS_T status, void* instance_data) {
 }
 
 void onStreamResponse(uint32_t timestamp, SppStream_t* stream, void* instance_data) {
-    // STUB
+    std::cout << timestamp << " ";
+    onValueResponse(nullptr, stream->def->id, stream->value, instance_data);
 }
 
 TelemetryComms* TelemetryComms::getInstance() {
@@ -257,7 +262,6 @@ TelemetryComms::TelemetryComms() {
 
 
 void connectViewer(std::promise<int>&& fd) {
-    fd.set_value(TelemetryComms::getInstance()->acceptClient());
 }
 
 void TelemetryComms::start() {
@@ -267,13 +271,16 @@ void TelemetryComms::start() {
     // accept emulator
     emulator_fd_ = acceptClient();
 
-    std::promise<int> viewer_fd_promise;
-    std::future<int> fd_future = viewer_fd_promise.get_future();
+    // std::promise<int> viewer_fd_promise;
+    // std::future<int> fd_future = viewer_fd_promise.get_future();
 
+    while(1) {
+        viewer_fd_ = TelemetryComms::getInstance()->acceptClient();
+    }
     // accept GUI
-    std::thread viewer_thread(connectViewer, std::move(viewer_fd_promise));
-    viewer_fd_ = fd_future.get();
-    viewer_thread.join();
+    // std::thread viewer_thread(connectViewer, std::move(viewer_fd_promise));
+    // viewer_fd_ = fd_future.get();
+    // viewer_thread.join();
 }
 
 void TelemetryComms::start(int comport, int baud) {
@@ -314,13 +321,20 @@ StcpEngine_t* TelemetryComms::getStcp() {
 
 StcpStatus_t handleStcpPacket(void* bytes, uint16_t len, void* instance_data) {
     SppHostEngine_t* spp = TelemetryComms::getInstance()->getSpp();
-    SppHostProcessMessage(spp, (uint8_t*)bytes, len);
-    return STCP_STATUS_SUCCESS;
+    SPP_STATUS_T ret = SppHostProcessMessage(spp, (uint8_t*)bytes, len);
+
+    if (ret != SPP_STATUS_OK) {
+        //for (int i = 0; i < len; ++i) printf("\\x%.2x", ((uint8_t*)bytes)[i]);
+        //std::cout << std::endl;
+        std::cout << (int)ret << std::endl;
+        return STCP_STATUS_UNDEFINED_ERROR;
+    } else {
+        return STCP_STATUS_SUCCESS;
+    }
 }
 
 StcpStatus_t sendStcpPacket(void *bytes, uint16_t len, void* instance_data) {
     TelemetryComms* tc = TelemetryComms::getInstance();
-    std::cout << "sending stcp" << std::endl;
 
     if (tc->isEmulated()) {
        tc->getServer()->sendToClient(tc->getEmulatorSock(), (uint8_t*)bytes, len);
@@ -333,7 +347,6 @@ StcpStatus_t sendStcpPacket(void *bytes, uint16_t len, void* instance_data) {
 }
 
 SPP_STATUS_T sendSPPPacket(uint8_t *bytes, uint16_t len, void* instance_data) {
-    std::cout << "sending spp" << std::endl;
     StcpEngine_t* stcp = TelemetryComms::getInstance()->getStcp();
     StcpWrite(stcp, bytes, len);
     return SPP_STATUS_OK;

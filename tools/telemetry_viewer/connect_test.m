@@ -1,25 +1,26 @@
 
 
 t = tcpclient("127.0.0.1", 65123);
+%%
 
 % get request
 % get/id
-packet = "get/0";
-write(t, packet)
-
-packet = "get/1";
-write(t, packet)
-
-packet = "get/2";
-write(t, packet)
-
-packet = "get/3";
-write(t, packet)
+% packet = "get/0";
+% write(t, packet)
+% 
+% packet = "get/1";
+% write(t, packet)
+% 
+% packet = "get/2";
+% write(t, packet)
+% 
+% packet = "get/3";
+% write(t, packet)
 
 % stream request
 % str/id/period
-% packet = "str/0/50";
-% write(t, packet)
+packet = "str/3/50";
+write(t, packet)
 
 % set request
 % set/id/value
@@ -31,9 +32,10 @@ write(t, packet)
 % packet = "val/0";
 % write(t, packet)
 
-pause(1);
-read(t)
+% pause(1);
+% read(t)
 
+%%
 
 % close connection
 clear t

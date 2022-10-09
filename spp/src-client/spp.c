@@ -206,9 +206,11 @@ extern void SppProcessStreams(SppClientEngine_t* client, uint32_t timestamp, uin
         s->elapsed_time += elapsed_time;
 
         if (s->elapsed_time > s->period) {
-            uint16_t msg_size = MESSAGE_SIZE(SPP_MSG_STREAM_ID, client->address_length);
+            uint16_t msg_size = MESSAGE_SIZE(SPP_MSG_STREAM_BASE_SIZE, client->address_length);
             uint8_t msg[msg_size];
-            uint16_t body_idx = SppFillMessageHeader(client->address_length, msg, &client->host_address, &client->client_address, SPP_MSG_STREAM_REQUEST_ID);
+            uint16_t body_idx = SppFillMessageHeader(client->address_length, msg, &client->host_address, &client->client_address, SPP_MSG_STREAM_ID);
+            memcpy(msg + body_idx, &s->stream_id, sizeof(s->stream_id));
+            body_idx += sizeof(s->stream_id);
             memcpy(msg + body_idx, &timestamp, sizeof(timestamp));
             body_idx += sizeof(timestamp);
             

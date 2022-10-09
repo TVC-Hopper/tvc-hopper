@@ -274,7 +274,6 @@ SPP_STATUS_T SppHostProcessMessage(SppHostEngine_t* host, uint8_t* message, uint
         memcpy(&timestamp, message + body_idx, sizeof(timestamp));
         body_idx += sizeof(timestamp);
         stream->value = &message[body_idx];
-
         host->callbacks.OnStreamResponse(timestamp, stream, host->instance_data);
 
     } else {
