@@ -206,7 +206,7 @@ extern void SppProcessStreams(SppClientEngine_t* client, uint32_t timestamp, uin
         s->elapsed_time += elapsed_time;
 
         if (s->elapsed_time > s->period) {
-            uint16_t msg_size = MESSAGE_SIZE(SPP_MSG_STREAM_BASE_SIZE, client->address_length);
+            uint16_t msg_size = MESSAGE_SIZE(SPP_MSG_STREAM_BASE_SIZE, client->address_length) + s->def->size;
             uint8_t msg[msg_size];
             uint16_t body_idx = SppFillMessageHeader(client->address_length, msg, &client->host_address, &client->client_address, SPP_MSG_STREAM_ID);
             memcpy(msg + body_idx, &s->stream_id, sizeof(s->stream_id));
@@ -214,14 +214,10 @@ extern void SppProcessStreams(SppClientEngine_t* client, uint32_t timestamp, uin
             memcpy(msg + body_idx, &timestamp, sizeof(timestamp));
             body_idx += sizeof(timestamp);
             
-            uint8_t value[s->def->size];
-            client->callbacks.GetValue(s->def->id, value, client->instance_data);
-            
-            memcpy(msg + body_idx, value, sizeof(value));
-            body_idx += sizeof(value);
+            client->callbacks.GetValue(s->def->id, msg + body_idx, client->instance_data);
+            body_idx += s->def->size;
 
             client->callbacks.Send(msg, body_idx, client->instance_data);
-           
             client->streams[i].elapsed_time = 0;
         }
     }

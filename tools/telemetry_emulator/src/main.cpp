@@ -6,6 +6,7 @@
 #include <thread>
 #include <sstream>
 #include <cmath>
+#include <mutex>
 
 #include <iostream>
 #include <csignal>
@@ -44,7 +45,7 @@ static uint8_t client_address_buffer[3];
 static SppAddress_t broadcast_addr = { &broadcast_addr_raw };
 static SppAddress_t address = { &addr_raw };
 
-
+std::mutex telem_mx;
 static uint32_t prop_status = 0;
 static float prop_telem[13];
 static float prop_battery_v = 22.5;
@@ -87,6 +88,7 @@ int main() {
     uint32_t last = duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
 
     double i = 0;
+    size_t counter = 0;
 	while(1)
 	{
         uint32_t now = duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
@@ -94,15 +96,17 @@ int main() {
         last = now;
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
         i += 0.0015;
+
+        std::lock_guard<std::mutex> lg(telem_mx);
         // position
         prop_telem[0] = (5 * sin(i*2)) - 2;
         prop_telem[1] = (6 * sin(i*2)) + 4;
         prop_telem[2] = (7 * sin(i*3)) + 2;
 
         // velocity
-        prop_telem[3] = (9 * sin(i*2.0)) + 5;
-        prop_telem[4] = (8 * sin(i)) + 6;
-        prop_telem[5] = (8 * sin(i)) + 1.0;
+        prop_telem[3] = (int)(counter / 100) % 5;
+        prop_telem[4] = (int)(counter / 200) % 3 + 2;
+        prop_telem[5] = (int)(counter / 400) % 10 - 5;
 
         // acceleration
         prop_telem[6] = (8 * sin(i)) + 5;
@@ -118,6 +122,7 @@ int main() {
         prop_telem[12] = (5 * sin(i + 1.0)) + 5;
 
         prop_battery_v -= 0.000001;
+        counter++;
 
 	}
 
@@ -191,6 +196,11 @@ static SPP_STATUS_T StcpSendPacket(void* buffer, uint16_t len, void* instance_da
 
     memcpy(msg, oss.str().c_str(), oss.str().length());
     memcpy(msg + 6, (uint8_t*)buffer, len);
+
+    for (int i = 0; i < len; ++i) {
+        printf("%02X ", ((uint8_t*)buffer)[i]);
+    }
+    std::cout << std::endl;
 
     pipe_ret_t sendRet = tcp.sendMsg(msg, len + 6);
 
@@ -281,7 +291,16 @@ static SPP_STATUS_T GetValue(uint16_t id, void* value, void* instance_data) {
         }
         case PROP_telemetry_ID:
         {
+            std::lock_guard<std::mutex> lg(telem_mx);
+            for (int i = 0; i < 13; ++i) {
+                std::cout << prop_telem[i] << " ";
+            }
+            std::cout << std::endl;
             memcpy((uint8_t*)value, prop_telem, sizeof(prop_telem));
+            for (int i = 0; i < 52; ++i) {
+                printf("%02X ", ((uint8_t*)value)[i]);
+            }
+            std::cout << std::endl;
             break;
         }
         case PROP_battery_v_ID:

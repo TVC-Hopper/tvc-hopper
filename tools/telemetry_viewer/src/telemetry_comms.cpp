@@ -225,9 +225,6 @@ void TelemetryComms::start() {
     // accept emulator
     emulator_fd_ = acceptClient();
 
-    // std::promise<int> viewer_fd_promise;
-    // std::future<int> fd_future = viewer_fd_promise.get_future();
-
     while(1) {
         viewer_fd_ = TelemetryComms::getInstance()->acceptClient();
     }
@@ -274,8 +271,6 @@ StcpStatus_t handleStcpPacket(void* bytes, uint16_t len, void* instance_data) {
     SPP_STATUS_T ret = SppHostProcessMessage(spp, (uint8_t*)bytes, len);
 
     if (ret != SPP_STATUS_OK) {
-        //for (int i = 0; i < len; ++i) printf("\\x%.2x", ((uint8_t*)bytes)[i]);
-        //std::cout << std::endl;
         std::cout << (int)ret << std::endl;
         return STCP_STATUS_UNDEFINED_ERROR;
     } else {
