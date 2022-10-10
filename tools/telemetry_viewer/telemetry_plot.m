@@ -26,7 +26,7 @@ updateCounter = 0;
 %%
 
 f = figure;
-
+f.Position = [100 100 1200 1200];
 subplotCount = 6;
 
 % position (x,y,z)
@@ -36,7 +36,7 @@ hp = [animatedline('Color', 'r', 'LineWidth', 1) ...
         animatedline('Color', 'b', 'LineWidth', 1) ...
       ];
 ylabel('position');
-legend('x', 'y', 'z');
+legend('x', 'y', 'z','AutoUpdate','off');
 set(ax(1), 'ylim', posAxLimY);
 
 % velocity (x,y,z)
@@ -46,7 +46,7 @@ hv = [animatedline('Color', 'r', 'LineWidth', 1) ...
         animatedline('Color', 'b', 'LineWidth', 1) ...
       ];
 ylabel('velocity');
-legend('x', 'y', 'z');
+legend('x', 'y', 'z','AutoUpdate','off');
 set(ax(2), 'ylim', velAxLimY);
 
 % acceleration (x,y,z)
@@ -56,7 +56,7 @@ ha = [animatedline('Color', 'r', 'LineWidth', 1) ...
         animatedline('Color', 'b', 'LineWidth', 1) ...
       ];
 ylabel('acceleration');
-legend('x', 'y', 'z');
+legend('x', 'y', 'z','AutoUpdate','off');
 set(ax(3), 'ylim', accelAxLimY);
 
 % attitude (x,y,z)
@@ -66,7 +66,7 @@ hatt = [animatedline('Color', 'r', 'LineWidth', 1) ...
         animatedline('Color', 'b', 'LineWidth', 1) ...
       ];
 ylabel('attitude');
-legend('yaw', 'pitch', 'roll'); 
+legend('yaw', 'pitch', 'roll','AutoUpdate','off'); 
 set(ax(4), 'ylim', attitudeAxLimY);
 
 % altitiude (x,y,z)
@@ -82,14 +82,18 @@ hb = [animatedline('Color', 'r', 'LineWidth', 1)];
 ylabel('voltage');
 set(ax(6), 'ylim', battVoltLimY);
 
+set(f,'defaultLegendAutoUpdate','off');
 hfig = axes(f, 'visible', 'off');
 hfig.Title.Visible = 'on';
 hfig.XLabel.Visible = 'on';
 xlabel(hfig, 'time (ms)');
 title(hfig, 'Telemetry Streams');
-
-set(ax, 'xlim', [0 xRange_ms]);
-set(ax, 'XTick', tickBase);
+linkaxes(ax,'x')
+set(hfig, 'xlim', [0 xRange_ms]);
+set(hfig, 'XTick', tickBase);
+% set(hfig,'LegendColorbarListeners',[]);
+setappdata(hfig,'LegendColorbarManualSpace',1);
+setappdata(hfig,'LegendColorbarReclaimSpace',1);
 
 pause(1);
 
@@ -106,7 +110,7 @@ batt_t0 = 0;
 %% ensure values and streams have started, wait for valid timestamp
 % since timestamp comes from SPP client, we can ensure these values have
 % arrived from the client and are ready to be plotted
-while (telem_t0 == 0 && batt_t0 == 0)
+for i = 1:10
     tv.RequestValue(telemetryPropId);
     [~, ~, telem_t0, ~] = tv.ReadValue();
     
@@ -115,8 +119,9 @@ while (telem_t0 == 0 && batt_t0 == 0)
     pause(0.1);
 end
 
+profile on
 
-while (true)
+while (updateCounter < 50)
 
     tv.RequestValue(telemetryPropId);
     [~, ~, telem_tstamp, telem_value] = tv.ReadValue();
@@ -171,13 +176,13 @@ while (true)
     if mod(updateCounter, tickUpdateInterval) == 0
         nearestTick = dTick * round(t / dTick);
         xTick = nearestTick + tickBase;
-        set(ax, 'XTick', xTick);
+        set(hfig, 'XTick', xTick);
     end
     
-    
-    drawnow limitrate;
+    drawnow limitrate
     updateCounter = updateCounter + 1;
 
-    pause(0.01); 
+    pause(0.015); 
 end
 
+profile viewer
