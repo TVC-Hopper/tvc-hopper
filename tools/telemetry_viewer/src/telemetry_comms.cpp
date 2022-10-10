@@ -153,37 +153,6 @@ SPP_STATUS_T onValueResponse(SppAddress_t *client, uint16_t id, void* value, voi
         memcpy(&pv->buffer[0], (uint8_t*)value, pv->def->size);
     }
 
-    switch(id) {
-        case PROP_start_ID:
-        {
-            std::cout << *((bool*)value) << std::endl;
-            break;
-        }
-        case PROP_stop_ID:
-        {
-            std::cout << *((bool*)value) << std::endl;
-            break;
-        }
-        case PROP_status_ID:
-        {
-            std::cout << *((uint32_t*)value) << std::endl;
-            break;
-        }
-        case PROP_telemetry_ID:
-        {
-            uint8_t* data = (uint8_t*)value;
-            for (int i = 0; i < 10; ++i) {
-                std::cout << data[i] << " ";
-            }
-            std::cout << std::endl;
-            break;
-        }
-        default:
-        {
-            return SPP_STATUS_UNKNOWN_PROPERTY;
-        }
-    }
-
     return SPP_STATUS_OK;
 }
 

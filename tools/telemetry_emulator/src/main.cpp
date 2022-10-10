@@ -45,10 +45,13 @@ static SppAddress_t broadcast_addr = { &broadcast_addr_raw };
 static SppAddress_t address = { &addr_raw };
 
 
-static bool prop_start = false;
-static bool prop_stop = false;
 static uint32_t prop_status = 0;
-static uint8_t prop_telem[10] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j'};
+static float prop_telem[13];
+static float prop_battery_v = 22.5;
+static bool prop_telem_filter_en = false;
+static float prop_servo_positions[4];
+static float prop_target_position[3];
+static float prop_param_bounds[9];
 
 
 int main() {
@@ -91,9 +94,31 @@ int main() {
         last = now;
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
         i += 0.0015;
-        prop_telem[0] = (int)(10 * sin(i)) + 15;
-        prop_telem[1] = (int)(5 * sin(i)) + 10;
-        prop_telem[2] = (int)(20 * sin(i)) + 21;
+        // position
+        prop_telem[0] = (5 * sin(i*2)) - 2;
+        prop_telem[1] = (6 * sin(i*2)) + 4;
+        prop_telem[2] = (7 * sin(i*3)) + 2;
+
+        // velocity
+        prop_telem[3] = (9 * sin(i*2.0)) + 5;
+        prop_telem[4] = (8 * sin(i)) + 6;
+        prop_telem[5] = (8 * sin(i)) + 1.0;
+
+        // acceleration
+        prop_telem[6] = (8 * sin(i)) + 5;
+        prop_telem[7] = (5 * sin(i)) + 7;
+        prop_telem[8] = (2 * sin(i)) + 10;
+
+        // attitude
+        prop_telem[9] = (10 * sin(i - 1.0)) - 15;
+        prop_telem[10] = (5 * sin(i + 2.1)) + 100;
+        prop_telem[11] = (20 * sin(i + 1.5)) + 50;
+
+        // altitude
+        prop_telem[12] = (5 * sin(i + 1.0)) + 5;
+
+        prop_battery_v -= 0.000001;
+
 	}
 
 	return 0;
@@ -183,22 +208,58 @@ static SPP_STATUS_T SetValue(uint16_t id, void* value, void* instance_data) {
     switch(id) {
         case PROP_start_ID:
         {
-            memcpy(&prop_start, value, sizeof(prop_start));
+            std::cout << "START: " << *((bool*)value) << std::endl;
             break;
         }
         case PROP_stop_ID:
         {
-            memcpy(&prop_stop, value, sizeof(prop_stop));
+            std::cout << "STOP: " << *((bool*)value) << std::endl;
             break;
         }
-        case PROP_status_ID:
+        case PROP_telem_filter_en_ID:
         {
-            memcpy(&prop_status, value, sizeof(prop_status));
+            prop_telem_filter_en = *((bool*)value);
+            std::cout << "TELEM_FILTER_EN: " << *((bool*)value) << std::endl;
             break;
         }
-        case PROP_telemetry_ID:
+        case PROP_reset_system_ID:
         {
-            memcpy(prop_telem, value, sizeof(prop_telem));
+            std::cout << "RESET_SYS: " << *((bool*)value) << std::endl;
+            break;
+        }
+        case PROP_reset_controls_ID:
+        {
+            std::cout << "RESET_CONTROLS: " << *((bool*)value) << std::endl;
+            break;
+        }
+        case PROP_servo_positions_ID:
+        {
+            memcpy(prop_servo_positions, (uint8_t*)value, sizeof(prop_servo_positions));
+            std::cout << "Servo positions: ";
+            for (size_t i = 0; i < 4; ++i) {
+                std::cout << prop_servo_positions[i] << " ";
+            }
+            std::cout << std::endl;
+            break;
+        }
+        case PROP_target_position_ID:
+        {
+            memcpy(prop_target_position, (uint8_t*)value, sizeof(prop_target_position));
+            std::cout << "Target position(x,y,z): ";
+            for (size_t i = 0; i < 3; ++i) {
+                std::cout << prop_target_position[i] << " ";
+            }
+            std::cout << std::endl;
+            break;
+        }
+        case PROP_param_bounds_ID:
+        {
+            memcpy(prop_param_bounds, (uint8_t*)value, sizeof(prop_param_bounds));
+            std::cout << "Bounds(vx,vy,vz,ax,ay,az,oy,op,or): ";
+            for (size_t i = 0; i < 9; ++i) {
+                std::cout << prop_param_bounds[i] << " ";
+            }
+            std::cout << std::endl;
             break;
         }
         default:
@@ -213,25 +274,41 @@ static SPP_STATUS_T SetValue(uint16_t id, void* value, void* instance_data) {
 static SPP_STATUS_T GetValue(uint16_t id, void* value, void* instance_data) {
     std::cout << "getting " << id << std::endl;
     switch(id) {
-        case PROP_start_ID:
-        {
-            memcpy(value, &prop_start, sizeof(prop_start));
-            break;
-        }
-        case PROP_stop_ID:
-        {
-            memcpy(value, &prop_stop, sizeof(prop_stop));
-            break;
-        }
         case PROP_status_ID:
         {
-            memcpy(value, &prop_status, sizeof(prop_status));
+            memcpy((uint8_t*)value, &prop_status, sizeof(prop_status));
             break;
         }
         case PROP_telemetry_ID:
         {
-            std::cout << sizeof(prop_telem) << std::endl;
-            memcpy(value, prop_telem, sizeof(prop_telem));
+            memcpy((uint8_t*)value, prop_telem, sizeof(prop_telem));
+            break;
+        }
+        case PROP_battery_v_ID:
+        {
+            memcpy((uint8_t*)value, &prop_battery_v, sizeof(prop_battery_v));
+            break;
+        }
+        case PROP_timestamp_ms_ID:
+        {
+            using namespace std::chrono;
+            uint32_t timestamp = duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
+            memcpy((uint8_t*)value, &timestamp, sizeof(timestamp));
+            break;
+        }
+        case PROP_servo_positions_ID:
+        {
+            memcpy((uint8_t*)value, prop_servo_positions, sizeof(prop_servo_positions));
+            break;
+        }
+        case PROP_target_position_ID:
+        {
+            memcpy((uint8_t*)value, prop_target_position, sizeof(prop_target_position));
+            break;
+        }
+        case PROP_param_bounds_ID:
+        {
+            memcpy((uint8_t*)value, prop_param_bounds, sizeof(prop_param_bounds));
             break;
         }
         default:
