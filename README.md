@@ -121,6 +121,8 @@ To add new data, modify the server and the matlab script to accept and plot new 
 
 The telemetry server operates an SPP host instance that streams data from the client (either vehicle or emulated). The MATLAB visualization/viewer client connects to the server and reads data to plot.
 
+![Telemetry Viewer plotting data streams](docs/readme-assets/matlab-telemetry.png)
+
 #### Server API
 
 - `id`: property id
