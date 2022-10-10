@@ -1,6 +1,8 @@
 build
 build-*
 
+*.bak
+
 .DS_Store
 .vscode
 
