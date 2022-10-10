@@ -55,14 +55,14 @@ void onIncomingMsg(const std::string &clientIP, const uint8_t * msg, size_t size
         return;
     }
 
-    std::string body = msg_str.substr(cmd_end + 1, msg_str.length());
-    int id_end = body.find('/');
-    std::string id_str = body.substr(0, id_end);
-    uint16_t id = std::stoi(id_str);
-
+    size_t body_idx = cmd_end + 1;
+    uint16_t id;
+    memcpy(&id, msg + body_idx, sizeof(uint16_t));
+    body_idx += sizeof(uint16_t);
 
     if (cmd == "str") {
-        uint16_t period = std::stoi(body.substr(id_end + 1, body.length()));
+        uint16_t period;
+        memcpy(&period, msg + body_idx, sizeof(uint16_t));
         std::cout << "stream request " << id << " " << period << std::endl;
         SppStream_t* s = TelemetryComms::getInstance()->getNextStream();
         SppHostStartStream(spp, &default_client, id, period, SPP_STREAM_READ, s);
@@ -74,54 +74,22 @@ void onIncomingMsg(const std::string &clientIP, const uint8_t * msg, size_t size
         PropValue* value = TelemetryComms::getInstance()->getValue(id);
 
         uint16_t type = value->def->type;
-
-        std::ostringstream oss;
-        oss << std::setfill('0') << std::setw(4) << std::hex << id;
-        oss << std::setfill('0') << std::setw(2) << std::hex << static_cast<int>(value->def->size);
-        oss << std::setfill('0') << std::setw(2) << std::hex << (value->timestamp);
-
-        std::unique_lock<std::mutex> ul(value->mx);
-        if (type == SPP_PROP_T_BOOL) {
-            oss << std::setfill('0') << std::setw(1) << std::hex << *((bool*)&value->buffer[0]);
-        } else if (type == SPP_PROP_T_U32) {
-            oss << std::setfill('0') << std::setw(8) << std::hex << *((uint32_t*)&value->buffer[0]);
-        } else if (type == SPP_PROP_T_I32) {
-            oss << std::setfill('0') << std::setw(8) << std::hex << *((int32_t*)&value->buffer[0]);
-        } else if (type == SPP_PROP_T_I16) {
-            oss << std::setfill('0') << std::setw(4) << std::hex <<  *((uint16_t*)&value->buffer[0]);
-        } else if (type == SPP_PROP_T_I16) {
-            oss << std::setfill('0') << std::setw(4) << std::hex <<  *((int16_t*)&value->buffer[0]);
-        } else if (type == SPP_PROP_T_ARR) {
-            for (auto &i : value->buffer) {
-                oss << std::setfill('0') << std::setw(2) << std::hex << static_cast<int>(i);
-            }
-            std::cout << "arr: " << oss.str() << std::endl;
+        uint16_t size = value->def->size;
+        uint8_t msg_len = 2 + 1 + 4 + size;
+        uint8_t msg[msg_len];
+        {
+            std::unique_lock<std::mutex> ul(value->mx);
+            memcpy(msg, &id, sizeof(uint16_t));
+            memcpy(msg + 2, &size, sizeof(uint8_t));
+            memcpy(msg + 2 + 1, &value->timestamp, sizeof(uint32_t));
+            memcpy(msg + 2 + 1 + 4, &value->buffer[0], size);
         }
-        ul.unlock();
-        
-        std::string response = oss.str();
+
         TelemetryComms* tc = TelemetryComms::getInstance();
-        tc->getServer()->sendToClient(tc->getViewerSock(), (uint8_t*)response.c_str(), response.length());
+        tc->getServer()->sendToClient(tc->getViewerSock(), msg, msg_len);
     } else if (cmd == "set") {
-        std::string value_str = body.substr(id_end + 1, body.length());
-        std::cout << "set request " << id << " " << value_str << std::endl;
-        SppPropertyDefinition_t *def;
-        SppHostGetDefinition(spp, &default_client, id, &def);
-
-        uint8_t value[def->size];
-
-        if (def->type == SPP_PROP_T_BOOL) {
-            value[0] = std::stoi(value_str);
-        } else if (def->type == SPP_PROP_T_U32) {
-            uint32_t value_tmp = std::stoul(value_str);
-            memcpy(value, &value_tmp, sizeof(value_tmp));
-        } else if (def->type == SPP_PROP_T_I32) {
-            int32_t value_tmp = std::stoi(value_str);
-            memcpy(value, &value_tmp, sizeof(value_tmp));
-        }
-            
-        
-        SppHostSetValue(spp, &default_client, id, value);
+        std::cout << "set request " << id << std::endl;
+        SppHostSetValue(spp, &default_client, id, (void*)(msg + body_idx));
     }
 }
 

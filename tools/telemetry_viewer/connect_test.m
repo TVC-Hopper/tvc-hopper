@@ -1,6 +1,11 @@
 
 tv = TelemetryViewerClient("127.0.0.1", 65123);
+%%
+% tv.RequestProperty(3);
+% tv.RequestValue(3);
+% [id, sz, tstamp, value] = tv.ReadValue()
 
+%%
 tv.StartStream(3, 20);
 
 %%
@@ -20,7 +25,7 @@ t0 = 0;
 
 while (t0 == 0)
     tv.RequestValue(3);
-    [id, sz, tstamp, value] = tv.ReadValue(@TelemetryViewerClient.ParseU8Array);
+    [id, sz, tstamp, value] = tv.ReadValue();
 
     t0 = tstamp;
     pause(0.1);
@@ -29,17 +34,17 @@ end
 
 while (true)
     tv.RequestValue(3);
-    [id, sz, tstamp, value] = tv.ReadValue(@TelemetryViewerClient.ParseU8Array);
+    [id, sz, tstamp, value] = tv.ReadValue();
     
 %     fprintf('%d %d %d', id, sz, tstamp);
     
     if ~isempty(value)
 %         disp(value);
 
-        t = tstamp - t0;
-        addpoints(hx, t, value(1));
-        addpoints(hy, t, value(2));
-        addpoints(hz, t, value(3));
+        t = double(tstamp - t0);
+        addpoints(hx, t, double(value(1)));
+        addpoints(hy, t, double(value(2)));
+        addpoints(hz, t, double(value(3)));
         drawnow;
     end
 

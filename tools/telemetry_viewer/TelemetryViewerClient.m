@@ -14,18 +14,19 @@ classdef TelemetryViewerClient
         end
 
         function RequestValue(s, id)
-            packet = "val/%d";
-            write(s.tcpsock, sprintf(packet, id))
+            packet = append('val/', char(typecast(uint16(id), 'uint8')));
+            write(s.tcpsock, packet);
         end
 
-        function [id, sz, tstamp, value] = ReadValue(s, parser)
-            buf = read(s.tcpsock);
-            if ~isempty(buf)
-                id = hex2dec(buf(1:4));
-                sz = hex2dec(buf(5:6));
-                tstamp = hex2dec(buf(7:14));
-                value = parser(buf(15:(15+(2*sz)-1)));
+        function [id, sz, tstamp, value] = ReadValue(s)
+            buf = read(s.tcpsock, 7);
+            if length(buf) == 7
+                id = typecast(buf(1:2), 'uint16');
+                sz = typecast(buf(3), 'uint8');
+                tstamp = typecast(buf(4:7), 'uint32');
+                value = read(s.tcpsock, sz);
             else
+                disp(buf);
                 id = 0;
                 sz = 0;
                 tstamp = 0;
@@ -34,31 +35,19 @@ classdef TelemetryViewerClient
         end
 
         function StartStream(s, id, period)
-            packet = "str/%d/%d";
-            write(s.tcpsock, sprintf(packet, id, period));
+            packet = append('str/', char(typecast(uint16(id), 'uint8')), '/', char(typecast(uint16(period), 'uint8')));
+            write(s.tcpsock, packet);
         end
 
 
         function RequestProperty(s, id)
-            packet = "get/%d";
-            write(s.tcpsock, sprintf(packet, id))
+            packet = append('get/', char(typecast(uint16(id), 'uint8')));
+            write(s.tcpsock, packet)
         end
 
         function SetProperty(s, id, value)
-            packet = "set/%d/%d";
-            write(s.tcpsock, sprintf(packet, id, value))
-        end
-    end
-    methods(Static)
-        function arr = ParseU8Array(buffer)
-            arr = zeros(1, length(buffer)/2);
-            for i = 1:(length(buffer)/2)
-                arr(i) = TelemetryViewerClient.ParseNumerical(buffer(2*i-1:2*i));
-            end
-        end
-
-        function i = ParseNumerical(buffer)
-            i = hex2dec(buffer);
+            packet = append('set/', char(typecast(uint16(id), 'uint8')), '/', char(typecast(value, 'uint8')));
+            write(s.tcpsock, packet)
         end
     end
 end
