@@ -197,11 +197,6 @@ static SPP_STATUS_T StcpSendPacket(void* buffer, uint16_t len, void* instance_da
     memcpy(msg, oss.str().c_str(), oss.str().length());
     memcpy(msg + 6, (uint8_t*)buffer, len);
 
-    for (int i = 0; i < len; ++i) {
-        printf("%02X ", ((uint8_t*)buffer)[i]);
-    }
-    std::cout << std::endl;
-
     pipe_ret_t sendRet = tcp.sendMsg(msg, len + 6);
 
     if (!sendRet.isSuccessful()) {
@@ -292,15 +287,7 @@ static SPP_STATUS_T GetValue(uint16_t id, void* value, void* instance_data) {
         case PROP_telemetry_ID:
         {
             std::lock_guard<std::mutex> lg(telem_mx);
-            for (int i = 0; i < 13; ++i) {
-                std::cout << prop_telem[i] << " ";
-            }
-            std::cout << std::endl;
             memcpy((uint8_t*)value, prop_telem, sizeof(prop_telem));
-            for (int i = 0; i < 52; ++i) {
-                printf("%02X ", ((uint8_t*)value)[i]);
-            }
-            std::cout << std::endl;
             break;
         }
         case PROP_battery_v_ID:
