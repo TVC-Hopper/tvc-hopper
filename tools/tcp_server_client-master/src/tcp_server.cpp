@@ -68,14 +68,14 @@ void TcpServer::terminateDeadClientsRemover() {
  * Handle different client events. Subscriber callbacks should be short and fast, and must not
  * call other server functions to avoid deadlock
  */
-void TcpServer::clientEventHandler(const Client &client, ClientEvent event, const std::string &msg) {
+void TcpServer::clientEventHandler(const Client &client, ClientEvent event, const uint8_t *msg, size_t size) {
     switch (event) {
         case ClientEvent::DISCONNECTED: {
-            publishClientDisconnected(client.getIp(), msg);
+            publishClientDisconnected(client.getIp(), msg, size);
             break;
         }
         case ClientEvent::INCOMING_MSG: {
-            publishClientMsg(client, msg.c_str(), msg.size());
+            publishClientMsg(client, msg, size);
             break;
         }
     }
@@ -87,7 +87,7 @@ void TcpServer::clientEventHandler(const Client &client, ClientEvent event, cons
  * from clients with IP address identical to
  * the specific observer requested IP
  */
-void TcpServer::publishClientMsg(const Client & client, const char * msg, size_t msgSize) {
+void TcpServer::publishClientMsg(const Client & client, const uint8_t * msg, size_t msgSize) {
     std::lock_guard<std::mutex> lock(_subscribersMtx);
 
     for (const server_observer_t& subscriber : _subscribers) {
@@ -105,13 +105,13 @@ void TcpServer::publishClientMsg(const Client & client, const char * msg, size_t
  * with IP address identical to the specific
  * observer requested IP
  */
-void TcpServer::publishClientDisconnected(const std::string &clientIP, const std::string &clientMsg) {
+void TcpServer::publishClientDisconnected(const std::string &clientIP, const uint8_t * msg, size_t msgSize) {
     std::lock_guard<std::mutex> lock(_subscribersMtx);
 
     for (const server_observer_t& subscriber : _subscribers) {
         if (subscriber.wantedIP == clientIP) {
             if (subscriber.disconnectionHandler) {
-                subscriber.disconnectionHandler(clientIP, clientMsg);
+                subscriber.disconnectionHandler(clientIP, msg, msgSize);
             }
         }
     }
@@ -176,7 +176,7 @@ void TcpServer::listenToClients(int maxNumOfClients) {
  * mode (async) and will quit after timeout seconds if no client tried to connect.
  * Return accepted client IP, or throw error if failed
  */
-std::string TcpServer::acceptClient(uint timeout) {
+Client* TcpServer::acceptClient(uint timeout) {
     const pipe_ret_t waitingForClient = waitForClient(timeout);
     if (!waitingForClient.isSuccessful()) {
         throw std::runtime_error(waitingForClient.message());
@@ -193,13 +193,13 @@ std::string TcpServer::acceptClient(uint timeout) {
     auto newClient = new Client(fileDescriptor);
     newClient->setIp(inet_ntoa(_clientAddress.sin_addr));
     using namespace std::placeholders;
-    newClient->setEventsHandler(std::bind(&TcpServer::clientEventHandler, this, _1, _2, _3));
+    newClient->setEventsHandler(std::bind(&TcpServer::clientEventHandler, this, _1, _2, _3, _4));
     newClient->startListen();
 
     std::lock_guard<std::mutex> lock(_clientsMtx);
     _clients.push_back(newClient);
 
-    return newClient->getIp();
+    return newClient;
 }
 
 pipe_ret_t TcpServer::waitForClient(uint32_t timeout) {
@@ -223,7 +223,7 @@ pipe_ret_t TcpServer::waitForClient(uint32_t timeout) {
  * Send message to all connected clients.
  * Return true if message was sent successfully to all clients
  */
-pipe_ret_t TcpServer::sendToAllClients(const char * msg, size_t size) {
+pipe_ret_t TcpServer::sendToAllClients(const uint8_t * msg, size_t size) {
     std::lock_guard<std::mutex> lock(_clientsMtx);
 
     for (const Client *client : _clients) {
@@ -240,7 +240,7 @@ pipe_ret_t TcpServer::sendToAllClients(const char * msg, size_t size) {
  * Send message to specific client (determined by client IP address).
  * Return true if message was sent successfully
  */
-pipe_ret_t TcpServer::sendToClient(const Client & client, const char * msg, size_t size){
+pipe_ret_t TcpServer::sendToClient(const Client & client, const uint8_t * msg, size_t size){
     try{
         client.send(msg, size);
     } catch (const std::runtime_error &error) {
@@ -250,7 +250,21 @@ pipe_ret_t TcpServer::sendToClient(const Client & client, const char * msg, size
     return pipe_ret_t::success();
 }
 
-pipe_ret_t TcpServer::sendToClient(const std::string & clientIP, const char * msg, size_t size) {
+pipe_ret_t TcpServer::sendToClient(int fd, const uint8_t * msg, size_t size){
+    std::lock_guard<std::mutex> lock(_clientsMtx);
+
+    const auto clientIter = std::find_if(_clients.begin(), _clients.end(),
+         [&fd](Client *client) { return client->getSock() == fd; });
+
+    if (clientIter == _clients.end()) {
+        return pipe_ret_t::failure("client not found");
+    }
+
+    const Client &client = *(*clientIter);
+    return sendToClient(client, msg, size);
+}
+
+pipe_ret_t TcpServer::sendToClient(const std::string & clientIP, const uint8_t * msg, size_t size) {
     std::lock_guard<std::mutex> lock(_clientsMtx);
 
     const auto clientIter = std::find_if(_clients.begin(), _clients.end(),

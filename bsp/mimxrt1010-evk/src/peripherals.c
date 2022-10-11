@@ -10,7 +10,7 @@ product: Peripherals v11.0
 processor: MIMXRT1011xxxxx
 package_id: MIMXRT1011DAE5A
 mcu_data: ksdk2_0
-processor_version: 12.0.0
+processor_version: 12.0.1
 board: MIMXRT1010-EVK
 functionalGroups:
 - name: BOARD_InitPeripherals

@@ -12,6 +12,7 @@ but also with custom tools, build needs, flashing, and testing.
 - `cmake` (>=3.17)
 - `arm-none-eabi-gcc` (>=10.3.1)
 - MCUXpresso Config Tools v12
+- MCUXpresso IDE
 - `catch2` (v3)
     ```
     $ git clone https://github.com/catchorg/Catch2.git
@@ -19,9 +20,26 @@ but also with custom tools, build needs, flashing, and testing.
     $ cmake -Bbuild -H. -DBUILD_TESTING=OFF
     $ sudo cmake --build build/ --target install
     ```
-- `ninja` (`sudo apt install ninja-build`)
+- `ninja` (`sudo apt install ninja-build` or `pip install ninja`)
 
 For Windows users, it is recommended to set up WSL for this toolchain.
+
+### Programming and Debugging
+
+#### Debugging
+
+Currently, only the debug target is supported for the development board. Hopefully adding other support later.
+
+To debug, use MCUXpresso IDE to open the project located at `support/tvc_ide_build` and use the `tvc_debug` target.
+This target should be configured with the relative path to `build-debug/hopper.elf` if the project is cloned using git.
+Build the project using the regular command line interface (`make debug`) to generate `hopper.elf`.
+Debug as normal using the IDE's GDB interface.
+
+This will be the normal method of debugging and testing you'll use on the System on a Board.
+
+#### Programming Flight Controller
+
+TBD. This may be difficult to get working.
 
 ### Build targets
 
@@ -33,24 +51,21 @@ The build supports 3 different targets:
 - FlexSPI NOR flash release: loaded to external flash memory, no debug symols
 - Tests: build and run tests
 
-```
-make clean
 
-# debug build
-make debug
+### `make` targets
 
-# release build
-make release 
+- `clean`: remove all build artifacts
+- `debug`: debug build
+- `release`: release build
+- `flexspi_nor_debug`: debug build for flexspi nor flash
+- `flexspi_nor_release`: release build for flexspi nor flash
+- `test`: build and run unit tests
+- `generate_spp_headers`: regenerate or update SPP property lists in various directories
+- `telemetry_server`: build telemetry server
+- `telemetry_emulator`: build telemetry emulator for testing
+- `start_telemetry_server`: starts telemetry server
+- `start_telemetry_emulator`: starts telemetry emulator (start from different terminal)
 
-# flexspi nor debug build
-make flexspi_nor_debug
-
-# flexspi nor release build
-make flexspi_nor_release
-
-# build, run tests
-make test
-```
 
 ## Design and Architecture
 
@@ -89,7 +104,7 @@ to connect the incoming data with the appropriate packet parser.
 
 ## License
 
-TBD
+Some parts under MIT, some under GPLv3.
 
 ## Testing
 
@@ -97,6 +112,40 @@ Unit tests are run using Catch2, a standard C/C++ unit test framework.
 The unit tests are focused on only testing the drivers and application code.
 
 All tests are located in `tests` directory
+
+### Telemetry Viewer
+
+Start the server using `make start_telemetry_server`.
+Use MATLAB, switch working directory to `tools/telemetry_viewer`. Run the script to plot incoming data.
+To add new data, modify the server and the matlab script to accept and plot new values.
+
+The telemetry server operates an SPP host instance that streams data from the client (either vehicle or emulated). The MATLAB visualization/viewer client connects to the server and reads data to plot.
+
+![Telemetry Viewer plotting data streams](docs/readme-assets/matlab-telemetry.png)
+
+#### Server API
+
+- `id`: property id
+- `period`: period in milliseconds
+- `value`: property value
+
+***Requests***
+
+- `get/<id>`: Request property value from SPP client
+- `val/<id>`: Request property value from telemetry server
+- `str/<id>/<period>`: Start stream
+- `set/<id>/<value>`: Set property value
+- `emdat/<id>/<value>`: Provide emulated data
+
+***Response***
+Where integer is number of characters (1/2 byte)
+- Value response: `<id:4><size:2><timestamp:8><value:size*2>`
+
+#### Data emulation
+
+Modify `tools/telemetry_emulator/src/main.cpp` to generate whatever telemetry data you'd like, may need to update property
+lists.
+Open a terminal and run `make telemetry_emulator start_telemetry_emulator`.
 
 
 

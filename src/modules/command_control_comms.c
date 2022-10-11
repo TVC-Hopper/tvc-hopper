@@ -78,42 +78,78 @@ static SPP_STATUS_T SetValue(uint16_t id, void* value, void* instance_data) {
     switch(id) {
         case PROP_start_ID:
         {
+            break;
         }
         case PROP_stop_ID:
         {
+            break;
         }
-        case PROP_status_ID:
+        case PROP_telem_filter_en_ID:
         {
+            break;
         }
-        case PROP_telemetry_ID:
+        case PROP_reset_system_ID:
         {
+            break;
+        }
+        case PROP_reset_controls_ID:
+        {
+            break;
+        }
+        case PROP_servo_positions_ID:
+        {
+            break;
+        }
+        case PROP_target_position_ID:
+        {
+            break;
+        }
+        case PROP_param_bounds_ID:
+        {
+            break;
         }
         default:
         {
             return SPP_STATUS_UNKNOWN_PROPERTY;
         }
     }
+
+    return SPP_STATUS_OK;
 }
 
 static SPP_STATUS_T GetValue(uint16_t id, void* value, void* instance_data) {
     switch(id) {
-        case PROP_start_ID:
-        {
-        }
-        case PROP_stop_ID:
-        {
-        }
-        case PROP_status_ID:
-        {
-        }
         case PROP_telemetry_ID:
         {
+            break;
+        }
+        case PROP_battery_v_ID:
+        {
+            break;
+        }
+        case PROP_timestamp_ms_ID:
+        {
+            break;
+        }
+        case PROP_servo_positions_ID:
+        {
+            break;
+        }
+        case PROP_target_position_ID:
+        {
+            break;
+        }
+        case PROP_param_bounds_ID:
+        {
+            break;
         }
         default:
         {
             return SPP_STATUS_UNKNOWN_PROPERTY;
         }
     }
+
+    return SPP_STATUS_OK;
 }
 
 static StcpStatus_t HandleStcpPacket(void* buffer, uint16_t length, void* instance_data) {

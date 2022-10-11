@@ -13,7 +13,7 @@
 
 class Client {
 
-    using client_event_handler_t = std::function<void(const Client&, ClientEvent, const std::string&)>;
+    using client_event_handler_t = std::function<void(const Client&, ClientEvent, const uint8_t*, size_t)>;
 
 private:
     FileDescriptor _sockfd;
@@ -36,15 +36,17 @@ public:
     void setIp(const std::string & ip) { _ip = ip; }
     std::string getIp() const { return _ip; }
 
+    int getSock() const { return _sockfd.get(); }
+
     void setEventsHandler(const client_event_handler_t & eventHandler) { _eventHandlerCallback = eventHandler; }
-    void publishEvent(ClientEvent clientEvent, const std::string &msg = "");
+    void publishEvent(ClientEvent clientEvent, const uint8_t * msg, size_t size);
 
 
     bool isConnected() const { return _isConnected; }
 
     void startListen();
 
-    void send(const char * msg, size_t msgSize) const;
+    void send(const uint8_t * msg, size_t msgSize) const;
 
     void close();
 

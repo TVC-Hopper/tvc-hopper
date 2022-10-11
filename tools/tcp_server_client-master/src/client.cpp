@@ -27,7 +27,7 @@ void Client::startListen() {
     _receiveThread = new std::thread(&Client::receiveTask, this);
 }
 
-void Client::send(const char *msg, size_t msgSize) const {
+void Client::send(const uint8_t *msg, size_t msgSize) const {
     const size_t numBytesSent = ::send(_sockfd.get(), (char *)msg, msgSize, 0);
 
     const bool sendFailed = (numBytesSent < 0);
@@ -56,7 +56,7 @@ void Client::receiveTask() {
             continue;
         }
 
-        char receivedMessage[MAX_PACKET_SIZE];
+        uint8_t receivedMessage[MAX_PACKET_SIZE];
         const size_t numOfBytesReceived = recv(_sockfd.get(), receivedMessage, MAX_PACKET_SIZE, 0);
 
         if(numOfBytesReceived < 1) {
@@ -68,16 +68,16 @@ void Client::receiveTask() {
                 disconnectionMessage = strerror(errno);
             }
             setConnected(false);
-            publishEvent(ClientEvent::DISCONNECTED, disconnectionMessage);
+            publishEvent(ClientEvent::DISCONNECTED, (uint8_t*)disconnectionMessage.c_str(), disconnectionMessage.length());
             return;
         } else {
-            publishEvent(ClientEvent::INCOMING_MSG, receivedMessage);
+            publishEvent(ClientEvent::INCOMING_MSG, receivedMessage, numOfBytesReceived);
         }
     }
 }
 
-void Client::publishEvent(ClientEvent clientEvent, const std::string &msg) {
-    _eventHandlerCallback(*this, clientEvent, msg);
+void Client::publishEvent(ClientEvent clientEvent, const uint8_t * msg, size_t size) {
+    _eventHandlerCallback(*this, clientEvent, msg, size);
 }
 
 void Client::print() const {

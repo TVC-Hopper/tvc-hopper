@@ -10,7 +10,7 @@ product: Pins v12.0
 processor: MIMXRT1011xxxxx
 package_id: MIMXRT1011DAE5A
 mcu_data: ksdk2_0
-processor_version: 12.0.0
+processor_version: 12.0.1
 board: MIMXRT1010-EVK
 pin_labels:
 - {pin_num: '57', pin_signal: GPIO_AD_03, label: 'LPSPI1_SDI/J57[10]/U27[2]', identifier: LPSPI1_SDI;PWM1_B_2}

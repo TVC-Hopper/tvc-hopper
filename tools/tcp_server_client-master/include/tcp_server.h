@@ -36,13 +36,13 @@ private:
     std::thread * _clientsRemoverThread = nullptr;
     std::atomic<bool> _stopRemoveClientsTask;
 
-    void publishClientMsg(const Client & client, const char * msg, size_t msgSize);
-    void publishClientDisconnected(const std::string&, const std::string&);
+    void publishClientMsg(const Client & client, const uint8_t * msg, size_t msgSize);
+    void publishClientDisconnected(const std::string&, const uint8_t * msg, size_t size);
     pipe_ret_t waitForClient(uint32_t timeout);
-    void clientEventHandler(const Client&, ClientEvent, const std::string &msg);
+    void clientEventHandler(const Client&, ClientEvent, const uint8_t * msg, size_t size);
     void removeDeadClients();
     void terminateDeadClientsRemover();
-    static pipe_ret_t sendToClient(const Client & client, const char * msg, size_t size);
+    static pipe_ret_t sendToClient(const Client & client, const uint8_t * msg, size_t size);
 
 public:
     TcpServer();
@@ -51,10 +51,11 @@ public:
     void initializeSocket();
     void bindAddress(int port);
     void listenToClients(int maxNumOfClients);
-    std::string acceptClient(uint timeout);
+    Client* acceptClient(uint timeout);
     void subscribe(const server_observer_t & observer);
-    pipe_ret_t sendToAllClients(const char * msg, size_t size);
-    pipe_ret_t sendToClient(const std::string & clientIP, const char * msg, size_t size);
+    pipe_ret_t sendToAllClients(const uint8_t * msg, size_t size);
+    pipe_ret_t sendToClient(const std::string & clientIP, const uint8_t * msg, size_t size);
+    pipe_ret_t sendToClient(int fd, const uint8_t * msg, size_t size);
     pipe_ret_t close();
     void printClients();
 };

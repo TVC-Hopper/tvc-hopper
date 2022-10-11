@@ -138,7 +138,8 @@ SPP_STATUS_T SppClientProcessMessage(SppClientEngine_t* client, uint8_t* message
         SppPropertyDefinition_t *pd;
         SppGetDefinition(client, id, &pd);
 
-        uint16_t get_resp_msg_len = SPP_MSG_HDR_SIZE(addr_len) + pd->size;
+        // +5 for token. status, size, id (2)
+        uint16_t get_resp_msg_len = SPP_MSG_HDR_SIZE(addr_len) + pd->size + SPP_MSG_GET_RESPONSE_BASE_SIZE;
         uint8_t get_resp_msg[get_resp_msg_len];
         body_idx = SppFillMessageHeader(addr_len, get_resp_msg, &client->host_address, &client->client_address, SPP_MSG_GET_RESPONSE_ID);
         get_resp_msg[body_idx++] = token;
@@ -205,20 +206,18 @@ extern void SppProcessStreams(SppClientEngine_t* client, uint32_t timestamp, uin
         s->elapsed_time += elapsed_time;
 
         if (s->elapsed_time > s->period) {
-            uint16_t msg_size = MESSAGE_SIZE(SPP_MSG_STREAM_ID, client->address_length);
+            uint16_t msg_size = MESSAGE_SIZE(SPP_MSG_STREAM_BASE_SIZE, client->address_length) + s->def->size;
             uint8_t msg[msg_size];
-            uint16_t body_idx = SppFillMessageHeader(client->address_length, msg, &client->host_address, &client->client_address, SPP_MSG_STREAM_REQUEST_ID);
+            uint16_t body_idx = SppFillMessageHeader(client->address_length, msg, &client->host_address, &client->client_address, SPP_MSG_STREAM_ID);
+            memcpy(msg + body_idx, &s->stream_id, sizeof(s->stream_id));
+            body_idx += sizeof(s->stream_id);
             memcpy(msg + body_idx, &timestamp, sizeof(timestamp));
             body_idx += sizeof(timestamp);
             
-            uint8_t value[s->def->size];
-            client->callbacks.GetValue(s->def->id, value, client->instance_data);
-            
-            memcpy(msg + body_idx, value, sizeof(value));
-            body_idx += sizeof(value);
+            client->callbacks.GetValue(s->def->id, msg + body_idx, client->instance_data);
+            body_idx += s->def->size;
 
             client->callbacks.Send(msg, body_idx, client->instance_data);
-           
             client->streams[i].elapsed_time = 0;
         }
     }

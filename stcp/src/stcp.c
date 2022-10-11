@@ -62,7 +62,7 @@ extern uint8_t *StcpUnEscape(uint8_t *buffer, uint16_t *size)
     {
         if (STCP_ESCAPE == buffer[i])
         {
-            read_payload_buffer[output_idx++] = buffer[i++];
+            read_payload_buffer[output_idx++] = buffer[++i];
         }
         else
         {

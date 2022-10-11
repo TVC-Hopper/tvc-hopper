@@ -43,7 +43,7 @@
             <file path="src/pin_mux.c" update_enabled="true"/>
          </generated_project_files>
          <pins_profile>
-            <processor_version>12.0.0</processor_version>
+            <processor_version>12.0.1</processor_version>
             <pin_labels>
                <pin_label pin_num="57" pin_signal="GPIO_AD_03" label="LPSPI1_SDI/J57[10]/U27[2]" identifier="LPSPI1_SDI;PWM1_B_2"/>
                <pin_label pin_num="56" pin_signal="GPIO_AD_04" label="LPSPI1_SDO/J57[8]/U27[5]" identifier="LPSPI1_SDO;PWM_A_2;PWM1_A_2"/>
@@ -361,7 +361,7 @@
             <file path="src/clock_config.c" update_enabled="true"/>
          </generated_project_files>
          <clocks_profile>
-            <processor_version>12.0.0</processor_version>
+            <processor_version>12.0.1</processor_version>
          </clocks_profile>
          <clock_configurations>
             <clock_configuration name="BOARD_BootClockRUN" id_prefix="" prefix_user_defined="false">
@@ -552,7 +552,7 @@
             <file path="src/peripherals.c" update_enabled="true"/>
          </generated_project_files>
          <peripherals_profile>
-            <processor_version>12.0.0</processor_version>
+            <processor_version>12.0.1</processor_version>
          </peripherals_profile>
          <functional_groups>
             <functional_group name="BOARD_InitPeripherals" uuid="5e519eed-bd94-4950-84de-0f29de85bcea" called_from_default_init="true" id_prefix="" core="core0">
@@ -1225,6 +1225,54 @@
                            <setting name="lutName" value="defaultLUT"/>
                         </struct>
                         <array name="devices_configs"/>
+                     </config_set>
+                  </instance>
+                  <instance name="LPI2C2" uuid="ccd5fbcc-a4a5-42a0-afec-216fa64dc897" type="lpi2c" type_id="lpi2c_6b71962515c3208facfccd030afebc98" mode="master" peripheral="LPI2C2" enabled="false" comment="" custom_name_enabled="false" editing_lock="false">
+                     <config_set name="main">
+                        <setting name="clockSource" value="Lpi2cClock"/>
+                        <setting name="clockSourceFreq" value="BOARD_BootClockRUN"/>
+                     </config_set>
+                     <config_set name="interrupt_vector"/>
+                     <config_set name="master" quick_selection="qs_master_transfer">
+                        <setting name="mode" value="transfer"/>
+                        <struct name="config">
+                           <setting name="enableMaster" value="true"/>
+                           <setting name="enableDoze" value="true"/>
+                           <setting name="debugEnable" value="false"/>
+                           <setting name="ignoreAck" value="false"/>
+                           <setting name="pinConfig" value="kLPI2C_2PinOpenDrain"/>
+                           <setting name="baudRate_Hz" value="100000"/>
+                           <setting name="busIdleTimeout_ns" value="0"/>
+                           <setting name="pinLowTimeout_ns" value="0"/>
+                           <setting name="sdaGlitchFilterWidth_ns" value="0"/>
+                           <setting name="sclGlitchFilterWidth_ns" value="0"/>
+                           <struct name="hostRequest">
+                              <setting name="enable" value="false"/>
+                              <setting name="source" value="kLPI2C_HostRequestExternalPin"/>
+                              <setting name="polarity" value="kLPI2C_HostRequestPinActiveHigh"/>
+                           </struct>
+                           <set name="edmaRequestSources">
+                              <selected/>
+                           </set>
+                        </struct>
+                        <struct name="transfer">
+                           <setting name="blocking" value="false"/>
+                           <setting name="enable_custom_handle" value="false"/>
+                           <struct name="callback">
+                              <setting name="name" value=""/>
+                              <setting name="userData" value=""/>
+                           </struct>
+                           <set name="flags">
+                              <selected/>
+                           </set>
+                           <setting name="slaveAddress" value="0"/>
+                           <setting name="direction" value="kLPI2C_Write"/>
+                           <setting name="subaddress" value="0"/>
+                           <setting name="subaddressSize" value="1"/>
+                           <setting name="blocking_buffer" value="false"/>
+                           <setting name="enable_custom_buffer" value="false"/>
+                           <setting name="dataSize" value="1"/>
+                        </struct>
                      </config_set>
                   </instance>
                </instances>
