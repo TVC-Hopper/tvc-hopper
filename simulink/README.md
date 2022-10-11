@@ -1,7 +1,6 @@
 # Simulink / MATLAB Code Generation
 
-Model currently in use is from (https://www.mathworks.com/help/simulink/sfg/integrating-existing-c-functions-into-simulink-models-with-the-legacy-code-tool.html) and 
-does not support direct C code generation from Simulink model in its entirety using Simulink Coder. 
+Model currently in use is from the [SingleRotor-UAV](https://github.com/SolidGeek/SingleRotorUAV/tree/main/MATLAB/NonlinearSimulation) project and does not support direct C code generation from Simulink model in its entirety using Simulink Coder. 
 
 ## Simulink Coder
 
