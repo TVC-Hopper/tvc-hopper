@@ -21,4 +21,4 @@ functions must be modified to be written with only compatible language features 
 2. Generate code from model (excluding the S-function block) using Simulink Coder, manually translate nonlinear dynamics functions to C code, and reintegrate.
 
 3. Manually translate nonlinear dynamics functions into C code and integrate C functions into the Simulink model using the 
-[legacy code tool](https://www.mathworks.com/help/simulink/sfg/integrating-existing-c-functions-into-simulink-models-with-the-legacy-code-tool.html).
+[legacy code tool](https://www.mathworks.com/help/simulink/sfg/integrating-existing-c-functions-into-simulink-models-with-the-legacy-code-tool.html) to enable tuning of model and full code generation.
