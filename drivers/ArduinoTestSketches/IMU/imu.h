@@ -541,11 +541,6 @@ void _IMU_GyroInit(IMU_t* imu, GyroInit_t* gyroInit);
  */
 uint8_t IMU_init(IMU_t* imu, AccelInit_t* Acc, GyroInit_t* gyro, IMUinit_t* imuInit);
 
-/**
- * @brief convert raw data measurement to LSBs
- * @param reading i2c buffer containing raw sensor data
- */
-void _processRawData(rawData_t *reading);
 
 /**
  * @brief set imu register

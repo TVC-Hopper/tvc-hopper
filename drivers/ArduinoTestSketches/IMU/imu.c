@@ -33,10 +33,9 @@ uint8_t IMU_readErrorStatusAcc(IMU_t* imu){
 void IMU_getAccReading(IMU_t *imu){
   _IMU_setDevAddr(imu, ACCEL);
   _IMU_readReg(imu, ACC_X_LSB, SIZE_3AXIS_READ);
-  _processRawData(&(imu->_RxTxData));
-  imu->Acc.xComp = _convertToGs(imu->_RxTxData.shorts[0], imu->Acc.LSB);
-  imu->Acc.yComp = _convertToGs(imu->_RxTxData.shorts[1], imu->Acc.LSB);
-  imu->Acc.zComp = _convertToGs(imu->_RxTxData.shorts[2], imu->Acc.LSB);
+  imu->Acc.xComp = ((imu->_RxTxData.bytes[1] << 8) | imu->_RxTxData.bytes[0]) * imu->Acc.LSB;
+  imu->Acc.yComp = ((imu->_RxTxData.bytes[3] << 8) | imu->_RxTxData.bytes[2]) * imu->Acc.LSB;
+  imu->Acc.zComp = ((imu->_RxTxData.bytes[5] << 8) | imu->_RxTxData.bytes[4]) * imu->Acc.LSB;
 }
 
 
@@ -67,7 +66,7 @@ void IMU_setAccelOsrOdr(IMU_t *imu, ACC_OSR_t osr, ACC_ODR_t odr){
 //set accelerometer range
 void IMU_setAccelRange(IMU_t *imu, AccRange_t range){
   _IMU_setAccReg(imu, ACC_RANGE, range, ACC_RANGE_MASK);
-  imu->Acc.LSB = ((2 << (range + 1)) * 1.5) / 32768.0;
+  imu->Acc.LSB = ((2 << range) * 1.5) / 32768.0;
 }
 
 //convert between lsbs to gs
@@ -99,7 +98,7 @@ void _IMU_AccIntConfig(IMU_t* imu, IntInit_t* accInts){
 void _IMU_AccInit(IMU_t* imu, AccelInit_t* acc){
   IMU_setAccelRange(imu, acc->range);
   IMU_setAccelOsrOdr(imu, acc->osr, acc->odr); 
-  _IMU_AccIntConfig(imu, &(acc->AccInts)); 
+  _IMU_AccIntConfig(imu, &(acc->AccInts));
   return;
 }
 
@@ -126,10 +125,9 @@ uint8_t IMU_readErrorStatusGyro(IMU_t* imu){
 void IMU_getGyroReading(IMU_t *imu){
   _IMU_setDevAddr(imu, GYRO);
   _IMU_readReg(imu, RATE_X_LSB, SIZE_3AXIS_READ);
-  _processRawData(&(imu->_RxTxData));
-  imu->Gyro.xComp = _convertToDegPerSec(imu->_RxTxData.shorts[0], imu->Gyro.LSB);
-  imu->Gyro.yComp = _convertToDegPerSec(imu->_RxTxData.shorts[1], imu->Gyro.LSB);
-  imu->Gyro.zComp = _convertToDegPerSec(imu->_RxTxData.shorts[2], imu->Gyro.LSB);
+  imu->Gyro.xComp = ((imu->_RxTxData.bytes[1] << 8) | imu->_RxTxData.bytes[0]) * imu->Gyro.LSB;
+  imu->Gyro.yComp = ((imu->_RxTxData.bytes[3] << 8) | imu->_RxTxData.bytes[2]) * imu->Gyro.LSB;
+  imu->Gyro.zComp = ((imu->_RxTxData.bytes[5] << 8) | imu->_RxTxData.bytes[4]) * imu->Gyro.LSB;
 }
 
 //return gyro register value
@@ -153,7 +151,7 @@ void IMU_setGyroOdrBW(IMU_t *imu, GyroOdrBw_t odrBw){
 //set gyro range range
 void IMU_setGyroRange(IMU_t *imu, GyroRange_t range){
   _IMU_setGyroReg(imu, GYRO_RANGE, range, MASK_ALL);
-  imu->Gyro.LSB = (2000.0 / (2 << range)) / 32767.0;
+  imu->Gyro.LSB = (2000.0 / (1 << range)) / 32767.0;
 }
 
 //convert measurement from LSBs to angular velocity
@@ -209,13 +207,6 @@ uint8_t IMU_init(IMU_t* imu, AccelInit_t* accInit, GyroInit_t* gyroInit, IMUinit
   
   return IMU_readErrorStatusAcc(imu) | IMU_readErrorStatusGyro(imu);
   
-}
-
-//convert raw data measurement to LSBs
-void _processRawData(rawData_t *reading){
-  for (int i = 0; i < 3; ++i){
-    reading->shorts[i] = (reading->bytes[i + 1] << 8) | reading->bytes[i];
-  }
 }
 
 //set imu register

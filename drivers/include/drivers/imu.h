@@ -30,16 +30,16 @@ typedef enum{
  * @brief accelerometer interrupt pin select
  */
 typedef enum{
-  INT1 = 0x04, 
-  INT2 = 0x40
+  INT_1 = 0x04, 
+  INT_2 = 0x40
 } AccIntPins_t;
 
 /**
  * @brief gyroscope interrupt pin select
  */
 typedef enum{
-  INT3 = 0x01, 
-  INT4 = 0x80
+  INT_3 = 0x01, 
+  INT_4 = 0x80
 } GyroIntPins_t;
 
 /**
@@ -541,11 +541,6 @@ void _IMU_GyroInit(IMU_t* imu, GyroInit_t* gyroInit);
  */
 uint8_t IMU_init(IMU_t* imu, AccelInit_t* Acc, GyroInit_t* gyro, IMUinit_t* imuInit);
 
-/**
- * @brief convert raw data measurement to LSBs
- * @param reading i2c buffer containing raw sensor data
- */
-void _processRawData(rawData_t *reading);
 
 /**
  * @brief set imu register

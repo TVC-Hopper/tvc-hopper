@@ -9,7 +9,7 @@ BUILD_TELEM_SERVER_DIR=build-telem
 
 .PHONY:
 generate_spp_headers:
-	python tools/generate_spp_lists.py support/prop_list.toml src/modules/spp_property_list tools/telemetry_viewer/include/telemetry/spp_property_list
+	python3 tools/generate_spp_lists.py support/prop_list.toml src/modules/spp_property_list tools/telemetry_viewer/include/telemetry/spp_property_list
 
 
 .PHONY: clean
