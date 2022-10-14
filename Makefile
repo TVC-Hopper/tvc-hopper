@@ -60,7 +60,7 @@ start_telemetry_emulator:
 
 .PHONY: start_telemetry_server
 start_telemetry_server:
-	./$(BUILD_TELEM_SERVER_DIR)/telemetry_server /dev/cu.usbserial-A9SCLUOH
+	./$(BUILD_TELEM_SERVER_DIR)/telemetry_server /dev/cu.usbmodem141202 
 
 
 .PHONY: test

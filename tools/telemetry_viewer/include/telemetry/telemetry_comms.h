@@ -22,7 +22,7 @@ class TelemetryComms {
 public:
     static TelemetryComms* getInstance();
 
-    void start(int comport, int baud);
+    void start(const char* comport, int baud);
     void start();
 
     int getComport();
