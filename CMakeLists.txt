@@ -40,8 +40,16 @@ target_include_directories(${PROJECT_NAME}.elf
         spp/include
 
         freertos/freertos_kernel/include
+        freertos/freertos_kernel/include/freertos
         freertos/freertos_kernel/portable/GCC/ARM_CM4F
 )
+
+if(BUILD_MIMXRT1010EVK_BSP)
+    target_include_directories(${PROJECT_NAME}.elf
+        PRIVATE
+            ../bsp/mimxrt1010-evk/include/bsp
+    )
+endif()
 
 target_link_libraries(${PROJECT_NAME}.elf PUBLIC circbuf spp_client stcp bsp fslhal drivers freertos)
 target_link_libraries(${PROJECT_NAME}.elf PRIVATE -Wl,--start-group)

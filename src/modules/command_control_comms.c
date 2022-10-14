@@ -4,6 +4,9 @@
 #include <stddef.h>
 #include <stdbool.h>
 
+#include <freertos/FreeRTOS.h>
+#include <freertos/task.h>
+
 #include <stcp/stcp.h>
 #include <sppclient/api.h>
 #include <sppclient/defs.h>
@@ -58,19 +61,15 @@ extern void CommandControlComms_Init() {
         .Send = XCCb_StcpSendPacket,
         .HandleMessage = HandleStcpPacket,
     };
-
-
     stcp.callbacks = stcp_callbacks;
     stcp.instance_data = NULL;
-
-    SppClientStart(&spp);
 }
 
 
 extern void CommandControlComms_Task(void* task_args) {
+    SppClientStart(&spp);
     for(;;) {
-
-
+        vTaskSuspend(NULL);
     }
 }
 

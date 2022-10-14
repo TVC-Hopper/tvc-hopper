@@ -13,6 +13,7 @@ add_library(fslhal
     src/fsl_sbrk.c
     src/fsl_str.c
     src/fsl_xbara.c
+    src/fsl_lpuart_freertos.c
 
     component/fsl_adapter_lpuart.c
     component/fsl_component_generic_list.c

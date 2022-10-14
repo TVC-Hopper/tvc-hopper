@@ -54,65 +54,59 @@ component:
  * BOARD_InitPeripherals functional group
  **********************************************************************************************************************/
 /***********************************************************************************************************************
- * DEBUG_UART initialization code
+ * COMMS_UART initialization code
  **********************************************************************************************************************/
 /* clang-format off */
 /* TEXT BELOW IS USED AS SETTING FOR TOOLS *************************************
 instance:
-- name: 'DEBUG_UART'
+- name: 'COMMS_UART'
 - type: 'lpuart'
-- mode: 'polling'
+- mode: 'freertos'
 - custom_name_enabled: 'true'
 - type_id: 'lpuart_bf01db7d964092f3cf860852cba17f7e'
 - functional_group: 'BOARD_InitPeripherals'
 - peripheral: 'LPUART1'
 - config_sets:
-  - lpuartConfig_t:
-    - lpuartConfig:
+  - fsl_lpuart_freertos:
+    - lpuart_rtos_configuration:
       - clockSource: 'LpuartClock'
-      - lpuartSrcClkFreq: 'BOARD_BootClockRUN'
-      - baudRate_Bps: '115200'
-      - parityMode: 'kLPUART_ParityDisabled'
-      - dataBitsCount: 'kLPUART_EightDataBits'
-      - isMsb: 'false'
-      - stopBitCount: 'kLPUART_OneStopBit'
-      - enableMatchAddress1: 'false'
-      - matchAddress1: '0'
-      - enableMatchAddress2: 'false'
-      - matchAddress2: '0'
-      - txFifoWatermark: '0'
-      - rxFifoWatermark: '1'
+      - srcclk: 'BOARD_BootClockRUN'
+      - baudrate: '115200'
+      - parity: 'kLPUART_ParityDisabled'
+      - stopbits: 'kLPUART_OneStopBit'
+      - buffer_size: '1'
       - enableRxRTS: 'false'
       - enableTxCTS: 'false'
       - txCtsSource: 'kLPUART_CtsSourcePin'
       - txCtsConfig: 'kLPUART_CtsSampleAtStart'
-      - rxIdleType: 'kLPUART_IdleTypeStartBit'
-      - rxIdleConfig: 'kLPUART_IdleCharacter1'
-      - enableTx: 'true'
-      - enableRx: 'true'
-    - quick_selection: 'QuickSelection1'
+    - interrupt_rx_tx:
+      - IRQn: 'LPUART1_IRQn'
+      - enable_priority: 'true'
+      - priority: '3'
  * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS **********/
 /* clang-format on */
-const lpuart_config_t DEBUG_UART_config = {
-  .baudRate_Bps = 115200UL,
-  .parityMode = kLPUART_ParityDisabled,
-  .dataBitsCount = kLPUART_EightDataBits,
-  .isMsb = false,
-  .stopBitCount = kLPUART_OneStopBit,
-  .txFifoWatermark = 0U,
-  .rxFifoWatermark = 1U,
+lpuart_rtos_handle_t COMMS_UART_rtos_handle;
+lpuart_handle_t COMMS_UART_lpuart_handle;
+uint8_t COMMS_UART_background_buffer[COMMS_UART_BACKGROUND_BUFFER_SIZE];
+lpuart_rtos_config_t COMMS_UART_rtos_config = {
+  .base = COMMS_UART_PERIPHERAL,
+  .baudrate = 115200UL,
+  .srcclk = 80000000UL,
+  .parity = kLPUART_ParityDisabled,
+  .stopbits = kLPUART_OneStopBit,
+  .buffer = COMMS_UART_background_buffer,
+  .buffer_size = COMMS_UART_BACKGROUND_BUFFER_SIZE,
   .enableRxRTS = false,
   .enableTxCTS = false,
   .txCtsSource = kLPUART_CtsSourcePin,
   .txCtsConfig = kLPUART_CtsSampleAtStart,
-  .rxIdleType = kLPUART_IdleTypeStartBit,
-  .rxIdleConfig = kLPUART_IdleCharacter1,
-  .enableTx = true,
-  .enableRx = true
 };
 
-static void DEBUG_UART_init(void) {
-  LPUART_Init(DEBUG_UART_PERIPHERAL, &DEBUG_UART_config, DEBUG_UART_CLOCK_SOURCE);
+static void COMMS_UART_init(void) {
+  /* LPUART rtos initialization */
+  LPUART_RTOS_Init(&COMMS_UART_rtos_handle, &COMMS_UART_lpuart_handle, &COMMS_UART_rtos_config);
+  /* Interrupt vector LPUART1_IRQn priority settings in the NVIC. */
+  NVIC_SetPriority(COMMS_UART_IRQN, COMMS_UART_IRQ_PRIORITY);
 }
 
 /***********************************************************************************************************************
@@ -134,14 +128,16 @@ instance:
     - gpio_interrupt_comb_0_15:
       - IRQn: 'GPIO2_Combined_0_15_IRQn'
       - enable_interrrupt: 'enabled'
-      - enable_priority: 'false'
-      - priority: '0'
+      - enable_priority: 'true'
+      - priority: '3'
       - enable_custom_name: 'false'
  * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS **********/
 /* clang-format on */
 
 static void USER_BUTTON_init(void) {
   /* Make sure, the clock gate for GPIO2 is enabled (e. g. in pin_mux.c) */
+  /* Interrupt vector GPIO2_Combined_0_15_IRQn priority settings in the NVIC. */
+  NVIC_SetPriority(USER_BUTTON_GPIO_COMB_0_15_IRQN, USER_BUTTON_GPIO_COMB_0_15_IRQ_PRIORITY);
   /* Enable interrupt GPIO2_Combined_0_15_IRQn request in the NVIC. */
   EnableIRQ(USER_BUTTON_GPIO_COMB_0_15_IRQN);
 }
@@ -163,6 +159,7 @@ instance:
   - nvic:
     - interrupt_table:
       - 0: []
+      - 1: []
     - interrupts: []
  * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS **********/
 /* clang-format on */
@@ -708,152 +705,15 @@ static void LPI2C1_init(void) {
 }
 
 /***********************************************************************************************************************
- * FLEXSPI initialization code
- **********************************************************************************************************************/
-/* clang-format off */
-/* TEXT BELOW IS USED AS SETTING FOR TOOLS *************************************
-instance:
-- name: 'FLEXSPI'
-- type: 'flexspi'
-- mode: 'general'
-- custom_name_enabled: 'false'
-- type_id: 'flexspi_cc6da638fb0490ad15096647c2b8e52a'
-- functional_group: 'BOARD_InitPeripherals'
-- peripheral: 'FLEXSPI'
-- config_sets:
-  - fsl_flexspi:
-    - flexspiConfig:
-      - rxSampleClock: 'kFLEXSPI_ReadSampleClkLoopbackInternally'
-      - clockSource: 'FlexSpiClock'
-      - clockSourceFreq: 'BOARD_BootClockRUN'
-      - enableSckFreeRunning: 'false'
-      - enableCombination: 'false'
-      - enableDoze: 'true'
-      - enableHalfSpeedAccess: 'false'
-      - enableSckBDiffOpt: 'false'
-      - enableSameConfigForAll: 'false'
-      - seqTimeoutCycleString: '65535'
-      - ipGrantTimeoutCycleString: '255'
-      - txWatermark: '8'
-      - rxWatermark: '8'
-      - ahbConfig:
-        - enableAHBWriteIpTxFifo: 'false'
-        - enableAHBWriteIpRxFifo: 'false'
-        - ahbGrantTimeoutCycleString: '255'
-        - ahbBusTimeoutCycleString: '65535'
-        - resumeWaitCycleString: '32'
-        - buffer:
-          - 0:
-            - priority: '0'
-            - masterIndex: '0'
-            - bufferSize: '256'
-            - enablePrefetch: 'true'
-          - 1:
-            - priority: '1'
-            - masterIndex: '0'
-            - bufferSize: '256'
-            - enablePrefetch: 'true'
-          - 2:
-            - priority: '2'
-            - masterIndex: '0'
-            - bufferSize: '256'
-            - enablePrefetch: 'true'
-          - 3:
-            - priority: '3'
-            - masterIndex: '0'
-            - bufferSize: '256'
-            - enablePrefetch: 'true'
-        - enableClearAHBBufferOpt: 'false'
-        - enableReadAddressOpt: 'false'
-        - enableAHBPrefetch: 'false'
-        - enableAHBBufferable: 'false'
-        - enableAHBCachable: 'false'
-    - flexspiInterrupt:
-      - interrupt_sel: ''
-      - interrupt_vectors:
-        - enableInterrupt: 'false'
-        - interrupt:
-          - IRQn: 'FLEXSPI_IRQn'
-          - enable_interrrupt: 'enabled'
-          - enable_priority: 'false'
-          - priority: '0'
-          - enable_custom_name: 'false'
-    - enableCustomLUT: 'false'
-    - lutConfig:
-      - flash: 'defaultFlash'
-      - lutName: 'defaultLUT'
-    - devices_configs: []
-    - quick_selection: 'default'
- * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS **********/
-/* clang-format on */
-const flexspi_config_t FLEXSPI_config = {
-  .rxSampleClock = kFLEXSPI_ReadSampleClkLoopbackInternally,
-  .enableSckFreeRunning = false,
-  .enableCombination = false,
-  .enableDoze = true,
-  .enableHalfSpeedAccess = false,
-  .enableSckBDiffOpt = false,
-  .enableSameConfigForAll = false,
-  .seqTimeoutCycle = 65535,
-  .ipGrantTimeoutCycle = 255,
-  .txWatermark = 8U,
-  .rxWatermark = 8U,
-  .ahbConfig = {
-    .enableAHBWriteIpTxFifo = false,
-    .enableAHBWriteIpRxFifo = false,
-    .ahbGrantTimeoutCycle = 255,
-    .ahbBusTimeoutCycle = 65535,
-    .resumeWaitCycle = 32,
-    .buffer = {
-      {
-        .priority = 0,
-        .masterIndex = 0U,
-        .bufferSize = 256U,
-        .enablePrefetch = true
-      },
-      {
-        .priority = 1,
-        .masterIndex = 0U,
-        .bufferSize = 256U,
-        .enablePrefetch = true
-      },
-      {
-        .priority = 2,
-        .masterIndex = 0U,
-        .bufferSize = 256U,
-        .enablePrefetch = true
-      },
-      {
-        .priority = 3,
-        .masterIndex = 0U,
-        .bufferSize = 256U,
-        .enablePrefetch = true
-      }
-    },
-    .enableClearAHBBufferOpt = false,
-    .enableReadAddressOpt = false,
-    .enableAHBPrefetch = false,
-    .enableAHBBufferable = false,
-    .enableAHBCachable = false
-  }
-};
-
-static void FLEXSPI_init(void) {
-  /* FLEXSPI peripheral initialization */
-  FLEXSPI_Init(FLEXSPI_PERIPHERAL, &FLEXSPI_config);
-}
-
-/***********************************************************************************************************************
  * Initialization functions
  **********************************************************************************************************************/
 void BOARD_InitPeripherals(void)
 {
   /* Initialize components */
-  DEBUG_UART_init();
+  COMMS_UART_init();
   USER_BUTTON_init();
   PWM1_init();
   LPI2C1_init();
-  FLEXSPI_init();
 }
 
 /***********************************************************************************************************************
