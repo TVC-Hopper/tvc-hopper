@@ -230,26 +230,65 @@ void TelemetryComms::start() {
     }
 }
 
-void TelemetryComms::start(int comport, int baud) {
+void TelemetryComms::start(const char* port, int baud) {
     // start with hardware connection
     is_data_src_emulated_ = false;
-    comport_ = comport;
     baud_ = baud;
 
     char mode[] = {'8', 'N', '1', 0};
+    comport_ = open_serial_port(port, baud);
 
-    if (RS232_OpenComport(comport, baud, mode, 0)) {
-        std::cout << "ERROR: failed to open com port " << comport << std::endl;
+    if (comport_ == -1) {
+        exit(1);
     }
 
     acceptClient();
 
-    // TODO: start listener for serial communications
+    uint8_t buffer[4096];
+    uint8_t msg[512];
+    uint32_t msg_idx = 0;
+
+    bool is_end_found = false;
+
+    while(true) {
+        uint32_t n = read_port(comport_, buffer, 4096);
+
+        if (n > 0) {
+            std::cout << "read " << n << std::endl;
+            
+            for (int i = 0; i < n; ++i) {
+                std::cout << std::setfill('0') << std::setw(2) << std::hex << (int)(buffer[i]);
+            }
+            std::cout << std::endl;
+        }
+
+        if (n > 2) {
+            uint32_t end_idx = 0;
+
+            for (end_idx = 0; end_idx < n - 1; ++end_idx) {
+                if ((buffer[end_idx] == STCP_FOOTER && buffer[end_idx + 1] == STCP_FOOTER )
+                        || end_idx == 0 && msg[msg_idx - 1] == STCP_FOOTER && (buffer[0] == STCP_FOOTER)) {
+                    memcpy(msg + msg_idx, buffer, end_idx + 1);
+                    msg_idx += end_idx + 1;
+
+                    StcpHandleMessage(&stcp_, msg, msg_idx);
+
+                    msg_idx = 0;
+                    memcpy(msg, buffer + end_idx + 1, n - (end_idx + 1));
+                    is_end_found = true;
+                }
+            }
+        }
+
+        if (!is_end_found && n > 0) {
+            memcpy(msg + msg_idx, buffer, n);
+        }
+    }
 }
 
 TelemetryComms::~TelemetryComms() {
     if (!is_data_src_emulated_) {
-        RS232_CloseComport(comport_);
+        close(comport_);
     }
     delete instance_;
 }
@@ -285,7 +324,7 @@ StcpStatus_t sendStcpPacket(void *bytes, uint16_t len, void* instance_data) {
        tc->getServer()->sendToClient(tc->getEmulatorSock(), (uint8_t*)bytes, len);
     } else {
         int com = tc->getComport();
-        RS232_SendBuf(com, (uint8_t*)bytes, len);
+        write_port(com, (uint8_t*)bytes, len);
     }
 
     return STCP_STATUS_SUCCESS;

@@ -10,11 +10,12 @@
 #include <chrono>
 #include <thread>
 
-int main() {
+int main(int argc, char** argv) {
     TelemetryComms* tc = TelemetryComms::getInstance();
 
-//    tc->start(0, 115200);
-    tc->start();
+
+    tc->start(argv[1], 9600);
+//    tc->start();
 
     std::cout << "started" << std::endl;
 

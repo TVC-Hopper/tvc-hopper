@@ -12,5 +12,7 @@
 
 extern SPP_STATUS_T XCCb_StcpSendPacket(uint8_t* buffer, uint16_t len, void* instance_data);
 
+extern void UartListener_Init();
+extern void UartListener_Task(void* task_args);
 
 #endif

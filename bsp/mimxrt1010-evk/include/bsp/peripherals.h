@@ -11,11 +11,11 @@
  **********************************************************************************************************************/
 #include "fsl_common.h"
 #include "fsl_lpuart.h"
+#include "fsl_lpuart_freertos.h"
 #include "fsl_clock.h"
 #include "fsl_gpio.h"
 #include "fsl_pwm.h"
 #include "fsl_lpi2c.h"
-#include "fsl_flexspi.h"
 
 #if defined(__cplusplus)
 extern "C" {
@@ -26,11 +26,17 @@ extern "C" {
  **********************************************************************************************************************/
 /* Definitions for BOARD_InitPeripherals functional group */
 /* Definition of peripheral ID */
-#define DEBUG_UART_PERIPHERAL LPUART1
-/* Definition of the clock source frequency */
-#define DEBUG_UART_CLOCK_SOURCE 80000000UL
+#define COMMS_UART_PERIPHERAL LPUART1
+/* Definition of the backround buffer size */
+#define COMMS_UART_BACKGROUND_BUFFER_SIZE 1
+/* COMMS_UART interrupt vector ID (number). */
+#define COMMS_UART_IRQN LPUART1_IRQn
+/* COMMS_UART interrupt vector priority. */
+#define COMMS_UART_IRQ_PRIORITY 3
 /* USER_BUTTON interrupt vector ID (number). */
 #define USER_BUTTON_GPIO_COMB_0_15_IRQN GPIO2_Combined_0_15_IRQn
+/* USER_BUTTON interrupt vector priority. */
+#define USER_BUTTON_GPIO_COMB_0_15_IRQ_PRIORITY 3
 /* USER_BUTTON interrupt handler identifier. */
 #define USER_BUTTON_GPIO_COMB_0_15_IRQHANDLER GPIO2_Combined_0_15_IRQHandler
 /* Definition of peripheral ID */
@@ -108,17 +114,13 @@ extern "C" {
 #define LPI2C1_MASTER_BUFFER_SIZE 1
 /* Definition of slave address */
 #define LPI2C1_MASTER_SLAVE_ADDRESS 0
-/* Definition of peripheral ID */
-#define FLEXSPI_PERIPHERAL FLEXSPI
-/* FLEXSPI interrupt vector ID (number). */
-#define FLEXSPI_IRQN FLEXSPI_IRQn
-/* FLEXSPI interrupt handler identifier. */
-#define FLEXSPI_IRQHANDLER FLEXSPI_IRQHandler
 
 /***********************************************************************************************************************
  * Global variables
  **********************************************************************************************************************/
-extern const lpuart_config_t DEBUG_UART_config;
+extern lpuart_rtos_handle_t COMMS_UART_rtos_handle;
+extern lpuart_handle_t COMMS_UART_lpuart_handle;
+extern lpuart_rtos_config_t COMMS_UART_rtos_config;
 extern pwm_config_t PWM1_SM0_config;
 
 extern pwm_signal_param_t PWM1_SM0_pwm_function_config[1];
@@ -139,7 +141,6 @@ extern const lpi2c_master_config_t LPI2C1_masterConfig;
 extern lpi2c_master_transfer_t LPI2C1_masterTransfer;
 extern uint8_t LPI2C1_masterBuffer[LPI2C1_MASTER_BUFFER_SIZE];
 extern lpi2c_master_handle_t LPI2C1_masterHandle;
-extern const flexspi_config_t FLEXSPI_config;
 
 /***********************************************************************************************************************
  * Initialization functions

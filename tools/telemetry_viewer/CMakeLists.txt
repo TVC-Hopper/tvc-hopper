@@ -25,12 +25,17 @@ target_include_directories(telemetry
         include
 )
 
+target_compile_options(telemetry PUBLIC -g -O0)
+target_link_options(telemetry PUBLIC -g)
+
 target_link_libraries(telemetry PUBLIC circbuf tcp_client_server stcp spp_host)
 
 
 add_executable(telemetry_server
     main.cpp
 )
+
+target_compile_options(telemetry_server PUBLIC -g -O0)
 
 target_include_directories(telemetry_server
     PRIVATE
