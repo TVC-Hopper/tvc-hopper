@@ -666,10 +666,10 @@
                         <struct name="lpuart_rtos_configuration">
                            <setting name="clockSource" value="LpuartClock"/>
                            <setting name="srcclk" value="BOARD_BootClockRUN"/>
-                           <setting name="baudrate" value="115200"/>
+                           <setting name="baudrate" value="9600"/>
                            <setting name="parity" value="kLPUART_ParityDisabled"/>
                            <setting name="stopbits" value="kLPUART_OneStopBit"/>
-                           <setting name="buffer_size" value="1"/>
+                           <setting name="buffer_size" value="32"/>
                            <setting name="enableRxRTS" value="false"/>
                            <setting name="enableTxCTS" value="false"/>
                            <setting name="txCtsSource" value="kLPUART_CtsSourcePin"/>
@@ -678,7 +678,7 @@
                         <struct name="interrupt_rx_tx">
                            <setting name="IRQn" value="LPUART1_IRQn"/>
                            <setting name="enable_priority" value="true"/>
-                           <setting name="priority" value="3"/>
+                           <setting name="priority" value="5"/>
                         </struct>
                      </config_set>
                   </instance>

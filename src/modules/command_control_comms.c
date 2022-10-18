@@ -124,6 +124,8 @@ static SPP_STATUS_T GetValue(uint16_t id, void* value, void* instance_data) {
         }
         case PROP_battery_v_ID:
         {
+            float v = 22.11;
+            memcpy((uint8_t*)value, &v, sizeof(v));
             break;
         }
         case PROP_timestamp_ms_ID:

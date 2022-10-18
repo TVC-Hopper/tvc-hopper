@@ -267,11 +267,13 @@ void TelemetryComms::start(const char* port, int baud) {
 
             for (end_idx = 0; end_idx < n - 1; ++end_idx) {
                 if ((buffer[end_idx] == STCP_FOOTER && buffer[end_idx + 1] == STCP_FOOTER )
-                        || end_idx == 0 && msg[msg_idx - 1] == STCP_FOOTER && (buffer[0] == STCP_FOOTER)) {
+                        || (msg_idx > 0 && end_idx == 0 && msg[msg_idx - 1] == STCP_FOOTER && buffer[0] == STCP_FOOTER)) {
                     memcpy(msg + msg_idx, buffer, end_idx + 1);
                     msg_idx += end_idx + 1;
 
                     StcpHandleMessage(&stcp_, msg, msg_idx);
+
+                    std::cout << "handled" << std::endl;
 
                     msg_idx = 0;
                     memcpy(msg, buffer + end_idx + 1, n - (end_idx + 1));
@@ -282,6 +284,14 @@ void TelemetryComms::start(const char* port, int baud) {
 
         if (!is_end_found && n > 0) {
             memcpy(msg + msg_idx, buffer, n);
+            msg_idx += n;
+
+            if (msg_idx >= 2) {
+                if (msg[msg_idx - 1] == STCP_FOOTER && msg[msg_idx - 2] == STCP_FOOTER) {
+                    StcpHandleMessage(&stcp_, msg, msg_idx);
+                    msg_idx = 0;
+                }
+            }
         }
     }
 }

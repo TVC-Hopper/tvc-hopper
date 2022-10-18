@@ -28,11 +28,11 @@ extern "C" {
 /* Definition of peripheral ID */
 #define COMMS_UART_PERIPHERAL LPUART1
 /* Definition of the backround buffer size */
-#define COMMS_UART_BACKGROUND_BUFFER_SIZE 1
+#define COMMS_UART_BACKGROUND_BUFFER_SIZE 32
 /* COMMS_UART interrupt vector ID (number). */
 #define COMMS_UART_IRQN LPUART1_IRQn
 /* COMMS_UART interrupt vector priority. */
-#define COMMS_UART_IRQ_PRIORITY 3
+#define COMMS_UART_IRQ_PRIORITY 5
 /* USER_BUTTON interrupt vector ID (number). */
 #define USER_BUTTON_GPIO_COMB_0_15_IRQN GPIO2_Combined_0_15_IRQn
 /* USER_BUTTON interrupt vector priority. */

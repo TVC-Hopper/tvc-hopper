@@ -15,18 +15,21 @@
 #include "app_hal_xconnect.h"
 
 
-#define PRIORITY_COMMAND_CONTROL_COMMS      1
-#define PROIRITY_UART_LISTENER              2
+#define PRIORITY_COMMAND_CONTROL_COMMS      2
+#define PROIRITY_UART_LISTENER              1
 
 static void CreateTasks();
 
 int main(void)
 {
     BOARD_ConfigMPU();
-    BOARD_InitBootPeripherals();
     BOARD_InitBootPins();
     BOARD_InitBootClocks();
     BOARD_InitDebugConsole();
+
+    // this needs to be after debug console init
+    // for some reason
+    BOARD_InitBootPeripherals();
     
 
     UartListener_Init();
@@ -43,7 +46,7 @@ int main(void)
 static void CreateTasks() {
     if (xTaskCreate(CommandControlComms_Task,
                         "cc_comms",
-                        configMINIMAL_STACK_SIZE,
+                        configMINIMAL_STACK_SIZE + 512,
                         NULL,
                         PRIORITY_COMMAND_CONTROL_COMMS,
                         NULL

@@ -71,10 +71,10 @@ instance:
     - lpuart_rtos_configuration:
       - clockSource: 'LpuartClock'
       - srcclk: 'BOARD_BootClockRUN'
-      - baudrate: '115200'
+      - baudrate: '9600'
       - parity: 'kLPUART_ParityDisabled'
       - stopbits: 'kLPUART_OneStopBit'
-      - buffer_size: '1'
+      - buffer_size: '32'
       - enableRxRTS: 'false'
       - enableTxCTS: 'false'
       - txCtsSource: 'kLPUART_CtsSourcePin'
@@ -82,7 +82,7 @@ instance:
     - interrupt_rx_tx:
       - IRQn: 'LPUART1_IRQn'
       - enable_priority: 'true'
-      - priority: '3'
+      - priority: '5'
  * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS **********/
 /* clang-format on */
 lpuart_rtos_handle_t COMMS_UART_rtos_handle;
@@ -90,7 +90,7 @@ lpuart_handle_t COMMS_UART_lpuart_handle;
 uint8_t COMMS_UART_background_buffer[COMMS_UART_BACKGROUND_BUFFER_SIZE];
 lpuart_rtos_config_t COMMS_UART_rtos_config = {
   .base = COMMS_UART_PERIPHERAL,
-  .baudrate = 115200UL,
+  .baudrate = 9600UL,
   .srcclk = 80000000UL,
   .parity = kLPUART_ParityDisabled,
   .stopbits = kLPUART_OneStopBit,
