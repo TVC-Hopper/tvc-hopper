@@ -14,10 +14,11 @@ uint8_t Servo_Init(Servo_t* Servo, ServoInit_t* ServoInit){
     width = ServoInit->pulseWidth0deg_us - ServoInit->pulseWidth180deg_us;
     
     Servo->pulseWidthMin_us = ServoInit->pulseWidth0deg_us;
+    
     Servo->pulseWidthMax_us = ServoInit->pulseWidth180deg_us;
+   
     Servo->degToMicros = width / DEGREES_MAX;
     Servo->microsToDeg = 1 / Servo->degToMicros;
-    
     if (ServoInit->applyDB){Servo->applyDB = true;}
     else {Servo->applyDB =  false;}
     
@@ -43,33 +44,34 @@ uint32_t Servo_applyDeadband(Servo_t* Servo, uint32_t micros){
     return micros;
 }
 
-void Servo_WritePosDeg(Servo_t *Servo, uint8_t deg){
+void Servo_WritePosDeg(Servo_t *Servo, int deg){
     uint32_t micros = 0;
     if (deg < DEGREES_MIN){ 
-        micros = Servo->pulseWidthMin_us;
+        micros = Servo->pulseWidthMax_us;
         deg = DEGREES_MIN;    
     }
     else if (deg > DEGREES_MAX){ 
-        micros = Servo->pulseWidthMax_us;
+        micros = Servo->pulseWidthMin_us;
         deg = DEGREES_MAX; 
     }
-    else {micros = Servo->pulseWidthMin_us + Servo->degToMicros * deg;}
+    else {micros = Servo->pulseWidthMin_us - Servo->degToMicros * deg;}
     Servo->lastWrite_deg = deg;
     Servo->lastWrite_us = micros;
     Servo_WriteMicros(Servo, micros);
 }
 
 void Servo_WritePosMicros(Servo_t *Servo, uint32_t micros){
-    if (micros < Servo->pulseWidthMin_us){ 
+    if (micros > Servo->pulseWidthMin_us){ 
         micros = Servo->pulseWidthMin_us;
         Servo->lastWrite_deg = DEGREES_MIN;    
     }
-    else if (micros > Servo->pulseWidthMax_us){ 
+    else if (micros < Servo->pulseWidthMax_us){ 
         micros = Servo->pulseWidthMax_us;
         Servo->lastWrite_deg = DEGREES_MAX; 
     }
-    else {micros = Servo->microsToDeg * micros;}
-    Servo->lastWrite_deg = micros * Servo->microsToDeg;
+    else {
+      Servo->lastWrite_deg = Servo->microsToDeg * micros;
+    }
     Servo->lastWrite_us = micros;
     Servo_WriteMicros(Servo, micros);
 }
@@ -77,7 +79,7 @@ void Servo_WritePosMicros(Servo_t *Servo, uint32_t micros){
 
 void Servo_WriteMicros(Servo_t* Servo, uint32_t micros){
     if (Servo->applyDB){
-        micros = applyDeadband(Servo, micros);
+        micros = Servo_applyDeadband(Servo, micros);
     }
     Servo->callbacks.onNewDutyCycle(micros);
 }

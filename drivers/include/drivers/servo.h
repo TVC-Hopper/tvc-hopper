@@ -19,7 +19,7 @@
  *  applyDB : apply deadband compensation
  */
 typedef struct ServoInit{
-    void (*onNewDutyCycle)(uint32_t);
+    void (*onNewDutyCycle)(int);
     uint32_t pulseWidth0deg_us;
     uint32_t pulseWidth180deg_us;
     uint8_t deadband;
@@ -32,7 +32,7 @@ typedef struct ServoInit{
  * onNewDutyCycle : set pulsewidth in microseconds
  */
 typedef struct ServoCallbacks {
-    void (*onNewDutyCycle)(uint32_t pulseWidth_us);
+    void (*onNewDutyCycle)(int pulseWidth_us);
 } ServoCallbacks_t;
 
 /**
@@ -52,7 +52,7 @@ typedef struct Servo {
     ServoCallbacks_t callbacks;
 
     uint32_t lastWrite_us;
-    uint8_t lastWrite_deg;
+    int lastWrite_deg;
 
     uint32_t pulseWidthMin_us;
     uint32_t pulseWidthMax_us;
@@ -95,7 +95,7 @@ uint32_t Servo_GetLastWriteMicros(Servo_t* Servo);
  * @param Servo ptr to object of type Servo_t
  * @param deg position commanded in degrees
  */
-void Servo_WritePosDeg(Servo_t *Servo, uint8_t deg);
+void Servo_WritePosDeg(Servo_t *Servo, int deg);
 
 /**
  * @brief write new position in micros
