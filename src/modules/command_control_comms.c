@@ -68,8 +68,12 @@ extern void CommandControlComms_Init() {
 
 extern void CommandControlComms_Task(void* task_args) {
     SppClientStart(&spp);
+    uint32_t last = xTaskGetTickCount();
     for(;;) {
-        vTaskSuspend(NULL);
+        uint32_t now = xTaskGetTickCount();
+        SppProcessStreams(&spp, now, now - last);
+        last = now;
+        vTaskDelay(5);
     }
 }
 

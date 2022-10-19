@@ -266,38 +266,31 @@ void TelemetryComms::start(const char* port, int baud) {
             std::cout << std::endl;
         }
 
-        if (n > 2) {
-            uint32_t end_idx = 0;
 
-            for (end_idx = 0; end_idx < n - 1; ++end_idx) {
-                if ((buffer[end_idx] == STCP_FOOTER && buffer[end_idx + 1] == STCP_FOOTER )
-                        || (msg_idx > 0 && end_idx == 0 && msg[msg_idx - 1] == STCP_FOOTER && buffer[0] == STCP_FOOTER)) {
-                    memcpy(msg + msg_idx, buffer, end_idx + 1);
-                    msg_idx += end_idx + 1;
+        if (n > 0) {
+            std::cout << "processing\n";
+            for (int j = 0; j < n; ++j) {
+                std::cout << "copy " << msg_idx << " " << j << std::endl;
+                msg[msg_idx++] = buffer[j];
 
-                    int ret = StcpHandleMessage(&stcp_, msg, msg_idx);
+                if (msg_idx >= 2) {
+                    std::cout << "check? " << msg_idx << "\n";
+                    if (msg[msg_idx - 2] == STCP_FOOTER && msg[msg_idx - 1] == STCP_FOOTER) {
+                        std::cout << "end\n";
 
-                    std::cout << "handled " << (int)ret << std::endl;
-
-                    msg_idx = 0;
-                    memcpy(msg, buffer + end_idx + 1, n - (end_idx + 1));
-                    is_end_found = true;
-                }
-            }
-        }
-
-        if (!is_end_found && n > 0) {
-            memcpy(msg + msg_idx, buffer, n);
-            msg_idx += n;
-
-            if (msg_idx >= 2) {
-                if (msg[msg_idx - 1] == STCP_FOOTER && msg[msg_idx - 2] == STCP_FOOTER) {
-                    StcpHandleMessage(&stcp_, msg, msg_idx);
-                    msg_idx = 0;
+                        int ret = StcpHandleMessage(&stcp_, msg, msg_idx);
+                        std::cout << "handled " << (int)ret << std::endl;
+                        for (int i = 0; i < msg_idx; ++i) {
+                            std::cout << std::setfill('0') << std::setw(2) << std::hex << (int)(msg[i]);
+                        }
+                        std::cout << std::endl;
+                        msg_idx = 0;
+                    }
                 }
             }
         }
     }
+
 }
 
 TelemetryComms::~TelemetryComms() {

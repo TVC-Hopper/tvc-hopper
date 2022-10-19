@@ -65,41 +65,15 @@ extern void UartListener_Task(void* task_args) {
             vTaskSuspend(NULL);
         }
 
-        bool is_end_found = false;
-        if (bytes_rcv_count > 2) {
-            uint32_t end_idx = 0;
-            // search for end of packet
-            for (end_idx = 0; end_idx < bytes_rcv_count - 1; ++end_idx) {
-                if ((uart_rcv_buffer[end_idx] == STCP_FOOTER &&
-                        uart_rcv_buffer[end_idx + 1] == STCP_FOOTER)
-                        || (msg_rcv_idx > 0 && end_idx == 0 && uart_msg_buffer[msg_rcv_idx - 1] == STCP_FOOTER
-                            && uart_rcv_buffer[0] == STCP_FOOTER)) {
-
-                    // copy up to end of packet
-                    memcpy(uart_msg_buffer + msg_rcv_idx, uart_rcv_buffer, end_idx + 1 + 1);
-                    msg_rcv_idx += end_idx + 1 + 1;
-
-                    // process packet
-                    StcpHandleMessage(stcp, uart_msg_buffer, msg_rcv_idx);
-                    msg_rcv_idx = 0;
-
-                    // copy remaining bytes
-                    memcpy(uart_msg_buffer, uart_rcv_buffer + end_idx + 1, bytes_rcv_count - (end_idx + 1));
-                    is_end_found = true;
-                    break;
-                }
-            }
-        }
-       
-        // if no packet found, copy everything into buffer
-        if (!is_end_found) {
-            memcpy(uart_msg_buffer + msg_rcv_idx, uart_rcv_buffer, bytes_rcv_count);
-            msg_rcv_idx += bytes_rcv_count;
-
-            if (msg_rcv_idx >= 2) {
-                if (uart_msg_buffer[msg_rcv_idx - 1] == STCP_FOOTER && uart_msg_buffer[msg_rcv_idx - 2] == STCP_FOOTER) {
-                    StcpHandleMessage(stcp, uart_msg_buffer, msg_rcv_idx);
-                    msg_rcv_idx = 0;
+        if (bytes_rcv_count > 0) {
+            for (uint32_t i = 0; i < bytes_rcv_count; ++i) {
+                uart_msg_buffer[msg_rcv_idx++] = uart_rcv_buffer[i];
+                if (msg_rcv_idx >= 2) {
+                    if (uart_msg_buffer[msg_rcv_idx - 2] == STCP_FOOTER
+                            && uart_msg_buffer[msg_rcv_idx - 1] == STCP_FOOTER) {
+                        StcpHandleMessage(stcp, uart_msg_buffer, msg_rcv_idx);
+                        msg_rcv_idx = 0;
+                    }
                 }
             }
         }

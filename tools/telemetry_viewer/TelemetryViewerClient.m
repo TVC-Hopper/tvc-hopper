@@ -35,7 +35,7 @@ classdef TelemetryViewerClient
         end
 
         function StartStream(s, id, period)
-            packet = append('str/', char(typecast(uint16(id), 'uint8')), '/', char(typecast(uint16(period), 'uint8')));
+            packet = append('str/', char(typecast(uint16(id), 'uint8')), char(typecast(uint16(period), 'uint8')));
             write(s.tcpsock, packet);
         end
 
@@ -46,7 +46,7 @@ classdef TelemetryViewerClient
         end
 
         function SetProperty(s, id, value)
-            packet = append('set/', char(typecast(uint16(id), 'uint8')), '/', char(typecast(value, 'uint8')));
+            packet = append('set/', char(typecast(uint16(id), 'uint8')), char(typecast(value, 'uint8')));
             write(s.tcpsock, packet)
         end
     end
