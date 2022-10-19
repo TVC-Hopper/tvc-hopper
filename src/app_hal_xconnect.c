@@ -20,7 +20,7 @@
 #include "modules/command_control_comms.h"
 
 
-#define UART_RCV_BUFFER_SIZE 4
+#define UART_RCV_BUFFER_SIZE 1
 #define UART_MSG_PACKET_SIZE 256
 
 static uint8_t uart_rcv_buffer[UART_RCV_BUFFER_SIZE];
