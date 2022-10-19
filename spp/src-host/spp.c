@@ -49,6 +49,8 @@ static void SppUnpackPropDef(SppHostEngine_t *host, SppAddress_t *client, uint8_
     pd->type = prop_type;
     pd->flags.value = prop_flags;
 
+    printf("SPP: Got property %d of size %d\n", pd->id, pd->size);
+
     uint8_t name_length = len - msg_idx;
     memcpy(pd->name, message + msg_idx, name_length);
     pd->name_length = name_length;
@@ -208,6 +210,7 @@ SPP_STATUS_T SppHostProcessMessage(SppHostEngine_t* host, uint8_t* message, uint
     if (SPP_MSG_CONNECT_REQUEST_BC_ID == msg_id) {
         if (host->state != SPP_STATE_READY) {
             SppSendConnectBusyResponse(host, &client);
+            printf("SPP: busy\n");
             return SPP_STATUS_OK;
         }
         host->state = SPP_STATE_CONNECTING;
@@ -219,10 +222,12 @@ SPP_STATUS_T SppHostProcessMessage(SppHostEngine_t* host, uint8_t* message, uint
         uint16_t num_bytes = *((uint16_t*)(message + body_idx));
 
         if (num_props + host->defs_buffer_used > host->defs_buffer_size) {
+            printf("SPP: too many properties\n");
             return SPP_STATUS_TOO_MANY_PROPERTIES;
         }
 
     } else if (SPP_MSG_PROP_DEF_ID == msg_id) {
+        printf("SPP: unpacking\n");
        SppUnpackPropDef(host, &client, &message[body_idx], len - body_idx);
     } else if (SPP_MSG_GET_RESPONSE_ID == msg_id) {
         uint8_t token = message[body_idx++];
@@ -277,6 +282,7 @@ SPP_STATUS_T SppHostProcessMessage(SppHostEngine_t* host, uint8_t* message, uint
         host->callbacks.OnStreamResponse(timestamp, stream, host->instance_data);
 
     } else {
+        printf("SPP: unknown message\n");
         return SPP_STATUS_UNKNOWN_MSG_ID;
     }
 

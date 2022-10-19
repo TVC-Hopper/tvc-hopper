@@ -118,9 +118,13 @@ SppStream_t* TelemetryComms::getNextStream() {
 
 PropValue* TelemetryComms::getValue(uint16_t id) {
     if (prop_values_.find(id) == prop_values_.end()) {
-        SppHostGetDefinition(getSpp(), &default_client, id, &prop_values_[id].def);
-        prop_values_[id].buffer = std::vector<uint8_t>(prop_values_[id].def->size, 0);
         prop_values_[id].timestamp = 0;
+        SppHostGetDefinition(getSpp(), &default_client, id, &prop_values_[id].def);
+        if (prop_values_[id].def == nullptr) {
+            std::cout << "null prop def" << std::endl;
+        } else {
+            prop_values_[id].buffer = std::vector<uint8_t>(prop_values_[id].def->size, 0);
+        }
     }
     return &prop_values_[id];
 }
@@ -271,9 +275,9 @@ void TelemetryComms::start(const char* port, int baud) {
                     memcpy(msg + msg_idx, buffer, end_idx + 1);
                     msg_idx += end_idx + 1;
 
-                    StcpHandleMessage(&stcp_, msg, msg_idx);
+                    int ret = StcpHandleMessage(&stcp_, msg, msg_idx);
 
-                    std::cout << "handled" << std::endl;
+                    std::cout << "handled " << (int)ret << std::endl;
 
                     msg_idx = 0;
                     memcpy(msg, buffer + end_idx + 1, n - (end_idx + 1));
@@ -323,6 +327,7 @@ StcpStatus_t handleStcpPacket(void* bytes, uint16_t len, void* instance_data) {
         std::cout << (int)ret << std::endl;
         return STCP_STATUS_UNDEFINED_ERROR;
     } else {
+        std::cout << "success" << std::endl;
         return STCP_STATUS_SUCCESS;
     }
 }
