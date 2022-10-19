@@ -7,6 +7,8 @@
 
 #include <unordered_map>
 
+#include <mutex>
+
 #include "tcp_server.h"
 #include "rs232.h"
 
@@ -47,10 +49,14 @@ private:
     ~TelemetryComms();
     static TelemetryComms* instance_;
 
+    void startListener();
+
     TcpServer server_;
     server_observer_t listener_;
+    std::thread serial_listener_;
 
     std::unordered_map<uint16_t, PropValue> prop_values_;
+
 
     static const int BUFFER_SIZE = 100;
     const uint8_t address_raw = 0x0;

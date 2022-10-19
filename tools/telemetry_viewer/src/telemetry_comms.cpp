@@ -4,8 +4,10 @@
 #include <iostream>
 #include <sstream>
 #include <future>
+#include <mutex>
 #include <utility>
 #include <thread>
+#include <chrono>
 
 #include <iomanip>
 
@@ -18,6 +20,8 @@
 
 #include "spp_property_list.h"
 #include "rs232.h"
+
+std::mutex stcp_mx_;
 
 TelemetryComms* TelemetryComms::instance_ = nullptr;
 uint8_t default_addr = 0x1;
@@ -44,6 +48,7 @@ void onIncomingMsg(const std::string &clientIP, const uint8_t * msg, size_t size
         for (size_t i = start; i < size - 1; ++i) {
             if (msg[i] == STCP_FOOTER && msg[i + 1] == STCP_FOOTER) {
                 StcpEngine_t* stcp = TelemetryComms::getInstance()->getStcp();
+                std::lock_guard<std::mutex> lg(stcp_mx_);
                 SPP_STATUS_T ret = StcpHandleMessage(stcp, (uint8_t*)(msg + start), (i + 2 - start));
                 std::cout << "Got msg, ret=" << (int)ret << std::endl;
 
@@ -65,9 +70,11 @@ void onIncomingMsg(const std::string &clientIP, const uint8_t * msg, size_t size
         memcpy(&period, msg + body_idx, sizeof(uint16_t));
         std::cout << "stream request " << id << " " << period << std::endl;
         SppStream_t* s = TelemetryComms::getInstance()->getNextStream();
+        std::lock_guard<std::mutex> lg(stcp_mx_);
         SppHostStartStream(spp, &default_client, id, period, SPP_STREAM_READ, s);
     } else if (cmd == "get") {
         std::cout << "get request " << id << std::endl;
+        std::lock_guard<std::mutex> lg(stcp_mx_);
         std::cout << (int)SppHostGetValue(spp, &default_client, id) << std::endl;
     } else if (cmd =="val") {
         std::cout << "value request " << id << std::endl;
@@ -89,6 +96,7 @@ void onIncomingMsg(const std::string &clientIP, const uint8_t * msg, size_t size
         tc->getServer()->sendToClient(tc->getViewerSock(), msg, msg_len);
     } else if (cmd == "set") {
         std::cout << "set request " << id << std::endl;
+        std::lock_guard<std::mutex> lg(stcp_mx_);
         SppHostSetValue(spp, &default_client, id, (void*)(msg + body_idx));
     }
 }
@@ -246,18 +254,20 @@ void TelemetryComms::start(const char* port, int baud) {
         exit(1);
     }
 
-    acceptClient();
+    viewer_fd_ = acceptClient();
 
+    serial_listener_ = std::thread(&TelemetryComms::startListener, this);
+}
+
+void TelemetryComms::startListener() {
     uint8_t buffer[4096];
     uint8_t msg[512];
     uint32_t msg_idx = 0;
 
-    bool is_end_found = false;
-
     while(true) {
         uint32_t n = read_port(comport_, buffer, 4096);
 
-        if (n > 0) {
+        if (false) {
             std::cout << "read " << n << std::endl;
             
             for (int i = 0; i < n; ++i) {
@@ -265,32 +275,20 @@ void TelemetryComms::start(const char* port, int baud) {
             }
             std::cout << std::endl;
         }
-
-
         if (n > 0) {
-            std::cout << "processing\n";
             for (int j = 0; j < n; ++j) {
-                std::cout << "copy " << msg_idx << " " << j << std::endl;
                 msg[msg_idx++] = buffer[j];
 
                 if (msg_idx >= 2) {
-                    std::cout << "check? " << msg_idx << "\n";
                     if (msg[msg_idx - 2] == STCP_FOOTER && msg[msg_idx - 1] == STCP_FOOTER) {
-                        std::cout << "end\n";
-
+                        std::lock_guard<std::mutex> lg(stcp_mx_);
                         int ret = StcpHandleMessage(&stcp_, msg, msg_idx);
-                        std::cout << "handled " << (int)ret << std::endl;
-                        for (int i = 0; i < msg_idx; ++i) {
-                            std::cout << std::setfill('0') << std::setw(2) << std::hex << (int)(msg[i]);
-                        }
-                        std::cout << std::endl;
                         msg_idx = 0;
                     }
                 }
             }
         }
     }
-
 }
 
 TelemetryComms::~TelemetryComms() {
