@@ -87,6 +87,14 @@ static SPP_STATUS_T SetValue(uint16_t id, void* value, void* instance_data) {
         {
             break;
         }
+        case PROP_telem_cap_start_ID:
+        {
+            break;
+        }
+        case PROP_telem_cap_stop_ID:
+        {
+            break;
+        }
         case PROP_telem_filter_en_ID:
         {
             break;
@@ -122,7 +130,11 @@ static SPP_STATUS_T SetValue(uint16_t id, void* value, void* instance_data) {
 
 static SPP_STATUS_T GetValue(uint16_t id, void* value, void* instance_data) {
     switch(id) {
-        case PROP_telemetry_ID:
+        case PROP_telem_data_ID:
+        {
+            break;
+        }
+        case PROP_telem_cap_ID:
         {
             break;
         }

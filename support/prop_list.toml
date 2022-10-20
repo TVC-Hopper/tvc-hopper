@@ -18,8 +18,8 @@ type = "U32"
 readable = true
 
 [[props]]
-name = "telemetry"
-id = 3
+name = "telem_data"
+id = 10
 type = "ARR"
 # float(4)
 # p(x,y,z) [12]
@@ -31,15 +31,42 @@ size = 52
 readable = true
 
 [[props]]
+# a stream of this property will read back all data
+# the stream will stop on its own when all data has been
+# read
+name = "telem_cap"
+id = 11
+type = "ARR"
+# bytes
+size = 64
+readable = true
+
+[[props]]
+# start telemetry capture
+name = "telem_cap_start"
+id = 12
+type = "BOOL"
+size = 1
+writeable = true
+
+[[props]]
+# stop telemetry capture
+name = "telem_cap_stop"
+id = 13
+type = "BOOL"
+size = 1
+writeable = true
+
+[[props]]
 name = "battery_v"
-id = 4
+id = 18
 type = "FLOAT"
 size = 4
 readable = true
 
 [[props]]
 name = "timestamp_ms"
-id = 5
+id = 19
 type = "U32"
 size = 4
 readable = true
@@ -47,7 +74,7 @@ readable = true
 [[props]]
 # telemetry values are read after filtering if enabled
 name = "telem_filter_en"
-id = 6
+id = 20
 type = "BOOL"
 size = 4
 readable = true
@@ -55,7 +82,7 @@ readable = true
 [[props]]
 # remote board reset
 name = "reset_system"
-id = 7
+id = 30
 type = "BOOL"
 size = 1
 writeable = true
@@ -64,14 +91,14 @@ writeable = true
 # reset only control flight systems and control
 # (e.g. soft soft reset between tests without power cycling, zero out values etv.)
 name = "reset_controls"
-id = 8
+id = 31
 type = "BOOL"
 size = 1
 writeable = true
 
 [[props]]
 name = "servo_positions"
-id = 9
+id = 40
 type = "ARR"
 # degress float(4)
 # servo[4] * 4
@@ -82,7 +109,7 @@ writeable = true
 [[props]]
 # delta from current
 name = "target_position"
-id = 10
+id = 41
 type = "ARR"
 # p(x,y,z)
 size = 12
@@ -91,7 +118,7 @@ readable = true
 
 [[props]]
 name = "param_bounds"
-id = 11
+id = 42
 type = "ARR"
 # max_val[4*3]
 # max_accel[4*3]

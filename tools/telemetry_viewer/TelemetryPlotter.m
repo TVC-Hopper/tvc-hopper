@@ -14,8 +14,8 @@ classdef TelemetryPlotter < handle
         tickUpdateInterval = 20;
         dTick = 4000;
         
-        telemetryPropId = 3;
-        battVoltPropId = 4;
+        telemetryPropId = 15;
+        battVoltPropId = 16;
         
         xRange_ms;
         tickBase;
