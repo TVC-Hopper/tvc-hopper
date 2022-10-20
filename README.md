@@ -115,9 +115,11 @@ All tests are located in `tests` directory
 
 ### Telemetry Viewer
 
-Start the server using `make start_telemetry_server`.
+Start the server using `make start_telemetry_server mode=s`.
 Use MATLAB, switch working directory to `tools/telemetry_viewer`. Run the script to plot incoming data.
 To add new data, modify the server and the matlab script to accept and plot new values.
+
+If starting the server with the emulator, use `make start_telemetry_server mode=e`
 
 The telemetry server operates an SPP host instance that streams data from the client (either vehicle or emulated). The MATLAB visualization/viewer client connects to the server and reads data to plot.
 

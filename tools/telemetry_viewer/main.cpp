@@ -14,8 +14,11 @@ int main(int argc, char** argv) {
     TelemetryComms* tc = TelemetryComms::getInstance();
 
 
-    tc->start(argv[1], 9600);
-//    tc->start();
+    if (argv[2][0] == 'e') {
+        tc->start();
+    } else {
+        tc->start(argv[1], 9600);
+    }
 
     std::cout << "started" << std::endl;
 
