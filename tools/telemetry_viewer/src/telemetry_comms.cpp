@@ -240,16 +240,20 @@ void TelemetryComms::start(const char* port, int baud) {
     is_data_src_emulated_ = false;
     baud_ = baud;
 
-    char mode[] = {'8', 'N', '1', 0};
     comport_ = open_serial_port(port, baud);
 
     if (comport_ == -1) {
         exit(1);
     }
 
-    viewer_fd_ = acceptClient();
-
+    SppConnectToClient(&spp_, &default_client);
+    wait_for_viewer_ = std::thread(&TelemetryComms::waitForViewer, this);
     serial_listener_ = std::thread(&TelemetryComms::startListener, this);
+
+}
+
+void TelemetryComms::waitForViewer() {
+    viewer_fd_ = acceptClient();
 }
 
 void TelemetryComms::startListener() {
@@ -300,7 +304,7 @@ StcpStatus_t handleStcpPacket(void* bytes, uint16_t len, void* instance_data) {
     SPP_STATUS_T ret = SppHostProcessMessage(spp, (uint8_t*)bytes, len);
 
     if (ret != SPP_STATUS_OK) {
-        std::cout << (int)ret << std::endl;
+        std::cout << "Error: " << (int)ret << std::endl;
         return STCP_STATUS_UNDEFINED_ERROR;
     } else {
         return STCP_STATUS_SUCCESS;

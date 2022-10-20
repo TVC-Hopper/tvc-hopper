@@ -14,6 +14,8 @@ extern "C" {
 
 SPP_STATUS_T SppHostEngineInit(SppHostEngineInitParams_t* init_params, SppHostEngine_t* host);
 
+void SppConnectToClient(SppHostEngine_t *host, SppAddress_t *client);
+
 SPP_STATUS_T SppHostProcessMessage(SppHostEngine_t* host, uint8_t* message, uint16_t len);
 
 SPP_STATUS_T SppHostGetValue(SppHostEngine_t* host, SppAddress_t* client, uint16_t id);

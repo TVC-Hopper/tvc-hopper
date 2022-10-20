@@ -11,7 +11,6 @@
 
 static void SppSendConnectBusyResponse(SppHostEngine_t *host, SppAddress_t *client);
 static void SppUnpackPropDef(SppHostEngine_t *host, SppAddress_t *client, uint8_t* message, uint16_t len);
-static void SppSendConnectResponse(SppHostEngine_t *host, SppAddress_t *client);
 static void SppAddClient(SppHostEngine_t *host, SppAddress_t* client);
 static SPP_STATUS_T SppClearToken(SppHostEngine_t *host, uint8_t token);
 static SPP_STATUS_T SppInsertToken(SppHostEngine_t *host, uint8_t token);
@@ -60,7 +59,7 @@ static void SppUnpackPropDef(SppHostEngine_t *host, SppAddress_t *client, uint8_
     }
 }
 
-static void SppSendConnectResponse(SppHostEngine_t *host, SppAddress_t *client) {
+void SppConnectToClient(SppHostEngine_t *host, SppAddress_t *client) {
     uint16_t msg_size = MESSAGE_SIZE(SPP_MSG_CONNECT_RESPONSE_SIZE, host->address_length);
     uint8_t msg[msg_size];
     uint16_t body_idx = SppFillMessageHeader(host->address_length, msg, &host->host_address, client, SPP_MSG_CONNECT_RESPONSE_ID);
@@ -216,7 +215,7 @@ SPP_STATUS_T SppHostProcessMessage(SppHostEngine_t* host, uint8_t* message, uint
         host->state = SPP_STATE_CONNECTING;
         client.property_list_id = *((uint16_t*)(message + body_idx));
         SppAddClient(host, &client);
-        SppSendConnectResponse(host, &client);
+        SppConnectToClient(host, &client);
     } else if (SPP_MSG_PROP_LIST_RESPONSE_ID == msg_id) {
         uint8_t num_props = message[body_idx++];
         uint16_t num_bytes = *((uint16_t*)(message + body_idx));

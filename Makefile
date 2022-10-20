@@ -17,12 +17,14 @@ generate_spp_headers:
 
 .PHONY: clean
 clean:
+	rm -rf build
 	rm -rf $(BUILD_DIR)
 	rm -rf $(BUILD_FSNOR_DIR)
 	rm -rf $(DEBUG_FSNOR_DIR)
 	rm -rf $(DEBUG_DIR)
 	rm -rf $(TEST_BUILD_DIR)
 	rm -rf $(BUILD_TELEM_SERVER_DIR)
+	rm -rf $(BUILD_TELEM_EMULATOR_DIR)
 
 .PHONY: release
 release: generate_spp_headers

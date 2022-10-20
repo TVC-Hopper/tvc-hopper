@@ -50,10 +50,12 @@ private:
     static TelemetryComms* instance_;
 
     void startListener();
+    void waitForViewer();
 
     TcpServer server_;
     server_observer_t listener_;
     std::thread serial_listener_;
+    std::thread wait_for_viewer_;
 
     std::unordered_map<uint16_t, PropValue> prop_values_;
 
