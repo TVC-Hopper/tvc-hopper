@@ -37,6 +37,9 @@ Debug as normal using the IDE's GDB interface.
 
 This will be the normal method of debugging and testing you'll use on the System on a Board.
 
+When connecting the development board, MCUXpresso sometimes has issues connecting if the board is connected before
+the IDE is launched. For a most reproducible and consistent environment, launch the IDE first.
+
 #### Programming Flight Controller
 
 TBD. This may be difficult to get working.

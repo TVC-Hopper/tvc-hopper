@@ -666,7 +666,7 @@
                         <struct name="lpuart_rtos_configuration">
                            <setting name="clockSource" value="LpuartClock"/>
                            <setting name="srcclk" value="BOARD_BootClockRUN"/>
-                           <setting name="baudrate" value="9600"/>
+                           <setting name="baudrate" value="115200"/>
                            <setting name="parity" value="kLPUART_ParityDisabled"/>
                            <setting name="stopbits" value="kLPUART_OneStopBit"/>
                            <setting name="buffer_size" value="32"/>

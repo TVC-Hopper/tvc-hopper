@@ -50,7 +50,6 @@ void onIncomingMsg(const std::string &clientIP, const uint8_t * msg, size_t size
                 StcpEngine_t* stcp = TelemetryComms::getInstance()->getStcp();
                 std::lock_guard<std::mutex> lg(stcp_mx_);
                 SPP_STATUS_T ret = StcpHandleMessage(stcp, (uint8_t*)(msg + start), (i + 2 - start));
-                std::cout << "Got msg, ret=" << (int)ret << std::endl;
 
                 start = i + cmd.length() + 3;
                 i++; // skip last footer
@@ -68,16 +67,12 @@ void onIncomingMsg(const std::string &clientIP, const uint8_t * msg, size_t size
     if (cmd == "str") {
         uint16_t period;
         memcpy(&period, msg + body_idx, sizeof(uint16_t));
-        std::cout << "stream request " << id << " " << period << std::endl;
         SppStream_t* s = TelemetryComms::getInstance()->getNextStream();
         std::lock_guard<std::mutex> lg(stcp_mx_);
         SppHostStartStream(spp, &default_client, id, period, SPP_STREAM_READ, s);
     } else if (cmd == "get") {
-        std::cout << "get request " << id << std::endl;
         std::lock_guard<std::mutex> lg(stcp_mx_);
-        std::cout << (int)SppHostGetValue(spp, &default_client, id) << std::endl;
     } else if (cmd =="val") {
-        std::cout << "value request " << id << std::endl;
         PropValue* value = TelemetryComms::getInstance()->getValue(id);
 
         uint16_t type = value->def->type;
@@ -95,7 +90,6 @@ void onIncomingMsg(const std::string &clientIP, const uint8_t * msg, size_t size
         TelemetryComms* tc = TelemetryComms::getInstance();
         tc->getServer()->sendToClient(tc->getViewerSock(), msg, msg_len);
     } else if (cmd == "set") {
-        std::cout << "set request " << id << std::endl;
         std::lock_guard<std::mutex> lg(stcp_mx_);
         SppHostSetValue(spp, &default_client, id, (void*)(msg + body_idx));
     }
@@ -173,7 +167,6 @@ void onStatusResponse(SPP_STATUS_T status, void* instance_data) {
 }
 
 void onStreamResponse(uint32_t timestamp, SppStream_t* stream, void* instance_data) {
-    std::cout << timestamp << " ";
     onValueResponse(nullptr, stream->def->id, stream->value, &timestamp);
 }
 
@@ -267,14 +260,6 @@ void TelemetryComms::startListener() {
     while(true) {
         uint32_t n = read_port(comport_, buffer, 4096);
 
-        if (false) {
-            std::cout << "read " << n << std::endl;
-            
-            for (int i = 0; i < n; ++i) {
-                std::cout << std::setfill('0') << std::setw(2) << std::hex << (int)(buffer[i]);
-            }
-            std::cout << std::endl;
-        }
         if (n > 0) {
             for (int j = 0; j < n; ++j) {
                 msg[msg_idx++] = buffer[j];
@@ -318,7 +303,6 @@ StcpStatus_t handleStcpPacket(void* bytes, uint16_t len, void* instance_data) {
         std::cout << (int)ret << std::endl;
         return STCP_STATUS_UNDEFINED_ERROR;
     } else {
-        std::cout << "success" << std::endl;
         return STCP_STATUS_SUCCESS;
     }
 }

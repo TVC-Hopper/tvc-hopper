@@ -71,7 +71,7 @@ instance:
     - lpuart_rtos_configuration:
       - clockSource: 'LpuartClock'
       - srcclk: 'BOARD_BootClockRUN'
-      - baudrate: '9600'
+      - baudrate: '115200'
       - parity: 'kLPUART_ParityDisabled'
       - stopbits: 'kLPUART_OneStopBit'
       - buffer_size: '32'
@@ -90,7 +90,7 @@ lpuart_handle_t COMMS_UART_lpuart_handle;
 uint8_t COMMS_UART_background_buffer[COMMS_UART_BACKGROUND_BUFFER_SIZE];
 lpuart_rtos_config_t COMMS_UART_rtos_config = {
   .base = COMMS_UART_PERIPHERAL,
-  .baudrate = 9600UL,
+  .baudrate = 115200UL,
   .srcclk = 80000000UL,
   .parity = kLPUART_ParityDisabled,
   .stopbits = kLPUART_OneStopBit,

@@ -9,13 +9,13 @@ classdef TelemetryPlotter < handle
         battVoltLimY = [0 25];
         xRange_s = 20;
 
-        telemetryStream_period_ms = 80;
-        battVoltStream_period_ms = 1000;
+        telemetryStream_period_ms = 20;
+        battVoltStream_period_ms = 500;
         tickUpdateInterval = 20;
         dTick = 4000;
         
-        telemetryPropId = 15;
-        battVoltPropId = 16;
+        telemetryPropId = 10;
+        battVoltPropId = 18;
         
         xRange_ms;
         tickBase;
