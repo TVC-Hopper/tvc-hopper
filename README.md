@@ -144,8 +144,7 @@ The telemetry server operates an SPP host instance that streams data from the cl
 - `emdat/<id:2><value:size>`: Provide emulated data
 
 ***Response***
-Where integer is number of characters (1/2 byte)
-- Value response: `<id:4><size:2><timestamp:8><value:size*2>`
+- Value response: `<id:2><size:1><timestamp:4><value:size>`
 
 #### Data emulation
 
