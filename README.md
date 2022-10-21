@@ -122,7 +122,8 @@ Start the server using `make start_telemetry_server mode=s`.
 Use MATLAB, switch working directory to `tools/telemetry_viewer`. Run the script to plot incoming data.
 To add new data, modify the server and the matlab script to accept and plot new values.
 
-If starting the server with the emulator, use `make start_telemetry_server mode=e`
+Unless using the telemetry emulator, the order of connections does not matter. The flight software, telemetry server, and telemetry viewer may be started in any sequence.
+Additionally, the telemetry server can be restarted without needing to restart the flight software. Same is true for the flight software.
 
 The telemetry server operates an SPP host instance that streams data from the client (either vehicle or emulated). The MATLAB visualization/viewer client connects to the server and reads data to plot.
 
@@ -130,17 +131,17 @@ The telemetry server operates an SPP host instance that streams data from the cl
 
 #### Server API
 
-- `id`: property id
-- `period`: period in milliseconds
-- `value`: property value
+- `id`: property id (2 bytes)
+- `period`: period in milliseconds (4 bytes)
+- `value`: property value (size bytes)
 
 ***Requests***
 
-- `get/<id>`: Request property value from SPP client
-- `val/<id>`: Request property value from telemetry server
-- `str/<id>/<period>`: Start stream
-- `set/<id>/<value>`: Set property value
-- `emdat/<id>/<value>`: Provide emulated data
+- `get/<id:2>`: Request property value from SPP client
+- `val/<id:2>`: Request property value from telemetry server
+- `str/<id:2><period:4>`: Start stream
+- `set/<id:2><value:size>`: Set property value
+- `emdat/<id:2><value:size>`: Provide emulated data
 
 ***Response***
 Where integer is number of characters (1/2 byte)
@@ -151,6 +152,9 @@ Where integer is number of characters (1/2 byte)
 Modify `tools/telemetry_emulator/src/main.cpp` to generate whatever telemetry data you'd like, may need to update property
 lists.
 Open a terminal and run `make telemetry_emulator start_telemetry_emulator`.
+If starting the server with the emulator, use `make start_telemetry_server mode=e`
+
+When using the emulator, the telemetry emulator must be started before the MATLAB viewer is launched.
 
 
 
