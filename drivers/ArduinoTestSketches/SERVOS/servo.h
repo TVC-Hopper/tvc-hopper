@@ -14,7 +14,9 @@
  *  onNewDutyCycle : ptr to PWM callback
  *  pulseWidth0deg_us : pulsewidth in microseconds corresponding to 0 deg
  *  pulseWidth180deg_us : pulsewidth in microseconds corresponding to 180 deg
+ *  deadband : half deadband width
  *  posStart_deg : servo start position in degrees
+ *  applyDB : apply deadband compensation
  */
 typedef struct ServoInit{
     void (*onNewDutyCycle)(int);
@@ -41,7 +43,7 @@ typedef struct ServoCallbacks {
  *  degToMicros : conversion between degrees and micros
  *  microsToDeg : conversion between micros and degrees
  */
-typedef struct Servo {
+typedef struct Servo_test {
     ServoCallbacks_t callbacks;
 
     uint32_t lastWrite_us;
@@ -94,5 +96,23 @@ void Servo_WritePosDeg(Servo_t *Servo, int deg);
  * @param micros position commanded in microseconds
  */
 void Servo_WritePosMicros(Servo_t *Servo, uint32_t micros);
+
+/**
+ * @brief compensate for servo deadband
+ * 
+ * @param Servo ptr to object of type Servo_t
+ * @param micros : position commanded in microseconds
+ * @return uint32_t : returns deadband compensated position in microseconds
+ */
+uint32_t applyDeadband(Servo_t* Servo, uint32_t micros);
+
+/**
+ * @brief write new position with deadband compensation
+ * 
+ * @param Servo ptr to object of type Servo_t
+ * @param micros position commanded in microseconds
+ */
+void Servo_WriteMicros(Servo_t* Servo, uint32_t micros);
+
 
 #endif
