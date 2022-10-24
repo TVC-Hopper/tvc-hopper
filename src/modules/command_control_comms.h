@@ -10,7 +10,6 @@
 extern StcpEngine_t* GetStcpEngine();
 
 extern void CommandControlComms_Init();
-
 extern void CommandControlComms_Task(void* task_args);
 
 

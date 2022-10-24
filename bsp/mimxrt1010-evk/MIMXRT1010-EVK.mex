@@ -213,6 +213,16 @@
                   <pin peripheral="FLEXSPI" signal="FLEXSPI_A_DATA2" pin_num="67" pin_signal="GPIO_SD_08"/>
                   <pin peripheral="FLEXSPI" signal="FLEXSPI_A_DATA3" pin_num="64" pin_signal="GPIO_SD_11"/>
                   <pin peripheral="FLEXSPI" signal="FLEXSPI_A_SS0_B" pin_num="69" pin_signal="GPIO_SD_06"/>
+                  <pin peripheral="GPIO1" signal="gpiomux_io, 23" pin_num="48" pin_signal="GPIO_AD_09">
+                     <pin_features>
+                        <pin_feature name="identifier" value=""/>
+                     </pin_features>
+                  </pin>
+                  <pin peripheral="GPIO1" signal="gpiomux_io, 24" pin_num="47" pin_signal="GPIO_AD_10">
+                     <pin_features>
+                        <pin_feature name="identifier" value=""/>
+                     </pin_features>
+                  </pin>
                </pins>
             </function>
             <function name="BOARD_InitLEDPins">
@@ -682,43 +692,13 @@
                         </struct>
                      </config_set>
                   </instance>
-                  <instance name="USER_BUTTON" uuid="6c9e57cc-d98c-4f6d-bf94-3920a8fd474e" type="igpio" type_id="igpio_b1c1fa279aa7069dca167502b8589cb7" mode="GPIO" peripheral="GPIO2" enabled="true" comment="" custom_name_enabled="true" editing_lock="false">
-                     <config_set name="fsl_gpio">
-                        <setting name="enable_irq_comb_0_15" value="true"/>
-                        <struct name="gpio_interrupt_comb_0_15">
-                           <setting name="IRQn" value="GPIO2_Combined_0_15_IRQn"/>
-                           <setting name="enable_interrrupt" value="enabled"/>
-                           <setting name="enable_priority" value="true"/>
-                           <setting name="priority" value="3"/>
-                           <setting name="enable_custom_name" value="false"/>
-                        </struct>
-                     </config_set>
-                  </instance>
-                  <instance name="USER_LED" uuid="0f7a142d-ad6c-4e47-a2a3-015e90afa37b" type="igpio" type_id="igpio_b1c1fa279aa7069dca167502b8589cb7" mode="GPIO" peripheral="GPIO1" enabled="false" comment="" custom_name_enabled="true" editing_lock="false">
-                     <config_set name="fsl_gpio">
-                        <setting name="enable_irq_comb_0_15" value="false"/>
-                        <struct name="gpio_interrupt_comb_0_15">
-                           <setting name="IRQn" value="GPIO1_Combined_0_15_IRQn"/>
-                           <setting name="enable_interrrupt" value="enabled"/>
-                           <setting name="enable_priority" value="false"/>
-                           <setting name="priority" value="0"/>
-                           <setting name="enable_custom_name" value="false"/>
-                        </struct>
-                        <setting name="enable_irq_comb_16_31" value="false"/>
-                        <struct name="gpio_interrupt_comb_16_31">
-                           <setting name="IRQn" value="GPIO1_Combined_16_31_IRQn"/>
-                           <setting name="enable_interrrupt" value="enabled"/>
-                           <setting name="enable_priority" value="false"/>
-                           <setting name="priority" value="0"/>
-                           <setting name="enable_custom_name" value="false"/>
-                        </struct>
-                     </config_set>
-                  </instance>
                   <instance name="NVIC" uuid="a76d6018-4cb8-4ad4-9ce5-2f5c7432a5af" type="nvic" type_id="nvic_57b5eef3774cc60acaede6f5b8bddc67" mode="general" peripheral="NVIC" enabled="true" comment="" custom_name_enabled="false" editing_lock="false">
                      <config_set name="nvic">
                         <array name="interrupt_table">
                            <struct name="0"/>
                            <struct name="1"/>
+                           <struct name="2"/>
+                           <struct name="3"/>
                         </array>
                         <array name="interrupts"/>
                      </config_set>
@@ -1217,51 +1197,36 @@
                         <array name="devices_configs"/>
                      </config_set>
                   </instance>
-                  <instance name="LPI2C2" uuid="ccd5fbcc-a4a5-42a0-afec-216fa64dc897" type="lpi2c" type_id="lpi2c_6b71962515c3208facfccd030afebc98" mode="master" peripheral="LPI2C2" enabled="false" comment="" custom_name_enabled="false" editing_lock="false">
-                     <config_set name="main">
-                        <setting name="clockSource" value="Lpi2cClock"/>
-                        <setting name="clockSourceFreq" value="BOARD_BootClockRUN"/>
-                     </config_set>
-                     <config_set name="interrupt_vector"/>
-                     <config_set name="master" quick_selection="qs_master_transfer">
-                        <setting name="mode" value="transfer"/>
-                        <struct name="config">
-                           <setting name="enableMaster" value="true"/>
-                           <setting name="enableDoze" value="true"/>
-                           <setting name="debugEnable" value="false"/>
-                           <setting name="ignoreAck" value="false"/>
-                           <setting name="pinConfig" value="kLPI2C_2PinOpenDrain"/>
-                           <setting name="baudRate_Hz" value="100000"/>
-                           <setting name="busIdleTimeout_ns" value="0"/>
-                           <setting name="pinLowTimeout_ns" value="0"/>
-                           <setting name="sdaGlitchFilterWidth_ns" value="0"/>
-                           <setting name="sclGlitchFilterWidth_ns" value="0"/>
-                           <struct name="hostRequest">
-                              <setting name="enable" value="false"/>
-                              <setting name="source" value="kLPI2C_HostRequestExternalPin"/>
-                              <setting name="polarity" value="kLPI2C_HostRequestPinActiveHigh"/>
-                           </struct>
-                           <set name="edmaRequestSources">
-                              <selected/>
-                           </set>
+                  <instance name="GPIO1" uuid="060de37c-80fc-4c2a-aba5-9ed295b0cc0a" type="igpio" type_id="igpio_b1c1fa279aa7069dca167502b8589cb7" mode="GPIO" peripheral="GPIO1" enabled="true" comment="" custom_name_enabled="false" editing_lock="false">
+                     <config_set name="fsl_gpio">
+                        <setting name="enable_irq_comb_0_15" value="true"/>
+                        <struct name="gpio_interrupt_comb_0_15">
+                           <setting name="IRQn" value="GPIO1_Combined_0_15_IRQn"/>
+                           <setting name="enable_interrrupt" value="enabled"/>
+                           <setting name="enable_priority" value="true"/>
+                           <setting name="priority" value="5"/>
+                           <setting name="enable_custom_name" value="false"/>
                         </struct>
-                        <struct name="transfer">
-                           <setting name="blocking" value="false"/>
-                           <setting name="enable_custom_handle" value="false"/>
-                           <struct name="callback">
-                              <setting name="name" value=""/>
-                              <setting name="userData" value=""/>
-                           </struct>
-                           <set name="flags">
-                              <selected/>
-                           </set>
-                           <setting name="slaveAddress" value="0"/>
-                           <setting name="direction" value="kLPI2C_Write"/>
-                           <setting name="subaddress" value="0"/>
-                           <setting name="subaddressSize" value="1"/>
-                           <setting name="blocking_buffer" value="false"/>
-                           <setting name="enable_custom_buffer" value="false"/>
-                           <setting name="dataSize" value="1"/>
+                        <setting name="enable_irq_comb_16_31" value="true"/>
+                        <struct name="gpio_interrupt_comb_16_31">
+                           <setting name="IRQn" value="GPIO1_Combined_16_31_IRQn"/>
+                           <setting name="enable_interrrupt" value="enabled"/>
+                           <setting name="enable_priority" value="true"/>
+                           <setting name="priority" value="5"/>
+                           <setting name="enable_custom_name" value="false"/>
+                        </struct>
+                     </config_set>
+                  </instance>
+                  <instance name="GPIO2" uuid="8f41f531-f1e2-4b66-9869-20ae6d9449d4" type="igpio" type_id="igpio_b1c1fa279aa7069dca167502b8589cb7" mode="GPIO" peripheral="GPIO2" enabled="true" comment="" custom_name_enabled="false" editing_lock="false">
+                     <config_set name="fsl_gpio">
+                        <setting name="enable_irq_comb_0_15" value="true"/>
+                        <struct name="gpio_interrupt_comb_0_15">
+                           <setting name="IRQn" value="GPIO2_Combined_0_15_IRQn"/>
+                           <setting name="enable_interrrupt" value="enabled"/>
+                           <setting name="enable_priority" value="true"/>
+                           <setting name="priority" value="3"/>
+                           <setting name="enable_custom_name" value="true"/>
+                           <setting name="handler_custom_name" value="GPIO2_0_15_IRQn"/>
                         </struct>
                      </config_set>
                   </instance>

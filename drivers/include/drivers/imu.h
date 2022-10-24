@@ -272,7 +272,7 @@ typedef enum {
  * onI2Cread : i2c read callback
  */
 typedef struct IMUcbk {
-    void (*onDelay_us)(uint32_t micros);
+    void (*onDelay_ms)(uint32_t micros);
     uint8_t (*onI2Cwrite)(uint8_t devAddr, uint8_t *bus_data, uint16_t size);
     uint8_t (*onI2Cread)(uint8_t devAddr, uint8_t *bus_data, uint16_t size);
 } IMUcbk_t;
@@ -325,7 +325,7 @@ typedef enum {
  */
 typedef struct IMUinit{
   SD01State_t sd01;
-  void (*onDelay_us)(uint32_t micros);
+  void (*onDelay_ms)(uint32_t micros);
   uint8_t (*onI2Cwrite)(uint8_t devAddr, uint8_t *bus_data, uint16_t size);
   uint8_t (*onI2Cread)(uint8_t devAddr, uint8_t *bus_data, uint16_t size);
 }IMUinit_t;

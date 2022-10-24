@@ -12,9 +12,15 @@
 
 #include "modules/command_control_comms.h"
 
+#include "hw/imu.h"
+#include "hw/lidar.h"
+#include "hw/thrust_vanes.h"
+
 #include "app_hal_xconnect.h"
 
 
+#define PRIORITY_IMU_ACC                    5
+#define PRIORITY_IMU_GYRO                   5
 #define PRIORITY_COMMAND_CONTROL_COMMS      2
 #define PROIRITY_UART_LISTENER              1
 
@@ -31,10 +37,10 @@ int main(void)
     // for some reason
     BOARD_InitBootPeripherals();
     
+    AppHal_Init();
 
     UartListener_Init();
     CommandControlComms_Init();
-
 
     CreateTasks();
 
@@ -60,6 +66,26 @@ static void CreateTasks() {
                         configMINIMAL_STACK_SIZE + 128,
                         NULL,
                         PROIRITY_UART_LISTENER,
+                        NULL) != pdPASS)
+    {
+        while (1) {}
+    }
+
+    if (xTaskCreate(HwImu_GyroTask,
+                        "hwimu_gyro",
+                        configMINIMAL_STACK_SIZE + 128,
+                        NULL,
+                        PRIORITY_IMU_GYRO,
+                        NULL) != pdPASS)
+    {
+        while (1) {}
+    }
+
+    if (xTaskCreate(HwImu_AccTask,
+                        "hwimu_acc",
+                        configMINIMAL_STACK_SIZE + 128,
+                        NULL,
+                        PRIORITY_IMU_ACC,
                         NULL) != pdPASS)
     {
         while (1) {}

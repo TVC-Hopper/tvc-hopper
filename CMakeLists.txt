@@ -27,6 +27,8 @@ add_executable(${PROJECT_NAME}.elf
 
     src/modules/command_control_comms.c
     src/modules/spp_property_list.c
+
+    src/hw/imu.c
 )
 
 target_include_directories(${PROJECT_NAME}.elf

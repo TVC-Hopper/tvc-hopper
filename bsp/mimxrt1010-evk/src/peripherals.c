@@ -110,39 +110,6 @@ static void COMMS_UART_init(void) {
 }
 
 /***********************************************************************************************************************
- * USER_BUTTON initialization code
- **********************************************************************************************************************/
-/* clang-format off */
-/* TEXT BELOW IS USED AS SETTING FOR TOOLS *************************************
-instance:
-- name: 'USER_BUTTON'
-- type: 'igpio'
-- mode: 'GPIO'
-- custom_name_enabled: 'true'
-- type_id: 'igpio_b1c1fa279aa7069dca167502b8589cb7'
-- functional_group: 'BOARD_InitPeripherals'
-- peripheral: 'GPIO2'
-- config_sets:
-  - fsl_gpio:
-    - enable_irq_comb_0_15: 'true'
-    - gpio_interrupt_comb_0_15:
-      - IRQn: 'GPIO2_Combined_0_15_IRQn'
-      - enable_interrrupt: 'enabled'
-      - enable_priority: 'true'
-      - priority: '3'
-      - enable_custom_name: 'false'
- * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS **********/
-/* clang-format on */
-
-static void USER_BUTTON_init(void) {
-  /* Make sure, the clock gate for GPIO2 is enabled (e. g. in pin_mux.c) */
-  /* Interrupt vector GPIO2_Combined_0_15_IRQn priority settings in the NVIC. */
-  NVIC_SetPriority(USER_BUTTON_GPIO_COMB_0_15_IRQN, USER_BUTTON_GPIO_COMB_0_15_IRQ_PRIORITY);
-  /* Enable interrupt GPIO2_Combined_0_15_IRQn request in the NVIC. */
-  EnableIRQ(USER_BUTTON_GPIO_COMB_0_15_IRQN);
-}
-
-/***********************************************************************************************************************
  * NVIC initialization code
  **********************************************************************************************************************/
 /* clang-format off */
@@ -160,6 +127,8 @@ instance:
     - interrupt_table:
       - 0: []
       - 1: []
+      - 2: []
+      - 3: []
     - interrupts: []
  * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS **********/
 /* clang-format on */
@@ -705,15 +674,94 @@ static void LPI2C1_init(void) {
 }
 
 /***********************************************************************************************************************
+ * GPIO1 initialization code
+ **********************************************************************************************************************/
+/* clang-format off */
+/* TEXT BELOW IS USED AS SETTING FOR TOOLS *************************************
+instance:
+- name: 'GPIO1'
+- type: 'igpio'
+- mode: 'GPIO'
+- custom_name_enabled: 'false'
+- type_id: 'igpio_b1c1fa279aa7069dca167502b8589cb7'
+- functional_group: 'BOARD_InitPeripherals'
+- peripheral: 'GPIO1'
+- config_sets:
+  - fsl_gpio:
+    - enable_irq_comb_0_15: 'true'
+    - gpio_interrupt_comb_0_15:
+      - IRQn: 'GPIO1_Combined_0_15_IRQn'
+      - enable_interrrupt: 'enabled'
+      - enable_priority: 'true'
+      - priority: '5'
+      - enable_custom_name: 'false'
+    - enable_irq_comb_16_31: 'true'
+    - gpio_interrupt_comb_16_31:
+      - IRQn: 'GPIO1_Combined_16_31_IRQn'
+      - enable_interrrupt: 'enabled'
+      - enable_priority: 'true'
+      - priority: '5'
+      - enable_custom_name: 'false'
+ * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS **********/
+/* clang-format on */
+
+static void GPIO1_init(void) {
+  /* Make sure, the clock gate for GPIO1 is enabled (e. g. in pin_mux.c) */
+  /* Interrupt vector GPIO1_Combined_0_15_IRQn priority settings in the NVIC. */
+  NVIC_SetPriority(GPIO1_GPIO_COMB_0_15_IRQN, GPIO1_GPIO_COMB_0_15_IRQ_PRIORITY);
+  /* Enable interrupt GPIO1_Combined_0_15_IRQn request in the NVIC. */
+  EnableIRQ(GPIO1_GPIO_COMB_0_15_IRQN);
+  /* Interrupt vector GPIO1_Combined_16_31_IRQn priority settings in the NVIC. */
+  NVIC_SetPriority(GPIO1_GPIO_COMB_16_31_IRQN, GPIO1_GPIO_COMB_16_31_IRQ_PRIORITY);
+  /* Enable interrupt GPIO1_Combined_16_31_IRQn request in the NVIC. */
+  EnableIRQ(GPIO1_GPIO_COMB_16_31_IRQN);
+}
+
+/***********************************************************************************************************************
+ * GPIO2 initialization code
+ **********************************************************************************************************************/
+/* clang-format off */
+/* TEXT BELOW IS USED AS SETTING FOR TOOLS *************************************
+instance:
+- name: 'GPIO2'
+- type: 'igpio'
+- mode: 'GPIO'
+- custom_name_enabled: 'false'
+- type_id: 'igpio_b1c1fa279aa7069dca167502b8589cb7'
+- functional_group: 'BOARD_InitPeripherals'
+- peripheral: 'GPIO2'
+- config_sets:
+  - fsl_gpio:
+    - enable_irq_comb_0_15: 'true'
+    - gpio_interrupt_comb_0_15:
+      - IRQn: 'GPIO2_Combined_0_15_IRQn'
+      - enable_interrrupt: 'enabled'
+      - enable_priority: 'true'
+      - priority: '3'
+      - enable_custom_name: 'true'
+      - handler_custom_name: 'GPIO2_0_15_IRQn'
+ * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS **********/
+/* clang-format on */
+
+static void GPIO2_init(void) {
+  /* Make sure, the clock gate for GPIO2 is enabled (e. g. in pin_mux.c) */
+  /* Interrupt vector GPIO2_Combined_0_15_IRQn priority settings in the NVIC. */
+  NVIC_SetPriority(GPIO2_GPIO_COMB_0_15_IRQN, GPIO2_GPIO_COMB_0_15_IRQ_PRIORITY);
+  /* Enable interrupt GPIO2_Combined_0_15_IRQn request in the NVIC. */
+  EnableIRQ(GPIO2_GPIO_COMB_0_15_IRQN);
+}
+
+/***********************************************************************************************************************
  * Initialization functions
  **********************************************************************************************************************/
 void BOARD_InitPeripherals(void)
 {
   /* Initialize components */
   COMMS_UART_init();
-  USER_BUTTON_init();
   PWM1_init();
   LPI2C1_init();
+  GPIO1_init();
+  GPIO2_init();
 }
 
 /***********************************************************************************************************************

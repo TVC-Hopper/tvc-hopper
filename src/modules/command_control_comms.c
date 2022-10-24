@@ -12,8 +12,8 @@
 #include <sppclient/defs.h>
 
 #include "spp_property_list.h"
+#include "app_hal_xconnect.h"
 
-extern SPP_STATUS_T XCCb_StcpSendPacket(void* buffer, uint16_t len, void* instance_data);
 
 static SPP_STATUS_T SppSendPacket(uint8_t* bytes, uint16_t len, void* instance_data);
 static StcpStatus_t HandleStcpPacket(void* buffer, uint16_t length, void* instance_data);
@@ -146,6 +146,8 @@ static SPP_STATUS_T GetValue(uint16_t id, void* value, void* instance_data) {
         }
         case PROP_timestamp_ms_ID:
         {
+            uint32_t t = xTaskGetTickCount();
+            memcpy((uint8_t*)value, &t, sizeof(t));
             break;
         }
         case PROP_servo_positions_ID:

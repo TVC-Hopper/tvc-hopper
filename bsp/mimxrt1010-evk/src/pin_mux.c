@@ -122,6 +122,8 @@ BOARD_InitQSPIPins:
   - {pin_num: '67', peripheral: FLEXSPI, signal: FLEXSPI_A_DATA2, pin_signal: GPIO_SD_08}
   - {pin_num: '64', peripheral: FLEXSPI, signal: FLEXSPI_A_DATA3, pin_signal: GPIO_SD_11}
   - {pin_num: '69', peripheral: FLEXSPI, signal: FLEXSPI_A_SS0_B, pin_signal: GPIO_SD_06}
+  - {pin_num: '48', peripheral: GPIO1, signal: 'gpiomux_io, 23', pin_signal: GPIO_AD_09, identifier: ''}
+  - {pin_num: '47', peripheral: GPIO1, signal: 'gpiomux_io, 24', pin_signal: GPIO_AD_10, identifier: ''}
  * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS ***********
  */
 
@@ -134,6 +136,8 @@ BOARD_InitQSPIPins:
 void BOARD_InitQSPIPins(void) {
   CLOCK_EnableClock(kCLOCK_Iomuxc);           
 
+  IOMUXC_SetPinMux(IOMUXC_GPIO_AD_09_GPIOMUX_IO23, 0U); 
+  IOMUXC_SetPinMux(IOMUXC_GPIO_AD_10_GPIOMUX_IO24, 0U); 
   IOMUXC_SetPinMux(IOMUXC_GPIO_SD_06_FLEXSPI_A_SS0_B, 0U); 
   IOMUXC_SetPinMux(IOMUXC_GPIO_SD_07_FLEXSPI_A_DATA1, 0U); 
   IOMUXC_SetPinMux(IOMUXC_GPIO_SD_08_FLEXSPI_A_DATA2, 0U); 

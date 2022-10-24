@@ -13,9 +13,9 @@
 #include "fsl_lpuart.h"
 #include "fsl_lpuart_freertos.h"
 #include "fsl_clock.h"
-#include "fsl_gpio.h"
 #include "fsl_pwm.h"
 #include "fsl_lpi2c.h"
+#include "fsl_gpio.h"
 
 #if defined(__cplusplus)
 extern "C" {
@@ -33,12 +33,6 @@ extern "C" {
 #define COMMS_UART_IRQN LPUART1_IRQn
 /* COMMS_UART interrupt vector priority. */
 #define COMMS_UART_IRQ_PRIORITY 5
-/* USER_BUTTON interrupt vector ID (number). */
-#define USER_BUTTON_GPIO_COMB_0_15_IRQN GPIO2_Combined_0_15_IRQn
-/* USER_BUTTON interrupt vector priority. */
-#define USER_BUTTON_GPIO_COMB_0_15_IRQ_PRIORITY 3
-/* USER_BUTTON interrupt handler identifier. */
-#define USER_BUTTON_GPIO_COMB_0_15_IRQHANDLER GPIO2_Combined_0_15_IRQHandler
 /* Definition of peripheral ID */
 #define PWM1_PERIPHERAL PWM1
 /* Definition of submodule 0 ID */
@@ -114,6 +108,24 @@ extern "C" {
 #define LPI2C1_MASTER_BUFFER_SIZE 1
 /* Definition of slave address */
 #define LPI2C1_MASTER_SLAVE_ADDRESS 0
+/* GPIO1 interrupt vector ID (number). */
+#define GPIO1_GPIO_COMB_0_15_IRQN GPIO1_Combined_0_15_IRQn
+/* GPIO1 interrupt vector priority. */
+#define GPIO1_GPIO_COMB_0_15_IRQ_PRIORITY 5
+/* GPIO1 interrupt handler identifier. */
+#define GPIO1_GPIO_COMB_0_15_IRQHANDLER GPIO1_Combined_0_15_IRQHandler
+/* GPIO1 interrupt vector ID (number). */
+#define GPIO1_GPIO_COMB_16_31_IRQN GPIO1_Combined_16_31_IRQn
+/* GPIO1 interrupt vector priority. */
+#define GPIO1_GPIO_COMB_16_31_IRQ_PRIORITY 5
+/* GPIO1 interrupt handler identifier. */
+#define GPIO1_GPIO_COMB_16_31_IRQHANDLER GPIO1_Combined_16_31_IRQHandler
+/* GPIO2 interrupt vector ID (number). */
+#define GPIO2_GPIO_COMB_0_15_IRQN GPIO2_Combined_0_15_IRQn
+/* GPIO2 interrupt vector priority. */
+#define GPIO2_GPIO_COMB_0_15_IRQ_PRIORITY 3
+/* GPIO2 interrupt handler identifier. */
+#define GPIO2_0_15_IRQn GPIO2_Combined_0_15_IRQHandler
 
 /***********************************************************************************************************************
  * Global variables

@@ -15,7 +15,7 @@
 void IMU_powerUpAcc(IMU_t *imu){
   _IMU_setDevAddr(imu, ACCEL);
   _IMU_writeReg(imu, ACC_PWR_CTRL, ACC_ON);
-  imu->Callbacks.onDelay_us(450);
+  imu->Callbacks.onDelay_ms(1);
 }
 
 //reset all registers to defaults
@@ -110,7 +110,7 @@ void _IMU_AccInit(IMU_t* imu, AccelInit_t* acc){
 void IMU_softResetGyro(IMU_t* imu){
   _IMU_setDevAddr(imu, GYRO);
   _IMU_writeReg(imu, GYRO_SOFT_RESET, SOFT_RESET);
-  imu->Callbacks.onDelay_us(30000);
+  imu->Callbacks.onDelay_ms(30);
 }
 
 //get error status gyro
@@ -195,11 +195,11 @@ uint8_t IMU_init(IMU_t* imu, AccelInit_t* accInit, GyroInit_t* gyroInit, IMUinit
     imu->Acc.devAddr = 0x18;
     imu->Gyro.devAddr = 0x68;
   }
-  imu->Callbacks.onDelay_us = imuInit->onDelay_us;
+  imu->Callbacks.onDelay_ms = imuInit->onDelay_ms;
   imu->Callbacks.onI2Cwrite = imuInit->onI2Cwrite;
   imu->Callbacks.onI2Cread = imuInit->onI2Cread;
 
-  imu->Callbacks.onDelay_us(30000);
+  imu->Callbacks.onDelay_ms(30);
   IMU_powerUpAcc(imu);
 
   if (accInit) {_IMU_AccInit(imu, accInit);}
