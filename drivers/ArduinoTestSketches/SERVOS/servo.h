@@ -43,6 +43,8 @@ typedef struct ServoCallbacks {
  *  degToMicros : conversion between degrees and micros
  *  microsToDeg : conversion between micros and degrees
  */
+
+//rename servo struct to Servo_test to prevent conflict with arduino servo library
 typedef struct Servo_test {
     ServoCallbacks_t callbacks;
 
