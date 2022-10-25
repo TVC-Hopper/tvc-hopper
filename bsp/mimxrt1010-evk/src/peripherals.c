@@ -213,8 +213,8 @@ instance:
         - sm_id: 'SM1'
         - config:
           - clockSource: 'kPWM_BusClock'
-          - prescale: 'kPWM_Prescale_Divide_1'
-          - pwmFreq: '16 kHz'
+          - prescale: 'kPWM_Prescale_Divide_64'
+          - pwmFreq: '50 Hz'
           - pairOperation: 'kPWM_Independent'
           - operationMode: 'kPWM_SignedCenterAligned'
           - initializationControl: 'kPWM_Initialize_LocalSync'
@@ -256,8 +256,8 @@ instance:
         - sm_id: 'SM2'
         - config:
           - clockSource: 'kPWM_BusClock'
-          - prescale: 'kPWM_Prescale_Divide_1'
-          - pwmFreq: '16 kHz'
+          - prescale: 'kPWM_Prescale_Divide_64'
+          - pwmFreq: '50 Hz'
           - pairOperation: 'kPWM_Independent'
           - operationMode: 'kPWM_SignedCenterAligned'
           - initializationControl: 'kPWM_Initialize_LocalSync'
@@ -319,8 +319,8 @@ instance:
         - sm_id: 'SM3'
         - config:
           - clockSource: 'kPWM_BusClock'
-          - prescale: 'kPWM_Prescale_Divide_1'
-          - pwmFreq: '16 kHz'
+          - prescale: 'kPWM_Prescale_Divide_64'
+          - pwmFreq: '50 Hz'
           - pairOperation: 'kPWM_Independent'
           - operationMode: 'kPWM_SignedCenterAligned'
           - initializationControl: 'kPWM_Initialize_LocalSync'
@@ -448,7 +448,7 @@ pwm_signal_param_t PWM1_SM0_pwm_function_config[1]= {
 
 pwm_config_t PWM1_SM1_config = {
   .clockSource = kPWM_BusClock,
-  .prescale = kPWM_Prescale_Divide_1,
+  .prescale = kPWM_Prescale_Divide_64,
   .pairOperation = kPWM_Independent,
   .initializationControl = kPWM_Initialize_LocalSync,
   .reloadLogic = kPWM_ReloadImmediate,
@@ -461,7 +461,7 @@ pwm_config_t PWM1_SM1_config = {
 
 pwm_config_t PWM1_SM2_config = {
   .clockSource = kPWM_BusClock,
-  .prescale = kPWM_Prescale_Divide_1,
+  .prescale = kPWM_Prescale_Divide_64,
   .pairOperation = kPWM_Independent,
   .initializationControl = kPWM_Initialize_LocalSync,
   .reloadLogic = kPWM_ReloadImmediate,
@@ -491,7 +491,7 @@ pwm_signal_param_t PWM1_SM2_pwm_function_config[2]= {
 
 pwm_config_t PWM1_SM3_config = {
   .clockSource = kPWM_BusClock,
-  .prescale = kPWM_Prescale_Divide_1,
+  .prescale = kPWM_Prescale_Divide_64,
   .pairOperation = kPWM_Independent,
   .initializationControl = kPWM_Initialize_LocalSync,
   .reloadLogic = kPWM_ReloadImmediate,

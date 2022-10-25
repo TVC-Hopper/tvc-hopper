@@ -54,9 +54,9 @@ extern "C" {
 /* Definition of clock source of submodule 1 frequency in Hertz */
 #define PWM1_SM1_SM_CLK_SOURCE_FREQ_HZ 125000000U
 /* Definition of submodule 1 counter clock source frequency in Hertz - PWM1_SM1_SM_CLK_SOURCE_FREQ_HZ divided by prescaler */
-#define PWM1_SM1_COUNTER_CLK_SOURCE_FREQ_HZ 125000000U
+#define PWM1_SM1_COUNTER_CLK_SOURCE_FREQ_HZ 1953125U
 /* Definition of submodule 1 counter (PWM) frequency in Hertz */
-#define PWM1_SM1_COUNTER_FREQ_HZ 16001U
+#define PWM1_SM1_COUNTER_FREQ_HZ 50U
 /* Definition of submodule 1 channel A ID */
 #define PWM1_SM1_A kPWM_PwmA
 /* Definition of submodule 1 channel B ID */
@@ -68,9 +68,9 @@ extern "C" {
 /* Definition of clock source of submodule 2 frequency in Hertz */
 #define PWM1_SM2_SM_CLK_SOURCE_FREQ_HZ 125000000U
 /* Definition of submodule 2 counter clock source frequency in Hertz - PWM1_SM2_SM_CLK_SOURCE_FREQ_HZ divided by prescaler */
-#define PWM1_SM2_COUNTER_CLK_SOURCE_FREQ_HZ 125000000U
+#define PWM1_SM2_COUNTER_CLK_SOURCE_FREQ_HZ 1953125U
 /* Definition of submodule 2 counter (PWM) frequency in Hertz */
-#define PWM1_SM2_COUNTER_FREQ_HZ 16001U
+#define PWM1_SM2_COUNTER_FREQ_HZ 50U
 /* Definition of submodule 2 channel A ID */
 #define PWM1_SM2_A kPWM_PwmA
 /* Definition of submodule 2 channel B ID */
@@ -82,9 +82,9 @@ extern "C" {
 /* Definition of clock source of submodule 3 frequency in Hertz */
 #define PWM1_SM3_SM_CLK_SOURCE_FREQ_HZ 125000000U
 /* Definition of submodule 3 counter clock source frequency in Hertz - PWM1_SM3_SM_CLK_SOURCE_FREQ_HZ divided by prescaler */
-#define PWM1_SM3_COUNTER_CLK_SOURCE_FREQ_HZ 125000000U
+#define PWM1_SM3_COUNTER_CLK_SOURCE_FREQ_HZ 1953125U
 /* Definition of submodule 3 counter (PWM) frequency in Hertz */
-#define PWM1_SM3_COUNTER_FREQ_HZ 16001U
+#define PWM1_SM3_COUNTER_FREQ_HZ 50U
 /* Definition of submodule 3 channel A ID */
 #define PWM1_SM3_A kPWM_PwmA
 /* Definition of submodule 3 channel B ID */

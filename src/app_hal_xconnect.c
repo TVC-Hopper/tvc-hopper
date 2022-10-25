@@ -38,14 +38,8 @@ static lpuart_rtos_handle_t* uart_handle = &COMMS_UART_rtos_handle;
 
 static SemaphoreHandle_t i2c_mx;
 
-static SemaphoreHandle_t servos_mx[4];
-
 extern void AppHal_Init() {
     i2c_mx = xSemaphoreCreateMutex();
-
-    for (uint8_t i = 0; i < 4; ++i) {
-        servos_mx[i] = xSemaphoreCreateMutex();
-    }
 }
 
 void GPIO1_GPIO_COMB_0_15_IRQHANDLER(void) {
@@ -109,30 +103,6 @@ extern uint8_t XCCb_I2CRead(uint8_t address, uint8_t* data, uint16_t size) {
 
 extern void XCCb_DelayMs(uint32_t ms) {
     vTaskDelay(ms);
-}
-
-extern void XCCb_ThrustVane_Servo0_Write(int us) {
-    xSemaphoreTake(servos_mx[0], 0xFFFF);
-    // TODO
-    xSemaphoreGive(servos_mx[0]);
-}
-
-extern void XCCb_ThrustVane_Servo1_Write(int us) {
-    xSemaphoreTake(servos_mx[1], 0xFFFF);
-    // TODO
-    xSemaphoreGive(servos_mx[1]);
-}
-
-extern void XCCb_ThrustVane_Servo2_Write(int us) {
-    xSemaphoreTake(servos_mx[2], 0xFFFF);
-    // TODO
-    xSemaphoreGive(servos_mx[2]);
-}
-
-extern void XCCb_ThrustVane_Servo3_Write(int us) {
-    xSemaphoreTake(servos_mx[3], 0xFFFF);
-    // TODO
-    xSemaphoreGive(servos_mx[3]);
 }
 
 extern void UartListener_Init() {

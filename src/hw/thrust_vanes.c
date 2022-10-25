@@ -4,33 +4,45 @@
 #include <freertos/task.h>
 #include <freertos/semphr.h>
 
-#include <drivers/servo.h>
+#include <bsp/peripherals.h>
 
-#include "app_hal_xconnect.h"
 
-static Servo_t servos[4];
+#define VANE_PWM_MODE       kPWM_SignedCenterAligned
+#define VANE_PWM            PWM1_PERIPHERAL
+#define VANE_0_SM           PWM1_SM2
+#define VANE_1_SM           PWM1_SM2
+#define VANE_2_SM           PWM1_SM3
+#define VANE_3_SM           PWM1_SM3
+
+#define VANE_0_CH           PWM1_SM2_A
+#define VANE_1_CH           PWM1_SM2_B
+#define VANE_2_CH           PWM1_SM3_A
+#define VANE_3_CH           PWM1_SM3_B
+
+#define MAX_DUTY_CYCLE      ((uint16_t)0xFFFFFFFFF)
 
 static float servo_positions[4] = {90.0, 90.0, 90.0, 90.0};
 
+static const pwm_submodule_t vanes[4] = {
+    VANE_0_SM,
+    VANE_1_SM,
+    VANE_2_SM,
+    VANE_3_SM,
+};
+
+static const pwm_channels_t vane_channels[4] = {
+    VANE_0_CH,
+    VANE_1_CH,
+    VANE_2_CH,
+    VANE_3_CH,
+};
+
 extern void HwThrustVane_Init() {
-    ServoInit_t si = {
-        .posStart_deg = 90,
-        .pulseWidth0deg_us = 2000,
-        .pulseWidth180deg_us = 1000,
-    };
-
-    void* callbacks[4] = {
-        XCCb_ThrustVane_Servo0_Write,
-        XCCb_ThrustVane_Servo1_Write,
-        XCCb_ThrustVane_Servo2_Write,
-        XCCb_ThrustVane_Servo3_Write,
-    };
-
-    for (uint8_t i = 0; i < 4; ++i) {
-        si.posStart_deg = servo_positions[i];
-        si.onNewDutyCycle = callbacks[i];
-        Servo_Init(&servos[i], &si);
-    }
+    PWM_StartTimer(VANE_PWM, kPWM_Control_Module_0
+                                | kPWM_Control_Module_1
+                                | kPWM_Control_Module_2
+                                | kPWM_Control_Module_3
+                );
 }
 
 extern void HwThrustVane_Task() {
@@ -40,9 +52,8 @@ extern void HwThrustVane_Task() {
 }
 
 extern void HwThrustVane_SetPositions(float* positions) {
-    memcpy(servo_positions, positions, sizeof(servo_positions));
     for (uint8_t i = 0; i < 4; ++i) {
-        Servo_WritePosDeg(&servos[i], (int)positions[i]);
+        HwThrustVane_SetPosition(i, positions[i]);
     }
 }
 
@@ -53,7 +64,7 @@ extern void HwThrustVane_GetPositions(float* positions) {
 
 extern void HwThrustVane_SetPosition(uint8_t idx, float position) {
     servo_positions[idx] = position;
-    Servo_WritePosDeg(&servos[idx], (int)position);
+    PWM_UpdatePwmDutycycleHighAccuracy(VANE_PWM, vanes[idx], vane_channels[idx], VANE_PWM_MODE, position * MAX_DUTY_CYCLE);
 }
 
 extern void HwThrustVane_GetPosition(uint8_t idx, float* position) {

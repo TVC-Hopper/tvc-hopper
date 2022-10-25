@@ -516,16 +516,6 @@
                   <data type="Version">2.5.1</data>
                </feature>
             </dependency>
-            <dependency resourceType="SWComponent" resourceId="platform.drivers.igpio" description="igpio not found in the toolchain/IDE project. Project will not compile!" problem_level="2" source="Peripherals">
-               <feature name="enabled" evaluation="equal">
-                  <data type="Boolean">true</data>
-               </feature>
-            </dependency>
-            <dependency resourceType="SWComponent" resourceId="platform.drivers.igpio" description="Unsupported version of the igpio in the toolchain/IDE project. Required: ${required_value}, actual: ${actual_value}. Project might not compile correctly." problem_level="1" source="Peripherals">
-               <feature name="version" evaluation="equivalent">
-                  <data type="Version">2.0.1</data>
-               </feature>
-            </dependency>
             <dependency resourceType="SWComponent" resourceId="platform.drivers.pwm" description="PWM Driver not found in the toolchain/IDE project. Project will not compile!" problem_level="2" source="Peripherals">
                <feature name="enabled" evaluation="equal">
                   <data type="Boolean">true</data>
@@ -544,6 +534,16 @@
             <dependency resourceType="SWComponent" resourceId="platform.drivers.lpi2c" description="Unsupported version of the LPI2C Driver in the toolchain/IDE project. Required: ${required_value}, actual: ${actual_value}. Project might not compile correctly." problem_level="1" source="Peripherals">
                <feature name="version" evaluation="greaterOrEqual">
                   <data type="Version">2.2.0</data>
+               </feature>
+            </dependency>
+            <dependency resourceType="SWComponent" resourceId="platform.drivers.igpio" description="igpio not found in the toolchain/IDE project. Project will not compile!" problem_level="2" source="Peripherals">
+               <feature name="enabled" evaluation="equal">
+                  <data type="Boolean">true</data>
+               </feature>
+            </dependency>
+            <dependency resourceType="SWComponent" resourceId="platform.drivers.igpio" description="Unsupported version of the igpio in the toolchain/IDE project. Required: ${required_value}, actual: ${actual_value}. Project might not compile correctly." problem_level="1" source="Peripherals">
+               <feature name="version" evaluation="equivalent">
+                  <data type="Version">2.0.1</data>
                </feature>
             </dependency>
          </dependencies>
@@ -786,8 +786,8 @@
                               <setting name="sm_id" value="SM1"/>
                               <struct name="config">
                                  <setting name="clockSource" value="kPWM_BusClock"/>
-                                 <setting name="prescale" value="kPWM_Prescale_Divide_1"/>
-                                 <setting name="pwmFreq" value="16 kHz"/>
+                                 <setting name="prescale" value="kPWM_Prescale_Divide_64"/>
+                                 <setting name="pwmFreq" value="50 Hz"/>
                                  <setting name="pairOperation" value="kPWM_Independent"/>
                                  <setting name="operationMode" value="kPWM_SignedCenterAligned"/>
                                  <setting name="initializationControl" value="kPWM_Initialize_LocalSync"/>
@@ -843,8 +843,8 @@
                               <setting name="sm_id" value="SM2"/>
                               <struct name="config">
                                  <setting name="clockSource" value="kPWM_BusClock"/>
-                                 <setting name="prescale" value="kPWM_Prescale_Divide_1"/>
-                                 <setting name="pwmFreq" value="16 kHz"/>
+                                 <setting name="prescale" value="kPWM_Prescale_Divide_64"/>
+                                 <setting name="pwmFreq" value="50 Hz"/>
                                  <setting name="pairOperation" value="kPWM_Independent"/>
                                  <setting name="operationMode" value="kPWM_SignedCenterAligned"/>
                                  <setting name="initializationControl" value="kPWM_Initialize_LocalSync"/>
@@ -932,8 +932,8 @@
                               <setting name="sm_id" value="SM3"/>
                               <struct name="config">
                                  <setting name="clockSource" value="kPWM_BusClock"/>
-                                 <setting name="prescale" value="kPWM_Prescale_Divide_1"/>
-                                 <setting name="pwmFreq" value="16 kHz"/>
+                                 <setting name="prescale" value="kPWM_Prescale_Divide_64"/>
+                                 <setting name="pwmFreq" value="50 Hz"/>
                                  <setting name="pairOperation" value="kPWM_Independent"/>
                                  <setting name="operationMode" value="kPWM_SignedCenterAligned"/>
                                  <setting name="initializationControl" value="kPWM_Initialize_LocalSync"/>
