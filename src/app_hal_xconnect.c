@@ -89,12 +89,16 @@ extern uint8_t XCCb_I2CWrite(uint8_t address, uint8_t* data, uint16_t size) {
     xSemaphoreTake(i2c_mx, 0xFFFF);
     // TODO
     xSemaphoreGive(i2c_mx);
+
+    return 0;
 }
 
 extern uint8_t XCCb_I2CRead(uint8_t address, uint8_t* data, uint16_t size) {
     xSemaphoreTake(i2c_mx, 0xFFFF);
     // TODO
     xSemaphoreGive(i2c_mx);
+
+    return 0;
 }
 
 extern void XCCb_DelayMs(uint32_t ms) {

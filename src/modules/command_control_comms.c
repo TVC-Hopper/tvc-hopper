@@ -14,11 +14,15 @@
 #include "spp_property_list.h"
 #include "app_hal_xconnect.h"
 
+#include "hw/imu.h"
+
 
 static SPP_STATUS_T SppSendPacket(uint8_t* bytes, uint16_t len, void* instance_data);
 static StcpStatus_t HandleStcpPacket(void* buffer, uint16_t length, void* instance_data);
 static SPP_STATUS_T SetValue(uint16_t id, void* value, void* instance_data);
 static SPP_STATUS_T GetValue(uint16_t id, void* value, void* instance_data);
+
+static void GetTelemetry(uint8_t* value);
 
 SppClientEngine_t spp;
 StcpEngine_t stcp;
@@ -27,6 +31,8 @@ static uint8_t broadcast_addr_raw = 0x00;
 static uint8_t addr_raw = 0x01;
 static uint8_t property_list_id = 0x00;
 static uint8_t client_address_buffer[3];
+
+static bool is_telemetry_filtered = false;
 
 static SppAddress_t broadcast_addr = { &broadcast_addr_raw };
 static SppAddress_t address = { &addr_raw };
@@ -132,6 +138,7 @@ static SPP_STATUS_T GetValue(uint16_t id, void* value, void* instance_data) {
     switch(id) {
         case PROP_telem_data_ID:
         {
+            GetTelemetry(value);
             break;
         }
         case PROP_telem_cap_ID:
@@ -169,6 +176,40 @@ static SPP_STATUS_T GetValue(uint16_t id, void* value, void* instance_data) {
     }
 
     return SPP_STATUS_OK;
+}
+
+static void GetTelemetry(uint8_t* value) {
+    float placeholder = 0.0;
+    uint8_t idx = 0;
+    float* value_f = (float*)value;
+    if (is_telemetry_filtered) {
+        // TODO
+    } else {
+        // TODO
+        // pos
+        value_f[idx++] = placeholder;
+        value_f[idx++] = placeholder;
+        value_f[idx++] = placeholder;
+
+        // vel
+        value_f[idx++] = placeholder;
+        value_f[idx++] = placeholder;
+        value_f[idx++] = placeholder;
+
+        // accel
+        value_f[idx++] = placeholder;
+        value_f[idx++] = placeholder;
+        value_f[idx++] = placeholder;
+
+        // att
+        value_f[idx++] = placeholder;
+        value_f[idx++] = placeholder;
+        value_f[idx++] = placeholder;
+
+        // alt
+        value_f[idx++] = placeholder;
+
+    }
 }
 
 static StcpStatus_t HandleStcpPacket(void* buffer, uint16_t length, void* instance_data) {
