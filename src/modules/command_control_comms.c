@@ -196,10 +196,13 @@ static void GetTelemetry(uint8_t* value) {
         value_f[idx++] = placeholder;
         value_f[idx++] = placeholder;
 
+        float x, y, z;
+        HwImu_GetAccValues(&x, &y, &z);
+
         // accel
-        value_f[idx++] = placeholder;
-        value_f[idx++] = placeholder;
-        value_f[idx++] = placeholder;
+        value_f[idx++] = x;
+        value_f[idx++] = y;
+        value_f[idx++] = z;
 
         // att
         value_f[idx++] = placeholder;
