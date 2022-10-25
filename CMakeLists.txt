@@ -29,6 +29,8 @@ add_executable(${PROJECT_NAME}.elf
     src/modules/spp_property_list.c
 
     src/hw/imu.c
+    src/hw/thrust_vanes.c
+    src/hw/lidar.c
 )
 
 target_include_directories(${PROJECT_NAME}.elf

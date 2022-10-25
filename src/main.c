@@ -20,6 +20,7 @@
 
 
 #define PRIORITY_IMU_ACC                    5
+#define PRIORITY_THRUST_VANES               5
 #define PRIORITY_IMU_GYRO                   5
 #define PRIORITY_COMMAND_CONTROL_COMMS      2
 #define PROIRITY_UART_LISTENER              1
@@ -41,6 +42,9 @@ int main(void)
 
     UartListener_Init();
     CommandControlComms_Init();
+
+    HwImu_Init();
+    HwThrustVane_Init();
 
     CreateTasks();
 
@@ -86,6 +90,16 @@ static void CreateTasks() {
                         configMINIMAL_STACK_SIZE + 128,
                         NULL,
                         PRIORITY_IMU_ACC,
+                        NULL) != pdPASS)
+    {
+        while (1) {}
+    }
+
+    if (xTaskCreate(HwThrustVane_Task,
+                        "hwthrustvanes",
+                        configMINIMAL_STACK_SIZE + 128,
+                        NULL,
+                        PRIORITY_THRUST_VANES,
                         NULL) != pdPASS)
     {
         while (1) {}
