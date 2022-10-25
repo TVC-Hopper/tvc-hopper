@@ -39,11 +39,12 @@ static const pwm_channels_t vane_channels[4] = {
 };
 
 extern void HwThrustVane_Init() {
-    PWM_StartTimer(VANE_PWM, kPWM_Control_Module_0
-                                | kPWM_Control_Module_1
-                                | kPWM_Control_Module_2
-                                | kPWM_Control_Module_3
-                );
+    PWM_StartTimer(
+            VANE_PWM, 
+            kPWM_Control_Module_1
+            | kPWM_Control_Module_2
+            | kPWM_Control_Module_3
+    );
 }
 
 extern void HwThrustVane_Task() {
@@ -65,7 +66,13 @@ extern void HwThrustVane_GetPositions(float* positions) {
 
 extern void HwThrustVane_SetPosition(uint8_t idx, float position) {
     servo_positions[idx] = position;
-    PWM_UpdatePwmDutycycleHighAccuracy(VANE_PWM, vanes[idx], vane_channels[idx], VANE_PWM_MODE, position * (MAX_DUTY_CYCLE / MAX_ANGLE));
+    PWM_UpdatePwmDutycycleHighAccuracy(
+            VANE_PWM,
+            vanes[idx],
+            vane_channels[idx],
+            VANE_PWM_MODE,
+            position * (MAX_DUTY_CYCLE / MAX_ANGLE)
+    );
 }
 
 extern void HwThrustVane_GetPosition(uint8_t idx, float* position) {

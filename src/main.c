@@ -13,6 +13,7 @@
 #include "modules/command_control_comms.h"
 
 #include "hw/imu.h"
+#include "hw/esc.h"
 #include "hw/lidar.h"
 #include "hw/thrust_vanes.h"
 
@@ -44,6 +45,7 @@ int main(void)
     CommandControlComms_Init();
 
     HwImu_Init();
+    HwEsc_Init();
     HwThrustVane_Init();
 
     CreateTasks();
@@ -76,7 +78,7 @@ static void CreateTasks() {
     }
 
     if (xTaskCreate(HwImu_GyroTask,
-                        "hwimu_gyro",
+                        "hw_imu_gyro",
                         configMINIMAL_STACK_SIZE + 128,
                         NULL,
                         PRIORITY_IMU_GYRO,
@@ -86,7 +88,7 @@ static void CreateTasks() {
     }
 
     if (xTaskCreate(HwImu_AccTask,
-                        "hwimu_acc",
+                        "hw_imu_acc",
                         configMINIMAL_STACK_SIZE + 128,
                         NULL,
                         PRIORITY_IMU_ACC,
@@ -96,7 +98,17 @@ static void CreateTasks() {
     }
 
     if (xTaskCreate(HwThrustVane_Task,
-                        "hwthrustvanes",
+                        "hw_thrustvanes",
+                        configMINIMAL_STACK_SIZE + 128,
+                        NULL,
+                        PRIORITY_THRUST_VANES,
+                        NULL) != pdPASS)
+    {
+        while (1) {}
+    }
+
+    if (xTaskCreate(HwEsc_Task,
+                        "hw_esc",
                         configMINIMAL_STACK_SIZE + 128,
                         NULL,
                         PRIORITY_THRUST_VANES,
