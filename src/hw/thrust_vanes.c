@@ -20,6 +20,7 @@
 #define VANE_3_CH           PWM1_SM3_B
 
 #define MAX_DUTY_CYCLE      ((uint16_t)0xFFFFFFFFF)
+#define MAX_ANGLE           ((float) 180.0)
 
 static float servo_positions[4] = {90.0, 90.0, 90.0, 90.0};
 
@@ -64,7 +65,7 @@ extern void HwThrustVane_GetPositions(float* positions) {
 
 extern void HwThrustVane_SetPosition(uint8_t idx, float position) {
     servo_positions[idx] = position;
-    PWM_UpdatePwmDutycycleHighAccuracy(VANE_PWM, vanes[idx], vane_channels[idx], VANE_PWM_MODE, position * MAX_DUTY_CYCLE);
+    PWM_UpdatePwmDutycycleHighAccuracy(VANE_PWM, vanes[idx], vane_channels[idx], VANE_PWM_MODE, position * (MAX_DUTY_CYCLE / MAX_ANGLE));
 }
 
 extern void HwThrustVane_GetPosition(uint8_t idx, float* position) {
