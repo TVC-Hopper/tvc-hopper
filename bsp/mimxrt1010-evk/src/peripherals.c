@@ -163,7 +163,7 @@ instance:
           - prescale: 'kPWM_Prescale_Divide_1'
           - pwmFreq: '16 khz'
           - pairOperation: 'kPWM_Independent'
-          - operationMode: 'kPWM_SignedCenterAligned'
+          - operationMode: 'kPWM_EdgeAligned'
           - initializationControl: 'kPWM_Initialize_LocalSync'
           - reloadLogic: 'kPWM_ReloadImmediate'
           - reloadSelect: 'kPWM_LocalReload'
@@ -172,8 +172,8 @@ instance:
           - enableDebugMode: 'true'
           - enableWait: 'false'
           - outputTrigger_sel: ''
-          - loadOK: 'false'
-          - startCounter: 'false'
+          - loadOK: 'true'
+          - startCounter: 'true'
           - interrupt_sel: ''
           - dma_used: 'false'
           - dma:
@@ -216,7 +216,7 @@ instance:
           - prescale: 'kPWM_Prescale_Divide_64'
           - pwmFreq: '50 Hz'
           - pairOperation: 'kPWM_Independent'
-          - operationMode: 'kPWM_SignedCenterAligned'
+          - operationMode: 'kPWM_EdgeAligned'
           - initializationControl: 'kPWM_Initialize_LocalSync'
           - reloadLogic: 'kPWM_ReloadImmediate'
           - reloadSelect: 'kPWM_LocalReload'
@@ -225,8 +225,8 @@ instance:
           - enableDebugMode: 'true'
           - enableWait: 'false'
           - outputTrigger_sel: ''
-          - loadOK: 'false'
-          - startCounter: 'false'
+          - loadOK: 'true'
+          - startCounter: 'true'
           - interrupt_sel: ''
           - dma_used: 'false'
           - dma:
@@ -279,7 +279,7 @@ instance:
           - prescale: 'kPWM_Prescale_Divide_64'
           - pwmFreq: '50 Hz'
           - pairOperation: 'kPWM_Independent'
-          - operationMode: 'kPWM_SignedCenterAligned'
+          - operationMode: 'kPWM_EdgeAligned'
           - initializationControl: 'kPWM_Initialize_LocalSync'
           - reloadLogic: 'kPWM_ReloadImmediate'
           - reloadSelect: 'kPWM_LocalReload'
@@ -288,8 +288,8 @@ instance:
           - enableDebugMode: 'true'
           - enableWait: 'false'
           - outputTrigger_sel: ''
-          - loadOK: 'false'
-          - startCounter: 'false'
+          - loadOK: 'true'
+          - startCounter: 'true'
           - interrupt_sel: ''
           - dma_used: 'false'
           - dma:
@@ -521,11 +521,15 @@ static void PWM1_init(void) {
   /* Initialize deadtime logic input for the channel B */
   PWM_SetupForceSignal(PWM1_PERIPHERAL, PWM1_SM3, PWM1_SM3_B, kPWM_UsePwm);
   /* Setup PWM output setting for submodule SM1 */
-  PWM_SetupPwm(PWM1_PERIPHERAL, PWM1_SM1, PWM1_SM1_pwm_function_config, 1U, kPWM_SignedCenterAligned, PWM1_SM1_COUNTER_FREQ_HZ, PWM1_SM1_SM_CLK_SOURCE_FREQ_HZ);
+  PWM_SetupPwm(PWM1_PERIPHERAL, PWM1_SM1, PWM1_SM1_pwm_function_config, 1U, kPWM_EdgeAligned, PWM1_SM1_COUNTER_FREQ_HZ, PWM1_SM1_SM_CLK_SOURCE_FREQ_HZ);
   /* Setup PWM output setting for submodule SM2 */
-  PWM_SetupPwm(PWM1_PERIPHERAL, PWM1_SM2, PWM1_SM2_pwm_function_config, 2U, kPWM_SignedCenterAligned, PWM1_SM2_COUNTER_FREQ_HZ, PWM1_SM2_SM_CLK_SOURCE_FREQ_HZ);
+  PWM_SetupPwm(PWM1_PERIPHERAL, PWM1_SM2, PWM1_SM2_pwm_function_config, 2U, kPWM_EdgeAligned, PWM1_SM2_COUNTER_FREQ_HZ, PWM1_SM2_SM_CLK_SOURCE_FREQ_HZ);
   /* Setup PWM output setting for submodule SM3 */
-  PWM_SetupPwm(PWM1_PERIPHERAL, PWM1_SM3, PWM1_SM3_pwm_function_config, 2U, kPWM_SignedCenterAligned, PWM1_SM3_COUNTER_FREQ_HZ, PWM1_SM3_SM_CLK_SOURCE_FREQ_HZ);
+  PWM_SetupPwm(PWM1_PERIPHERAL, PWM1_SM3, PWM1_SM3_pwm_function_config, 2U, kPWM_EdgeAligned, PWM1_SM3_COUNTER_FREQ_HZ, PWM1_SM3_SM_CLK_SOURCE_FREQ_HZ);
+  /* Initialize LDOK for update of the working registers */
+  PWM_SetPwmLdok(PWM1_PERIPHERAL, (kPWM_Control_Module_1 | kPWM_Control_Module_2 | kPWM_Control_Module_3), true);
+  /* Start selected counters */
+  PWM_StartTimer(PWM1_PERIPHERAL, (kPWM_Control_Module_1 | kPWM_Control_Module_2 | kPWM_Control_Module_3));
 }
 
 /***********************************************************************************************************************

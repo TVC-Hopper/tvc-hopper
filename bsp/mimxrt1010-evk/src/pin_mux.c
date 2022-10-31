@@ -50,6 +50,7 @@ expansion_headers:
     - {id: 4, name: D1, pin_num: '2', pin_signal: GPIO_10}
     - {id: 6, name: D2, pin_num: '55', pin_signal: GPIO_AD_05}
     - {id: 8, name: D3, pin_num: '52', pin_signal: GPIO_AD_06}
+    - {id: 10, pin_num: '52', pin_signal: GPIO_AD_06}
     - {id: 14, name: D6, pin_num: '59', pin_signal: GPIO_AD_01}
     - {id: 16, name: D7, pin_num: '58', pin_signal: GPIO_AD_02}
   - id: C4
@@ -105,8 +106,6 @@ BOARD_InitPins:
   - {pin_num: '6', peripheral: PWM1, signal: 'A, 2', pin_signal: GPIO_06, direction: OUTPUT}
   - {pin_num: '8', peripheral: PWM1, signal: 'B, 2', pin_signal: GPIO_05, direction: OUTPUT}
   - {pin_num: '51', peripheral: PWM1, signal: 'FAULT, 0', pin_signal: GPIO_AD_07}
-  - {pin_num: '52', peripheral: PWM1, signal: 'A, 3', pin_signal: GPIO_AD_06, identifier: PWM1_A_3, direction: OUTPUT}
-  - {pin_num: '55', peripheral: PWM1, signal: 'B, 3', pin_signal: GPIO_AD_05, identifier: PWM1_B_3, direction: OUTPUT}
   - {pin_num: '49', peripheral: JTAG, signal: TRSTB, pin_signal: GPIO_AD_08}
   - {pin_num: '44', peripheral: JTAG, signal: TMS, pin_signal: GPIO_AD_13}
   - {pin_num: '48', peripheral: JTAG, signal: TDO, pin_signal: GPIO_AD_09}
@@ -114,6 +113,8 @@ BOARD_InitPins:
   - {pin_num: '45', peripheral: JTAG, signal: TCK, pin_signal: GPIO_AD_12}
   - {pin_num: '58', peripheral: GPIO1, signal: 'gpiomux_io, 16', pin_signal: GPIO_AD_02, identifier: IMU_INT0, direction: INPUT}
   - {pin_num: '43', peripheral: GPIO1, signal: 'gpiomux_io, 28', pin_signal: GPIO_AD_14, identifier: IMU_INT1, direction: INPUT}
+  - {pin_num: '55', peripheral: PWM1, signal: 'B, 3', pin_signal: GPIO_AD_05, identifier: PWM1_B_3, direction: OUTPUT}
+  - {pin_num: '52', peripheral: PWM1, signal: 'A, 3', pin_signal: GPIO_AD_06, identifier: PWM1_A_3, direction: OUTPUT}
  * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS ***********
  */
 

@@ -66,18 +66,6 @@ void BOARD_InitBootPins(void);
 #define BOARD_INITPINS_ADC12_3_SIGNAL                                      FAULT   /*!< Signal name */
 #define BOARD_INITPINS_ADC12_3_CHANNEL                                        0U   /*!< Signal channel */
 
-/* GPIO_AD_06 (number 52), LPSPI1_SCK/INT2_COMBO/J56[8]/J57[12]/U26[9]/U27[6] */
-/* Routed pin properties */
-#define BOARD_INITPINS_PWM1_A_3_PERIPHERAL                                  PWM1   /*!< Peripheral name */
-#define BOARD_INITPINS_PWM1_A_3_SIGNAL                                         A   /*!< Signal name */
-#define BOARD_INITPINS_PWM1_A_3_CHANNEL                                       3U   /*!< Signal channel */
-
-/* GPIO_AD_05 (number 55), LPSPI1_PCS0/INT1_COMBO/J56[6]/J57[6]/U26[11]/U27[1] */
-/* Routed pin properties */
-#define BOARD_INITPINS_PWM1_B_3_PERIPHERAL                                  PWM1   /*!< Peripheral name */
-#define BOARD_INITPINS_PWM1_B_3_SIGNAL                                         B   /*!< Signal name */
-#define BOARD_INITPINS_PWM1_B_3_CHANNEL                                       3U   /*!< Signal channel */
-
 /* GPIO_AD_08 (number 49), JTAG_TRSTB/J55[10] */
 /* Routed pin properties */
 #define BOARD_INITPINS_JTAG_TRSTB_PERIPHERAL                                JTAG   /*!< Peripheral name */
@@ -114,6 +102,18 @@ void BOARD_InitBootPins(void);
 #define BOARD_INITPINS_IMU_INT1_PERIPHERAL                                 GPIO1   /*!< Peripheral name */
 #define BOARD_INITPINS_IMU_INT1_SIGNAL                                gpiomux_io   /*!< Signal name */
 #define BOARD_INITPINS_IMU_INT1_CHANNEL                                      28U   /*!< Signal channel */
+
+/* GPIO_AD_05 (number 55), LPSPI1_PCS0/INT1_COMBO/J56[6]/J57[6]/U26[11]/U27[1] */
+/* Routed pin properties */
+#define BOARD_INITPINS_PWM1_B_3_PERIPHERAL                                  PWM1   /*!< Peripheral name */
+#define BOARD_INITPINS_PWM1_B_3_SIGNAL                                         B   /*!< Signal name */
+#define BOARD_INITPINS_PWM1_B_3_CHANNEL                                       3U   /*!< Signal channel */
+
+/* GPIO_AD_06 (number 52), LPSPI1_SCK/INT2_COMBO/J56[8]/J57[12]/U26[9]/U27[6] */
+/* Routed pin properties */
+#define BOARD_INITPINS_PWM1_A_3_PERIPHERAL                                  PWM1   /*!< Peripheral name */
+#define BOARD_INITPINS_PWM1_A_3_SIGNAL                                         A   /*!< Signal name */
+#define BOARD_INITPINS_PWM1_A_3_CHANNEL                                       3U   /*!< Signal channel */
 
 /*!
  * @brief Configures pin routing and optionally pin electrical features.

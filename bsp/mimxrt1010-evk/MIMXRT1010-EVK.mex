@@ -92,6 +92,7 @@
                            <pin id="4" pin_num="2" pin_signal="GPIO_10" name="D1"/>
                            <pin id="6" pin_num="55" pin_signal="GPIO_AD_05" name="D2"/>
                            <pin id="8" pin_num="52" pin_signal="GPIO_AD_06" name="D3"/>
+                           <pin id="10" pin_num="52" pin_signal="GPIO_AD_06"/>
                            <pin id="14" pin_num="59" pin_signal="GPIO_AD_01" name="D6"/>
                            <pin id="16" pin_num="58" pin_signal="GPIO_AD_02" name="D7"/>
                         </pins>
@@ -201,18 +202,6 @@
                      </pin_features>
                   </pin>
                   <pin peripheral="PWM1" signal="FAULT, 0" pin_num="51" pin_signal="GPIO_AD_07"/>
-                  <pin peripheral="PWM1" signal="A, 3" pin_num="52" pin_signal="GPIO_AD_06">
-                     <pin_features>
-                        <pin_feature name="identifier" value="PWM1_A_3"/>
-                        <pin_feature name="direction" value="OUTPUT"/>
-                     </pin_features>
-                  </pin>
-                  <pin peripheral="PWM1" signal="B, 3" pin_num="55" pin_signal="GPIO_AD_05">
-                     <pin_features>
-                        <pin_feature name="identifier" value="PWM1_B_3"/>
-                        <pin_feature name="direction" value="OUTPUT"/>
-                     </pin_features>
-                  </pin>
                   <pin peripheral="JTAG" signal="TRSTB" pin_num="49" pin_signal="GPIO_AD_08"/>
                   <pin peripheral="JTAG" signal="TMS" pin_num="44" pin_signal="GPIO_AD_13"/>
                   <pin peripheral="JTAG" signal="TDO" pin_num="48" pin_signal="GPIO_AD_09"/>
@@ -228,6 +217,18 @@
                      <pin_features>
                         <pin_feature name="identifier" value="IMU_INT1"/>
                         <pin_feature name="direction" value="INPUT"/>
+                     </pin_features>
+                  </pin>
+                  <pin peripheral="PWM1" signal="B, 3" pin_num="55" pin_signal="GPIO_AD_05">
+                     <pin_features>
+                        <pin_feature name="identifier" value="PWM1_B_3"/>
+                        <pin_feature name="direction" value="OUTPUT"/>
+                     </pin_features>
+                  </pin>
+                  <pin peripheral="PWM1" signal="A, 3" pin_num="52" pin_signal="GPIO_AD_06">
+                     <pin_features>
+                        <pin_feature name="identifier" value="PWM1_A_3"/>
+                        <pin_feature name="direction" value="OUTPUT"/>
                      </pin_features>
                   </pin>
                </pins>
@@ -799,7 +800,7 @@
                                  <setting name="prescale" value="kPWM_Prescale_Divide_1"/>
                                  <setting name="pwmFreq" value="16 khz"/>
                                  <setting name="pairOperation" value="kPWM_Independent"/>
-                                 <setting name="operationMode" value="kPWM_SignedCenterAligned"/>
+                                 <setting name="operationMode" value="kPWM_EdgeAligned"/>
                                  <setting name="initializationControl" value="kPWM_Initialize_LocalSync"/>
                                  <setting name="reloadLogic" value="kPWM_ReloadImmediate"/>
                                  <setting name="reloadSelect" value="kPWM_LocalReload"/>
@@ -810,8 +811,8 @@
                                  <set name="outputTrigger_sel">
                                     <selected/>
                                  </set>
-                                 <setting name="loadOK" value="false"/>
-                                 <setting name="startCounter" value="false"/>
+                                 <setting name="loadOK" value="true"/>
+                                 <setting name="startCounter" value="true"/>
                                  <set name="interrupt_sel">
                                     <selected/>
                                  </set>
@@ -872,7 +873,7 @@
                                  <setting name="prescale" value="kPWM_Prescale_Divide_64"/>
                                  <setting name="pwmFreq" value="50 Hz"/>
                                  <setting name="pairOperation" value="kPWM_Independent"/>
-                                 <setting name="operationMode" value="kPWM_SignedCenterAligned"/>
+                                 <setting name="operationMode" value="kPWM_EdgeAligned"/>
                                  <setting name="initializationControl" value="kPWM_Initialize_LocalSync"/>
                                  <setting name="reloadLogic" value="kPWM_ReloadImmediate"/>
                                  <setting name="reloadSelect" value="kPWM_LocalReload"/>
@@ -883,8 +884,8 @@
                                  <set name="outputTrigger_sel">
                                     <selected/>
                                  </set>
-                                 <setting name="loadOK" value="false"/>
-                                 <setting name="startCounter" value="false"/>
+                                 <setting name="loadOK" value="true"/>
+                                 <setting name="startCounter" value="true"/>
                                  <set name="interrupt_sel">
                                     <selected/>
                                  </set>
@@ -961,7 +962,7 @@
                                  <setting name="prescale" value="kPWM_Prescale_Divide_64"/>
                                  <setting name="pwmFreq" value="50 Hz"/>
                                  <setting name="pairOperation" value="kPWM_Independent"/>
-                                 <setting name="operationMode" value="kPWM_SignedCenterAligned"/>
+                                 <setting name="operationMode" value="kPWM_EdgeAligned"/>
                                  <setting name="initializationControl" value="kPWM_Initialize_LocalSync"/>
                                  <setting name="reloadLogic" value="kPWM_ReloadImmediate"/>
                                  <setting name="reloadSelect" value="kPWM_LocalReload"/>
@@ -972,8 +973,8 @@
                                  <set name="outputTrigger_sel">
                                     <selected/>
                                  </set>
-                                 <setting name="loadOK" value="false"/>
-                                 <setting name="startCounter" value="false"/>
+                                 <setting name="loadOK" value="true"/>
+                                 <setting name="startCounter" value="true"/>
                                  <set name="interrupt_sel">
                                     <selected/>
                                  </set>

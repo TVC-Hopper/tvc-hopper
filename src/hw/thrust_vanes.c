@@ -6,7 +6,7 @@
 #include <bsp/peripherals.h>
 
 
-#define VANE_PWM_MODE       kPWM_SignedCenterAligned
+#define VANE_PWM_MODE       kPWM_EdgeAligned
 #define VANE_PWM            PWM1_PERIPHERAL
 #define VANE_0_SM           PWM1_SM2
 #define VANE_1_SM           PWM1_SM2
@@ -53,13 +53,7 @@ extern void HwThrustVane_Init() {
         );
     }
 
-    PWM_SetPwmLdok(VANE_PWM, kPWM_Control_Module_2 | kPWM_Control_Module_3, true);
-    PWM_StartTimer(
-            VANE_PWM, 
-            kPWM_Control_Module_2
-            | kPWM_Control_Module_3
-    );
-    HwThrustVane_SetPositions(servo_positions);
+    //HwThrustVane_SetPositions(servo_positions);
 }
 
 extern void HwThrustVane_Task() {
