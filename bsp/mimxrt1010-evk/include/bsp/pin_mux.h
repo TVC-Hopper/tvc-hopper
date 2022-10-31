@@ -108,6 +108,18 @@ void BOARD_InitBootPins(void);
 #define BOARD_INITPINS_WDOG_B_PERIPHERAL                                    JTAG   /*!< Peripheral name */
 #define BOARD_INITPINS_WDOG_B_SIGNAL                                         MOD   /*!< Signal name */
 
+/* GPIO_AD_02 (number 58), ADC12_2/J26[12]/J56[16] */
+/* Routed pin properties */
+#define BOARD_INITPINS_IMU_INT0_PERIPHERAL                                 GPIO1   /*!< Peripheral name */
+#define BOARD_INITPINS_IMU_INT0_SIGNAL                                gpiomux_io   /*!< Signal name */
+#define BOARD_INITPINS_IMU_INT0_CHANNEL                                      16U   /*!< Signal channel */
+
+/* GPIO_AD_14 (number 43), ADC12_6/J26[8] */
+/* Routed pin properties */
+#define BOARD_INITPINS_IMU_INT1_PERIPHERAL                                 GPIO1   /*!< Peripheral name */
+#define BOARD_INITPINS_IMU_INT1_SIGNAL                                gpiomux_io   /*!< Signal name */
+#define BOARD_INITPINS_IMU_INT1_CHANNEL                                      28U   /*!< Signal channel */
+
 /*!
  * @brief Configures pin routing and optionally pin electrical features.
  *
