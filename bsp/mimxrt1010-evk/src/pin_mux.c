@@ -105,6 +105,13 @@ BOARD_InitPins:
   - {pin_num: '51', peripheral: PWM1, signal: 'FAULT, 0', pin_signal: GPIO_AD_07}
   - {pin_num: '52', peripheral: PWM1, signal: 'A, 3', pin_signal: GPIO_AD_06, identifier: PWM1_A_3, direction: OUTPUT}
   - {pin_num: '55', peripheral: PWM1, signal: 'B, 3', pin_signal: GPIO_AD_05, identifier: PWM1_B_3, direction: OUTPUT}
+  - {pin_num: '57', peripheral: JTAG, signal: DE_B, pin_signal: GPIO_AD_03}
+  - {pin_num: '49', peripheral: JTAG, signal: TRSTB, pin_signal: GPIO_AD_08}
+  - {pin_num: '44', peripheral: JTAG, signal: TMS, pin_signal: GPIO_AD_13}
+  - {pin_num: '48', peripheral: JTAG, signal: TDO, pin_signal: GPIO_AD_09}
+  - {pin_num: '47', peripheral: JTAG, signal: TDI, pin_signal: GPIO_AD_10}
+  - {pin_num: '45', peripheral: JTAG, signal: TCK, pin_signal: GPIO_AD_12}
+  - {pin_num: '46', peripheral: JTAG, signal: MOD, pin_signal: GPIO_AD_11}
  * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS ***********
  */
 
@@ -123,9 +130,16 @@ void BOARD_InitPins(void) {
   IOMUXC_SetPinMux(IOMUXC_GPIO_03_FLEXPWM1_PWM1_B, 0U); 
   IOMUXC_SetPinMux(IOMUXC_GPIO_05_FLEXPWM1_PWM2_B, 0U); 
   IOMUXC_SetPinMux(IOMUXC_GPIO_06_FLEXPWM1_PWM2_A, 0U); 
+  IOMUXC_SetPinMux(IOMUXC_GPIO_AD_03_JTAG_DE_B, 0U); 
   IOMUXC_SetPinMux(IOMUXC_GPIO_AD_05_FLEXPWM1_PWM3_B, 0U); 
   IOMUXC_SetPinMux(IOMUXC_GPIO_AD_06_FLEXPWM1_PWM3_A, 0U); 
   IOMUXC_SetPinMux(IOMUXC_GPIO_AD_07_XBAR1_INOUT03, 0U); 
+  IOMUXC_SetPinMux(IOMUXC_GPIO_AD_08_JTAG_TRSTB, 0U); 
+  IOMUXC_SetPinMux(IOMUXC_GPIO_AD_09_JTAG_TDO, 0U); 
+  IOMUXC_SetPinMux(IOMUXC_GPIO_AD_10_JTAG_TDI, 0U); 
+  IOMUXC_SetPinMux(IOMUXC_GPIO_AD_11_JTAG_MOD, 0U); 
+  IOMUXC_SetPinMux(IOMUXC_GPIO_AD_12_JTAG_TCK, 0U); 
+  IOMUXC_SetPinMux(IOMUXC_GPIO_AD_13_JTAG_TMS, 0U); 
   IOMUXC_GPR->GPR6 = ((IOMUXC_GPR->GPR6 &
     (~(IOMUXC_GPR_GPR6_IOMUXC_XBAR_DIR_SEL_3_MASK))) 
       | IOMUXC_GPR_GPR6_IOMUXC_XBAR_DIR_SEL_3(0x00U) 

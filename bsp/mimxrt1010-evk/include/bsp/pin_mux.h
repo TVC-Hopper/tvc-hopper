@@ -78,6 +78,36 @@ void BOARD_InitBootPins(void);
 #define BOARD_INITPINS_PWM1_B_3_SIGNAL                                         B   /*!< Signal name */
 #define BOARD_INITPINS_PWM1_B_3_CHANNEL                                       3U   /*!< Signal channel */
 
+/* GPIO_AD_08 (number 49), JTAG_TRSTB/J55[10] */
+/* Routed pin properties */
+#define BOARD_INITPINS_JTAG_TRSTB_PERIPHERAL                                JTAG   /*!< Peripheral name */
+#define BOARD_INITPINS_JTAG_TRSTB_SIGNAL                                   TRSTB   /*!< Signal name */
+
+/* GPIO_AD_13 (number 44), JTAG_TMS/J55[2] */
+/* Routed pin properties */
+#define BOARD_INITPINS_JTAG_TMS_PERIPHERAL                                  JTAG   /*!< Peripheral name */
+#define BOARD_INITPINS_JTAG_TMS_SIGNAL                                       TMS   /*!< Signal name */
+
+/* GPIO_AD_09 (number 48), ADC12_4/JTAG_TDO/J55[6]/J26[4] */
+/* Routed pin properties */
+#define BOARD_INITPINS_ADC12_4_PERIPHERAL                                   JTAG   /*!< Peripheral name */
+#define BOARD_INITPINS_ADC12_4_SIGNAL                                        TDO   /*!< Signal name */
+
+/* GPIO_AD_10 (number 47), ADC12_5/JTAG_TDI/J55[8]/J26[6] */
+/* Routed pin properties */
+#define BOARD_INITPINS_ADC12_5_PERIPHERAL                                   JTAG   /*!< Peripheral name */
+#define BOARD_INITPINS_ADC12_5_SIGNAL                                        TDI   /*!< Signal name */
+
+/* GPIO_AD_12 (number 45), JTAG_TCK/J55[4] */
+/* Routed pin properties */
+#define BOARD_INITPINS_JTAG_TCK_PERIPHERAL                                  JTAG   /*!< Peripheral name */
+#define BOARD_INITPINS_JTAG_TCK_SIGNAL                                       TCK   /*!< Signal name */
+
+/* GPIO_AD_11 (number 46), WDOG_B/JTAG_MOD */
+/* Routed pin properties */
+#define BOARD_INITPINS_WDOG_B_PERIPHERAL                                    JTAG   /*!< Peripheral name */
+#define BOARD_INITPINS_WDOG_B_SIGNAL                                         MOD   /*!< Signal name */
+
 /*!
  * @brief Configures pin routing and optionally pin electrical features.
  *

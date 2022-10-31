@@ -130,6 +130,11 @@
                         <data>true</data>
                      </feature>
                   </dependency>
+                  <dependency resourceType="Peripheral" resourceId="JTAG" description="Peripheral JTAG is not initialized" problem_level="1" source="Pins:BOARD_InitPins">
+                     <feature name="initialized" evaluation="equal">
+                        <data>true</data>
+                     </feature>
+                  </dependency>
                   <dependency resourceType="SWComponent" resourceId="platform.drivers.common" description="Pins initialization requires the COMMON Driver in the project." problem_level="2" source="Pins:BOARD_InitPins">
                      <feature name="enabled" evaluation="equal" configuration="core0">
                         <data>true</data>
@@ -196,6 +201,13 @@
                         <pin_feature name="direction" value="OUTPUT"/>
                      </pin_features>
                   </pin>
+                  <pin peripheral="JTAG" signal="DE_B" pin_num="57" pin_signal="GPIO_AD_03"/>
+                  <pin peripheral="JTAG" signal="TRSTB" pin_num="49" pin_signal="GPIO_AD_08"/>
+                  <pin peripheral="JTAG" signal="TMS" pin_num="44" pin_signal="GPIO_AD_13"/>
+                  <pin peripheral="JTAG" signal="TDO" pin_num="48" pin_signal="GPIO_AD_09"/>
+                  <pin peripheral="JTAG" signal="TDI" pin_num="47" pin_signal="GPIO_AD_10"/>
+                  <pin peripheral="JTAG" signal="TCK" pin_num="45" pin_signal="GPIO_AD_12"/>
+                  <pin peripheral="JTAG" signal="MOD" pin_num="46" pin_signal="GPIO_AD_11"/>
                </pins>
             </function>
             <function name="BOARD_InitDEBUG_UARTPins">
