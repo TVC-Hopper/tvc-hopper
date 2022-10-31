@@ -103,11 +103,6 @@ void BOARD_InitBootPins(void);
 #define BOARD_INITPINS_JTAG_TCK_PERIPHERAL                                  JTAG   /*!< Peripheral name */
 #define BOARD_INITPINS_JTAG_TCK_SIGNAL                                       TCK   /*!< Signal name */
 
-/* GPIO_AD_11 (number 46), WDOG_B/JTAG_MOD */
-/* Routed pin properties */
-#define BOARD_INITPINS_WDOG_B_PERIPHERAL                                    JTAG   /*!< Peripheral name */
-#define BOARD_INITPINS_WDOG_B_SIGNAL                                         MOD   /*!< Signal name */
-
 /* GPIO_AD_02 (number 58), ADC12_2/J26[12]/J56[16] */
 /* Routed pin properties */
 #define BOARD_INITPINS_IMU_INT0_PERIPHERAL                                 GPIO1   /*!< Peripheral name */
