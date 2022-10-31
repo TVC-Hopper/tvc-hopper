@@ -10,6 +10,15 @@ but also with custom tools, build needs, flashing, and testing.
 ### Dependencies
 
 - `cmake` (>=3.17)
+    Windows WSL users:
+    ```
+    $ sudo apt-get update
+    $ sudo apt-get install apt-transport-https ca-certificates gnupg software-properties-common wget
+    $ wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | sudo apt-key add -
+    $ sudo apt-add-repository 'deb https://apt.kitware.com/ubuntu/ bionic main'
+    $ sudo apt-get update
+    $ sudo apt-get install cmake
+    ```
 - `arm-none-eabi-gcc` (>=10.3.1)
 - MCUXpresso Config Tools v12
 - MCUXpresso IDE
