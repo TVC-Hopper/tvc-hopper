@@ -744,6 +744,16 @@
                         <data type="Boolean">true</data>
                      </feature>
                   </dependency>
+                  <dependency resourceType="SWComponent" resourceId="platform.drivers.lpi2c_freertos" description="The fsl_lpi2c_freertos driver is missing in the project  (required for the FreeRTOS mode)." problem_level="2" source="Peripherals:BOARD_InitPeripherals">
+                     <feature name="enabled" evaluation="equal">
+                        <data type="Boolean">true</data>
+                     </feature>
+                  </dependency>
+                  <dependency resourceType="SWComponent" resourceId="platform.drivers.lpi2c_freertos" description="The compatible version of the fsl_lpi2c_freertos driver is not available in the project  (required for the FreeRTOS mode)." problem_level="1" source="Peripherals:BOARD_InitPeripherals">
+                     <feature name="version" evaluation="compatible">
+                        <data type="Version">2.2.0</data>
+                     </feature>
+                  </dependency>
                </dependencies>
                <instances>
                   <instance name="COMMS_UART" uuid="0d9274fe-8f49-48a8-8e6a-8c3ac009384d" type="lpuart" type_id="lpuart_bf01db7d964092f3cf860852cba17f7e" mode="freertos" peripheral="LPUART1" enabled="true" comment="" custom_name_enabled="true" editing_lock="false">
@@ -1095,8 +1105,8 @@
                         <setting name="clockSourceFreq" value="BOARD_BootClockRUN"/>
                      </config_set>
                      <config_set name="interrupt_vector"/>
-                     <config_set name="master" quick_selection="qs_master_transfer">
-                        <setting name="mode" value="transfer"/>
+                     <config_set name="master">
+                        <setting name="mode" value="freertos"/>
                         <struct name="config">
                            <setting name="enableMaster" value="true"/>
                            <setting name="enableDoze" value="true"/>
@@ -1118,12 +1128,7 @@
                            </set>
                         </struct>
                         <struct name="transfer">
-                           <setting name="blocking" value="false"/>
                            <setting name="enable_custom_handle" value="false"/>
-                           <struct name="callback">
-                              <setting name="name" value=""/>
-                              <setting name="userData" value=""/>
-                           </struct>
                            <set name="flags">
                               <selected/>
                            </set>
@@ -1133,7 +1138,7 @@
                            <setting name="subaddressSize" value="1"/>
                            <setting name="blocking_buffer" value="false"/>
                            <setting name="enable_custom_buffer" value="false"/>
-                           <setting name="dataSize" value="1"/>
+                           <setting name="dataSize" value="16"/>
                         </struct>
                      </config_set>
                   </instance>

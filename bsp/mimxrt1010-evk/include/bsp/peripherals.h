@@ -15,6 +15,7 @@
 #include "fsl_clock.h"
 #include "fsl_pwm.h"
 #include "fsl_lpi2c.h"
+#include "fsl_lpi2c_freertos.h"
 #include "fsl_gpio.h"
 
 #if defined(__cplusplus)
@@ -91,7 +92,7 @@ extern "C" {
 /* Definition of clock source */
 #define LPI2C1_CLOCK_FREQ 60000000UL
 /* Transfer buffer size */
-#define LPI2C1_MASTER_BUFFER_SIZE 1
+#define LPI2C1_MASTER_BUFFER_SIZE 16
 /* Definition of slave address */
 #define LPI2C1_MASTER_SLAVE_ADDRESS 0
 /* GPIO1 interrupt vector ID (number). */
@@ -136,7 +137,7 @@ extern const pwm_fault_param_t PWM1_Fault3_fault_config;
 extern const lpi2c_master_config_t LPI2C1_masterConfig;
 extern lpi2c_master_transfer_t LPI2C1_masterTransfer;
 extern uint8_t LPI2C1_masterBuffer[LPI2C1_MASTER_BUFFER_SIZE];
-extern lpi2c_master_handle_t LPI2C1_masterHandle;
+extern lpi2c_rtos_handle_t LPI2C1_masterHandle;
 
 /***********************************************************************************************************************
  * Initialization functions

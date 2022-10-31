@@ -547,7 +547,7 @@ instance:
     - clockSourceFreq: 'BOARD_BootClockRUN'
   - interrupt_vector: []
   - master:
-    - mode: 'transfer'
+    - mode: 'freertos'
     - config:
       - enableMaster: 'true'
       - enableDoze: 'true'
@@ -565,11 +565,7 @@ instance:
         - polarity: 'kLPI2C_HostRequestPinActiveHigh'
       - edmaRequestSources: ''
     - transfer:
-      - blocking: 'false'
       - enable_custom_handle: 'false'
-      - callback:
-        - name: ''
-        - userData: ''
       - flags: ''
       - slaveAddress: '0'
       - direction: 'kLPI2C_Write'
@@ -577,8 +573,7 @@ instance:
       - subaddressSize: '1'
       - blocking_buffer: 'false'
       - enable_custom_buffer: 'false'
-      - dataSize: '1'
-    - quick_selection: 'qs_master_transfer'
+      - dataSize: '16'
  * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS **********/
 /* clang-format on */
 const lpi2c_master_config_t LPI2C1_masterConfig = {
@@ -605,14 +600,13 @@ lpi2c_master_transfer_t LPI2C1_masterTransfer = {
   .subaddress = 0,
   .subaddressSize = 1,
   .data = LPI2C1_masterBuffer,
-  .dataSize = 1
+  .dataSize = 16
 };
-lpi2c_master_handle_t LPI2C1_masterHandle;
+lpi2c_rtos_handle_t LPI2C1_masterHandle;
 uint8_t LPI2C1_masterBuffer[LPI2C1_MASTER_BUFFER_SIZE];
 
 static void LPI2C1_init(void) {
-  LPI2C_MasterInit(LPI2C1_PERIPHERAL, &LPI2C1_masterConfig, LPI2C1_CLOCK_FREQ);
-  LPI2C_MasterTransferCreateHandle(LPI2C1_PERIPHERAL, &LPI2C1_masterHandle, NULL, NULL);
+  LPI2C_RTOS_Init(&LPI2C1_masterHandle, LPI2C1_PERIPHERAL, &LPI2C1_masterConfig, LPI2C1_CLOCK_FREQ);
 }
 
 /***********************************************************************************************************************

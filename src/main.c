@@ -44,7 +44,7 @@ int main(void)
     UartListener_Init();
     CommandControlComms_Init();
 
-//    HwImu_Init();
+    HwImu_Init();
     HwEsc_Init();
     HwThrustVane_Init();
 
