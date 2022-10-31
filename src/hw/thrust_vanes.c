@@ -2,7 +2,6 @@
 
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
-#include <freertos/semphr.h>
 
 #include <bsp/peripherals.h>
 
@@ -19,11 +18,12 @@
 #define VANE_2_CH           PWM1_SM3_A
 #define VANE_3_CH           PWM1_SM3_B
 
-#define MAX_DUTY_CYCLE      ((uint16_t)0xFFFFFFFFF)
+#define MAX_DUTY_CYCLE      ((uint16_t)0xFFFF)
 #define MAX_ANGLE           ((float) 180.0)
 
 static float servo_positions[4] = {90.0, 90.0, 90.0, 90.0};
 
+// indexed by servo id
 static const pwm_submodule_t vanes[4] = {
     VANE_0_SM,
     VANE_1_SM,
@@ -31,6 +31,7 @@ static const pwm_submodule_t vanes[4] = {
     VANE_3_SM,
 };
 
+// indexed by servo id
 static const pwm_channels_t vane_channels[4] = {
     VANE_0_CH,
     VANE_1_CH,
@@ -39,12 +40,26 @@ static const pwm_channels_t vane_channels[4] = {
 };
 
 extern void HwThrustVane_Init() {
+    for (uint8_t i = 0; i < 4; ++i) {
+        PWM_SetupFaultDisableMap(
+                VANE_PWM,
+                vanes[i],
+                vane_channels[i],
+                kPWM_faultchannel_0,
+                kPWM_FaultDisable_0
+                | kPWM_FaultDisable_1
+                | kPWM_FaultDisable_2
+                | kPWM_FaultDisable_3
+        );
+    }
+
+    PWM_SetPwmLdok(VANE_PWM, kPWM_Control_Module_2 | kPWM_Control_Module_3, true);
     PWM_StartTimer(
             VANE_PWM, 
-            kPWM_Control_Module_1
-            | kPWM_Control_Module_2
+            kPWM_Control_Module_2
             | kPWM_Control_Module_3
     );
+    HwThrustVane_SetPositions(servo_positions);
 }
 
 extern void HwThrustVane_Task() {
@@ -66,13 +81,15 @@ extern void HwThrustVane_GetPositions(float* positions) {
 
 extern void HwThrustVane_SetPosition(uint8_t idx, float position) {
     servo_positions[idx] = position;
+    uint16_t duty_cycle = position * (MAX_DUTY_CYCLE / MAX_ANGLE);
     PWM_UpdatePwmDutycycleHighAccuracy(
             VANE_PWM,
             vanes[idx],
             vane_channels[idx],
             VANE_PWM_MODE,
-            position * (MAX_DUTY_CYCLE / MAX_ANGLE)
+            duty_cycle
     );
+    PWM_SetPwmLdok(VANE_PWM, kPWM_Control_Module_2 | kPWM_Control_Module_3, true);
 }
 
 extern void HwThrustVane_GetPosition(uint8_t idx, float* position) {

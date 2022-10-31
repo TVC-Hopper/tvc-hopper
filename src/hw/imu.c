@@ -94,6 +94,7 @@ extern void HwImu_Init() {
 
 extern void HwImu_GyroTask() {
     while(1) {
+        vTaskSuspend(NULL);
         if (xSemaphoreTake(gyro_isr_sem, 0xFFFF) == pdTRUE) {
         }
     }
@@ -101,6 +102,7 @@ extern void HwImu_GyroTask() {
 
 extern void HwImu_AccTask() {
     while(1) {
+        vTaskSuspend(NULL);
         if (xSemaphoreTake(acc_isr_sem, 0xFFFF) == pdTRUE) {
         }
     }

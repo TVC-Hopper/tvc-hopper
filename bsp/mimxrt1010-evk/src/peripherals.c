@@ -156,12 +156,12 @@ instance:
     - clockSourceFreq: 'BOARD_BootClockRUN'
     - submodules:
       - 0:
-        - sm: 'kPWM_Module_0'
-        - sm_id: 'SM0'
+        - sm: 'kPWM_Module_1'
+        - sm_id: 'SM1'
         - config:
           - clockSource: 'kPWM_BusClock'
           - prescale: 'kPWM_Prescale_Divide_1'
-          - pwmFreq: '16 kHz'
+          - pwmFreq: '16 khz'
           - pairOperation: 'kPWM_Independent'
           - operationMode: 'kPWM_SignedCenterAligned'
           - initializationControl: 'kPWM_Initialize_LocalSync'
@@ -169,7 +169,7 @@ instance:
           - reloadSelect: 'kPWM_LocalReload'
           - reloadFrequency: 'kPWM_LoadEveryOportunity'
           - forceTrigger: 'kPWM_Force_Local'
-          - enableDebugMode: 'false'
+          - enableDebugMode: 'true'
           - enableWait: 'false'
           - outputTrigger_sel: ''
           - loadOK: 'false'
@@ -184,6 +184,9 @@ instance:
         - channels:
           - 0:
             - channel_id: 'A'
+            - functionSel: 'notUsed'
+          - 1:
+            - channel_id: 'B'
             - functionSel: 'pwmOutput'
             - pwm:
               - dutyCyclePercent: '0'
@@ -195,52 +198,6 @@ instance:
               - clockSource: 'kPWM_BusClock'
               - deadtimeValue: '0'
               - interrupt_sel: ''
-          - 1:
-            - channel_id: 'B'
-            - functionSel: 'notUsed'
-          - 2:
-            - channel_id: 'X'
-            - functionSel: 'notUsed'
-        - common_interruptEn: 'false'
-        - common_interrupt:
-          - IRQn: 'PWM1_0_IRQn'
-          - enable_interrrupt: 'enabled'
-          - enable_priority: 'false'
-          - priority: '0'
-          - enable_custom_name: 'false'
-      - 1:
-        - sm: 'kPWM_Module_1'
-        - sm_id: 'SM1'
-        - config:
-          - clockSource: 'kPWM_BusClock'
-          - prescale: 'kPWM_Prescale_Divide_64'
-          - pwmFreq: '50 Hz'
-          - pairOperation: 'kPWM_Independent'
-          - operationMode: 'kPWM_SignedCenterAligned'
-          - initializationControl: 'kPWM_Initialize_LocalSync'
-          - reloadLogic: 'kPWM_ReloadImmediate'
-          - reloadSelect: 'kPWM_LocalReload'
-          - reloadFrequency: 'kPWM_LoadEveryOportunity'
-          - forceTrigger: 'kPWM_Force_Local'
-          - enableDebugMode: 'false'
-          - enableWait: 'false'
-          - outputTrigger_sel: ''
-          - loadOK: 'false'
-          - startCounter: 'false'
-          - interrupt_sel: ''
-          - dma_used: 'false'
-          - dma:
-            - pwmDMA_activate: 'false'
-            - captureDMA_enable: ''
-            - captureDMA_source: 'kPWM_DMARequestDisable'
-            - captureDMA_watermark_control: 'kPWM_FIFOWatermarksOR'
-        - channels:
-          - 0:
-            - channel_id: 'A'
-            - functionSel: 'notUsed'
-          - 1:
-            - channel_id: 'B'
-            - functionSel: 'notUsed'
           - 2:
             - channel_id: 'X'
             - functionSel: 'notUsed'
@@ -251,7 +208,7 @@ instance:
           - enable_priority: 'false'
           - priority: '0'
           - enable_custom_name: 'false'
-      - 2:
+      - 1:
         - sm: 'kPWM_Module_2'
         - sm_id: 'SM2'
         - config:
@@ -265,7 +222,7 @@ instance:
           - reloadSelect: 'kPWM_LocalReload'
           - reloadFrequency: 'kPWM_LoadEveryOportunity'
           - forceTrigger: 'kPWM_Force_Local'
-          - enableDebugMode: 'false'
+          - enableDebugMode: 'true'
           - enableWait: 'false'
           - outputTrigger_sel: ''
           - loadOK: 'false'
@@ -314,7 +271,7 @@ instance:
           - enable_priority: 'false'
           - priority: '0'
           - enable_custom_name: 'false'
-      - 3:
+      - 2:
         - sm: 'kPWM_Module_3'
         - sm_id: 'SM3'
         - config:
@@ -328,7 +285,7 @@ instance:
           - reloadSelect: 'kPWM_LocalReload'
           - reloadFrequency: 'kPWM_LoadEveryOportunity'
           - forceTrigger: 'kPWM_Force_Local'
-          - enableDebugMode: 'false'
+          - enableDebugMode: 'true'
           - enableWait: 'false'
           - outputTrigger_sel: ''
           - loadOK: 'false'
@@ -423,7 +380,7 @@ instance:
  * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS **********/
 /* clang-format on */
 /* PWM main configuration */
-pwm_config_t PWM1_SM0_config = {
+pwm_config_t PWM1_SM1_config = {
   .clockSource = kPWM_BusClock,
   .prescale = kPWM_Prescale_Divide_1,
   .pairOperation = kPWM_Independent,
@@ -432,31 +389,18 @@ pwm_config_t PWM1_SM0_config = {
   .reloadSelect = kPWM_LocalReload,
   .reloadFrequency = kPWM_LoadEveryOportunity,
   .forceTrigger = kPWM_Force_Local,
-  .enableDebugMode = false,
+  .enableDebugMode = true,
   .enableWait = false
 };
 
-pwm_signal_param_t PWM1_SM0_pwm_function_config[1]= {
+pwm_signal_param_t PWM1_SM1_pwm_function_config[1]= {
   {
-    .pwmChannel = kPWM_PwmA,
+    .pwmChannel = kPWM_PwmB,
     .dutyCyclePercent = 0U,
     .level = kPWM_HighTrue,
     .faultState = kPWM_PwmFaultState0,
     .deadtimeValue = 0U
   },
-};
-
-pwm_config_t PWM1_SM1_config = {
-  .clockSource = kPWM_BusClock,
-  .prescale = kPWM_Prescale_Divide_64,
-  .pairOperation = kPWM_Independent,
-  .initializationControl = kPWM_Initialize_LocalSync,
-  .reloadLogic = kPWM_ReloadImmediate,
-  .reloadSelect = kPWM_LocalReload,
-  .reloadFrequency = kPWM_LoadEveryOportunity,
-  .forceTrigger = kPWM_Force_Local,
-  .enableDebugMode = false,
-  .enableWait = false
 };
 
 pwm_config_t PWM1_SM2_config = {
@@ -468,7 +412,7 @@ pwm_config_t PWM1_SM2_config = {
   .reloadSelect = kPWM_LocalReload,
   .reloadFrequency = kPWM_LoadEveryOportunity,
   .forceTrigger = kPWM_Force_Local,
-  .enableDebugMode = false,
+  .enableDebugMode = true,
   .enableWait = false
 };
 
@@ -498,7 +442,7 @@ pwm_config_t PWM1_SM3_config = {
   .reloadSelect = kPWM_LocalReload,
   .reloadFrequency = kPWM_LoadEveryOportunity,
   .forceTrigger = kPWM_Force_Local,
-  .enableDebugMode = false,
+  .enableDebugMode = true,
   .enableWait = false
 };
 
@@ -550,8 +494,6 @@ const pwm_fault_param_t PWM1_Fault3_fault_config = {
 };
 
 static void PWM1_init(void) {
-  /* Initialize PWM submodule SM0 main configuration */
-  PWM_Init(PWM1_PERIPHERAL, PWM1_SM0, &PWM1_SM0_config);
   /* Initialize PWM submodule SM1 main configuration */
   PWM_Init(PWM1_PERIPHERAL, PWM1_SM1, &PWM1_SM1_config);
   /* Initialize PWM submodule SM2 main configuration */
@@ -568,8 +510,8 @@ static void PWM1_init(void) {
   PWM_SetupFaults(PWM1_PERIPHERAL, PWM1_F0_FAULT2, &PWM1_Fault2_fault_config);
   /* Initialize fault channel 0 fault Fault3 configuration */
   PWM_SetupFaults(PWM1_PERIPHERAL, PWM1_F0_FAULT3, &PWM1_Fault3_fault_config);
-  /* Initialize deadtime logic input for the channel A */
-  PWM_SetupForceSignal(PWM1_PERIPHERAL, PWM1_SM0, PWM1_SM0_A, kPWM_UsePwm);
+  /* Initialize deadtime logic input for the channel B */
+  PWM_SetupForceSignal(PWM1_PERIPHERAL, PWM1_SM1, PWM1_SM1_B, kPWM_UsePwm);
   /* Initialize deadtime logic input for the channel A */
   PWM_SetupForceSignal(PWM1_PERIPHERAL, PWM1_SM2, PWM1_SM2_A, kPWM_UsePwm);
   /* Initialize deadtime logic input for the channel B */
@@ -578,8 +520,8 @@ static void PWM1_init(void) {
   PWM_SetupForceSignal(PWM1_PERIPHERAL, PWM1_SM3, PWM1_SM3_A, kPWM_UsePwm);
   /* Initialize deadtime logic input for the channel B */
   PWM_SetupForceSignal(PWM1_PERIPHERAL, PWM1_SM3, PWM1_SM3_B, kPWM_UsePwm);
-  /* Setup PWM output setting for submodule SM0 */
-  PWM_SetupPwm(PWM1_PERIPHERAL, PWM1_SM0, PWM1_SM0_pwm_function_config, 1U, kPWM_SignedCenterAligned, PWM1_SM0_COUNTER_FREQ_HZ, PWM1_SM0_SM_CLK_SOURCE_FREQ_HZ);
+  /* Setup PWM output setting for submodule SM1 */
+  PWM_SetupPwm(PWM1_PERIPHERAL, PWM1_SM1, PWM1_SM1_pwm_function_config, 1U, kPWM_SignedCenterAligned, PWM1_SM1_COUNTER_FREQ_HZ, PWM1_SM1_SM_CLK_SOURCE_FREQ_HZ);
   /* Setup PWM output setting for submodule SM2 */
   PWM_SetupPwm(PWM1_PERIPHERAL, PWM1_SM2, PWM1_SM2_pwm_function_config, 2U, kPWM_SignedCenterAligned, PWM1_SM2_COUNTER_FREQ_HZ, PWM1_SM2_SM_CLK_SOURCE_FREQ_HZ);
   /* Setup PWM output setting for submodule SM3 */

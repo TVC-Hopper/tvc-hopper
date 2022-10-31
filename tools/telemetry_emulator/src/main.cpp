@@ -284,7 +284,7 @@ static SPP_STATUS_T GetValue(uint16_t id, void* value, void* instance_data) {
             memcpy((uint8_t*)value, &prop_status, sizeof(prop_status));
             break;
         }
-        case PROP_telemetry_ID:
+        case PROP_telem_data_ID:
         {
             std::lock_guard<std::mutex> lg(telem_mx);
             memcpy((uint8_t*)value, prop_telem, sizeof(prop_telem));

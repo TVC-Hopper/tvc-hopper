@@ -2,14 +2,13 @@
 
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
-#include <freertos/semphr.h>
 
 #include <bsp/peripherals.h>
 
 #define ESC_PWM_MODE        kPWM_SignedCenterAligned
 #define ESC_PWM             PWM1_PERIPHERAL
-#define ESC_SM              PWM1_SM0
-#define ESC_CH              PWM1_SM0_A
+#define ESC_SM              PWM1_SM1
+#define ESC_CH              PWM1_SM1_B
 
 #define MAX_DUTY_CYCLE ((uint16_t)0xFFFFFFFF)
 

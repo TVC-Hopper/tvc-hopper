@@ -15,6 +15,7 @@
 #include "app_hal_xconnect.h"
 
 #include "hw/imu.h"
+#include "hw/thrust_vanes.h"
 
 
 static SPP_STATUS_T SppSendPacket(uint8_t* bytes, uint16_t len, void* instance_data);
@@ -115,6 +116,8 @@ static SPP_STATUS_T SetValue(uint16_t id, void* value, void* instance_data) {
         }
         case PROP_servo_positions_ID:
         {
+            float* positions = (float*)value;
+            HwThrustVane_SetPositions(positions);
             break;
         }
         case PROP_target_position_ID:

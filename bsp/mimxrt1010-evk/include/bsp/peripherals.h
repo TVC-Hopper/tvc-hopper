@@ -35,28 +35,14 @@ extern "C" {
 #define COMMS_UART_IRQ_PRIORITY 5
 /* Definition of peripheral ID */
 #define PWM1_PERIPHERAL PWM1
-/* Definition of submodule 0 ID */
-#define PWM1_SM0 kPWM_Module_0
-/* Definition of clock source of submodule 0 frequency in Hertz */
-#define PWM1_SM0_SM_CLK_SOURCE_FREQ_HZ 125000000U
-/* Definition of submodule 0 counter clock source frequency in Hertz - PWM1_SM0_SM_CLK_SOURCE_FREQ_HZ divided by prescaler */
-#define PWM1_SM0_COUNTER_CLK_SOURCE_FREQ_HZ 125000000U
-/* Definition of submodule 0 counter (PWM) frequency in Hertz */
-#define PWM1_SM0_COUNTER_FREQ_HZ 16001U
-/* Definition of submodule 0 channel A ID */
-#define PWM1_SM0_A kPWM_PwmA
-/* Definition of submodule 0 channel B ID */
-#define PWM1_SM0_B kPWM_PwmB
-/* Definition of submodule 0 channel X ID */
-#define PWM1_SM0_X kPWM_PwmX
 /* Definition of submodule 1 ID */
 #define PWM1_SM1 kPWM_Module_1
 /* Definition of clock source of submodule 1 frequency in Hertz */
 #define PWM1_SM1_SM_CLK_SOURCE_FREQ_HZ 125000000U
 /* Definition of submodule 1 counter clock source frequency in Hertz - PWM1_SM1_SM_CLK_SOURCE_FREQ_HZ divided by prescaler */
-#define PWM1_SM1_COUNTER_CLK_SOURCE_FREQ_HZ 1953125U
+#define PWM1_SM1_COUNTER_CLK_SOURCE_FREQ_HZ 125000000U
 /* Definition of submodule 1 counter (PWM) frequency in Hertz */
-#define PWM1_SM1_COUNTER_FREQ_HZ 50U
+#define PWM1_SM1_COUNTER_FREQ_HZ 16001U
 /* Definition of submodule 1 channel A ID */
 #define PWM1_SM1_A kPWM_PwmA
 /* Definition of submodule 1 channel B ID */
@@ -133,11 +119,9 @@ extern "C" {
 extern lpuart_rtos_handle_t COMMS_UART_rtos_handle;
 extern lpuart_handle_t COMMS_UART_lpuart_handle;
 extern lpuart_rtos_config_t COMMS_UART_rtos_config;
-extern pwm_config_t PWM1_SM0_config;
-
-extern pwm_signal_param_t PWM1_SM0_pwm_function_config[1];
 extern pwm_config_t PWM1_SM1_config;
 
+extern pwm_signal_param_t PWM1_SM1_pwm_function_config[1];
 extern pwm_config_t PWM1_SM2_config;
 
 extern pwm_signal_param_t PWM1_SM2_pwm_function_config[2];

@@ -12,11 +12,61 @@ package_id: MIMXRT1011DAE5A
 mcu_data: ksdk2_0
 processor_version: 12.0.1
 board: MIMXRT1010-EVK
+expansion_headers:
+- id: frdm_arduino
+  name: IMXRT Expansion Header
+  connectors:
+  - id: C1
+    name: J60
+    pins:
+    - {id: 1, name: GND, external_signal_types: ground}
+    - {id: 3, name: GND, external_signal_types: ground}
+    - {id: 4, name: 3.3V, external_signal_types: power_supply_3.3V}
+    - {id: 5, pin_num: '8', pin_signal: GPIO_05}
+    - {id: 6, name: RESET, pin_num: '22', pin_signal: POR_B}
+    - {id: 7, pin_num: '6', pin_signal: GPIO_06}
+    - {id: 8, name: 3.3V, external_signal_types: power_supply_3.3V}
+    - {id: 9, pin_num: '10', pin_signal: GPIO_03}
+    - {id: 10, name: 5V, external_signal_types: power_supply_5V}
+    - {id: 12, name: GND, external_signal_types: ground}
+    - {id: 14, name: GND, external_signal_types: ground}
+    - {id: 16, name: 5V, external_signal_types: power_supply_5V}
+  - id: C2
+    name: J57
+    pins:
+    - {id: 2, name: D8, pin_num: '74', pin_signal: GPIO_SD_02}
+    - {id: 6, name: D10, pin_num: '55', pin_signal: GPIO_AD_05}
+    - {id: 8, name: D11, pin_num: '56', pin_signal: GPIO_AD_04}
+    - {id: 10, name: D12, pin_num: '57', pin_signal: GPIO_AD_03}
+    - {id: 12, name: D13, pin_num: '52', pin_signal: GPIO_AD_06}
+    - {id: 14, name: GND, external_signal_types: ground}
+    - {id: 16, name: AREF, external_signal_types: aref}
+    - {id: 18, name: D14, pin_num: '12', pin_signal: GPIO_01}
+    - {id: 20, name: D15, pin_num: '11', pin_signal: GPIO_02}
+  - id: C3
+    name: J56
+    pins:
+    - {id: 2, name: D0, pin_num: '3', pin_signal: GPIO_09}
+    - {id: 4, name: D1, pin_num: '2', pin_signal: GPIO_10}
+    - {id: 6, name: D2, pin_num: '55', pin_signal: GPIO_AD_05}
+    - {id: 8, name: D3, pin_num: '52', pin_signal: GPIO_AD_06}
+    - {id: 14, name: D6, pin_num: '59', pin_signal: GPIO_AD_01}
+    - {id: 16, name: D7, pin_num: '58', pin_signal: GPIO_AD_02}
+  - id: C4
+    name: J26
+    pins:
+    - {id: 2, name: A0, pin_num: '51', pin_signal: GPIO_AD_07}
+    - {id: 4, name: A1, pin_num: '48', pin_signal: GPIO_AD_09}
+    - {id: 6, name: A2, pin_num: '47', pin_signal: GPIO_AD_10}
+    - {id: 8, name: A3, pin_num: '43', pin_signal: GPIO_AD_14}
+    - {id: 10, name: A4, pin_num: '59', pin_signal: GPIO_AD_01}
+    - {id: 12, name: A5, pin_num: '58', pin_signal: GPIO_AD_02}
 pin_labels:
 - {pin_num: '57', pin_signal: GPIO_AD_03, label: 'LPSPI1_SDI/J57[10]/U27[2]', identifier: LPSPI1_SDI;PWM1_B_2}
 - {pin_num: '56', pin_signal: GPIO_AD_04, label: 'LPSPI1_SDO/J57[8]/U27[5]', identifier: LPSPI1_SDO;PWM_A_2;PWM1_A_2}
 - {pin_num: '55', pin_signal: GPIO_AD_05, label: 'LPSPI1_PCS0/INT1_COMBO/J56[6]/J57[6]/U26[11]/U27[1]', identifier: LPSPI1_PCS0;PWM1_B_3}
 - {pin_num: '52', pin_signal: GPIO_AD_06, label: 'LPSPI1_SCK/INT2_COMBO/J56[8]/J57[12]/U26[9]/U27[6]', identifier: LPSPI1_SCK;PWM1_A_3}
+- {pin_num: '51', pin_signal: GPIO_AD_07, label: 'SAI1_TX_SYNC/U10[13]', identifier: ADC12_3}
 - {pin_num: '74', pin_signal: GPIO_SD_02, label: 'GPIO_SD_02/BT_CFG[0]/J57[2]/TP34', identifier: GPIO_SD_02;PWM1_A_0}
 power_domains: {NVCC_GPIO: '3.3'}
  * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS ***********
@@ -44,17 +94,17 @@ void BOARD_InitBootPins(void) {
 BOARD_InitPins:
 - options: {callFromInitBoot: 'true', coreID: core0, enableClock: 'true'}
 - pin_list:
-  - {pin_num: '55', peripheral: PWM1, signal: 'B, 3', pin_signal: GPIO_AD_05, identifier: PWM1_B_3, direction: OUTPUT}
-  - {pin_num: '52', peripheral: PWM1, signal: 'A, 3', pin_signal: GPIO_AD_06, identifier: PWM1_A_3, direction: OUTPUT}
-  - {pin_num: '74', peripheral: PWM1, signal: 'A, 0', pin_signal: GPIO_SD_02, identifier: PWM1_A_0, direction: OUTPUT}
-  - {pin_num: '57', peripheral: PWM1, signal: 'B, 2', pin_signal: GPIO_AD_03, identifier: PWM1_B_2, direction: OUTPUT}
-  - {pin_num: '56', peripheral: PWM1, signal: 'A, 2', pin_signal: GPIO_AD_04, identifier: PWM1_A_2, direction: OUTPUT}
   - {pin_num: '11', peripheral: LPI2C1, signal: SCL, pin_signal: GPIO_02}
   - {pin_num: '12', peripheral: LPI2C1, signal: SDA, pin_signal: GPIO_01, identifier: ''}
   - {pin_num: '51', peripheral: PWM1, signal: 'FAULT, 3', pin_signal: GPIO_AD_07, identifier: ''}
   - {pin_num: '51', peripheral: PWM1, signal: 'FAULT, 2', pin_signal: GPIO_AD_07, identifier: ''}
   - {pin_num: '51', peripheral: PWM1, signal: 'FAULT, 1', pin_signal: GPIO_AD_07, identifier: ''}
-  - {pin_num: '51', peripheral: PWM1, signal: 'FAULT, 0', pin_signal: GPIO_AD_07, identifier: ''}
+  - {pin_num: '10', peripheral: PWM1, signal: 'B, 1', pin_signal: GPIO_03, direction: OUTPUT}
+  - {pin_num: '6', peripheral: PWM1, signal: 'A, 2', pin_signal: GPIO_06, direction: OUTPUT}
+  - {pin_num: '8', peripheral: PWM1, signal: 'B, 2', pin_signal: GPIO_05, direction: OUTPUT}
+  - {pin_num: '51', peripheral: PWM1, signal: 'FAULT, 0', pin_signal: GPIO_AD_07}
+  - {pin_num: '52', peripheral: PWM1, signal: 'A, 3', pin_signal: GPIO_AD_06, identifier: PWM1_A_3, direction: OUTPUT}
+  - {pin_num: '55', peripheral: PWM1, signal: 'B, 3', pin_signal: GPIO_AD_05, identifier: PWM1_B_3, direction: OUTPUT}
  * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS ***********
  */
 
@@ -70,12 +120,12 @@ void BOARD_InitPins(void) {
 
   IOMUXC_SetPinMux(IOMUXC_GPIO_01_LPI2C1_SDA, 0U); 
   IOMUXC_SetPinMux(IOMUXC_GPIO_02_LPI2C1_SCL, 0U); 
-  IOMUXC_SetPinMux(IOMUXC_GPIO_AD_03_FLEXPWM1_PWM2_B, 0U); 
-  IOMUXC_SetPinMux(IOMUXC_GPIO_AD_04_FLEXPWM1_PWM2_A, 0U); 
+  IOMUXC_SetPinMux(IOMUXC_GPIO_03_FLEXPWM1_PWM1_B, 0U); 
+  IOMUXC_SetPinMux(IOMUXC_GPIO_05_FLEXPWM1_PWM2_B, 0U); 
+  IOMUXC_SetPinMux(IOMUXC_GPIO_06_FLEXPWM1_PWM2_A, 0U); 
   IOMUXC_SetPinMux(IOMUXC_GPIO_AD_05_FLEXPWM1_PWM3_B, 0U); 
   IOMUXC_SetPinMux(IOMUXC_GPIO_AD_06_FLEXPWM1_PWM3_A, 0U); 
   IOMUXC_SetPinMux(IOMUXC_GPIO_AD_07_XBAR1_INOUT03, 0U); 
-  IOMUXC_SetPinMux(IOMUXC_GPIO_SD_02_FLEXPWM1_PWM0_A, 0U); 
   IOMUXC_GPR->GPR6 = ((IOMUXC_GPR->GPR6 &
     (~(IOMUXC_GPR_GPR6_IOMUXC_XBAR_DIR_SEL_3_MASK))) 
       | IOMUXC_GPR_GPR6_IOMUXC_XBAR_DIR_SEL_3(0x00U) 
