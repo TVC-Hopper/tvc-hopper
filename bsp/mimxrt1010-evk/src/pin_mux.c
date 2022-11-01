@@ -95,26 +95,46 @@ void BOARD_InitBootPins(void) {
 /*
  * TEXT BELOW IS USED AS SETTING FOR TOOLS *************************************
 BOARD_InitPins:
-- options: {callFromInitBoot: 'true', coreID: core0, enableClock: 'true'}
+- options: {callFromInitBoot: 'true', coreID: core0, enableClock: 'true', fullInit: 'true'}
 - pin_list:
-  - {pin_num: '11', peripheral: LPI2C1, signal: SCL, pin_signal: GPIO_02}
-  - {pin_num: '12', peripheral: LPI2C1, signal: SDA, pin_signal: GPIO_01, identifier: ''}
-  - {pin_num: '51', peripheral: PWM1, signal: 'FAULT, 3', pin_signal: GPIO_AD_07, identifier: ''}
-  - {pin_num: '51', peripheral: PWM1, signal: 'FAULT, 2', pin_signal: GPIO_AD_07, identifier: ''}
-  - {pin_num: '51', peripheral: PWM1, signal: 'FAULT, 1', pin_signal: GPIO_AD_07, identifier: ''}
-  - {pin_num: '10', peripheral: PWM1, signal: 'B, 1', pin_signal: GPIO_03, direction: OUTPUT}
-  - {pin_num: '6', peripheral: PWM1, signal: 'A, 2', pin_signal: GPIO_06, direction: OUTPUT}
-  - {pin_num: '8', peripheral: PWM1, signal: 'B, 2', pin_signal: GPIO_05, direction: OUTPUT}
-  - {pin_num: '51', peripheral: PWM1, signal: 'FAULT, 0', pin_signal: GPIO_AD_07}
-  - {pin_num: '49', peripheral: JTAG, signal: TRSTB, pin_signal: GPIO_AD_08}
-  - {pin_num: '44', peripheral: JTAG, signal: TMS, pin_signal: GPIO_AD_13}
-  - {pin_num: '48', peripheral: JTAG, signal: TDO, pin_signal: GPIO_AD_09}
-  - {pin_num: '47', peripheral: JTAG, signal: TDI, pin_signal: GPIO_AD_10}
-  - {pin_num: '45', peripheral: JTAG, signal: TCK, pin_signal: GPIO_AD_12}
-  - {pin_num: '58', peripheral: GPIO1, signal: 'gpiomux_io, 16', pin_signal: GPIO_AD_02, identifier: IMU_INT0, direction: INPUT}
-  - {pin_num: '43', peripheral: GPIO1, signal: 'gpiomux_io, 28', pin_signal: GPIO_AD_14, identifier: IMU_INT1, direction: INPUT}
-  - {pin_num: '55', peripheral: PWM1, signal: 'B, 3', pin_signal: GPIO_AD_05, identifier: PWM1_B_3, direction: OUTPUT}
-  - {pin_num: '52', peripheral: PWM1, signal: 'A, 3', pin_signal: GPIO_AD_06, identifier: PWM1_A_3, direction: OUTPUT}
+  - {pin_num: '11', peripheral: LPI2C1, signal: SCL, pin_signal: GPIO_02, slew_rate: Slow, software_input_on: Disable, open_drain: Disable, speed: MHZ_100, drive_strength: R0_4,
+    pull_keeper_select: Keeper, pull_keeper_enable: Enable, pull_up_down_config: Pull_Down_100K_Ohm, hysteresis_enable: Disable}
+  - {pin_num: '12', peripheral: LPI2C1, signal: SDA, pin_signal: GPIO_01, identifier: '', slew_rate: Slow, software_input_on: Disable, open_drain: Disable, speed: MHZ_100,
+    drive_strength: R0_4, pull_keeper_select: Keeper, pull_keeper_enable: Enable, pull_up_down_config: Pull_Down_100K_Ohm, hysteresis_enable: Disable}
+  - {pin_num: '51', peripheral: PWM1, signal: 'FAULT, 3', pin_signal: GPIO_AD_07, identifier: '', slew_rate: Slow, software_input_on: Disable, open_drain: Disable,
+    speed: MHZ_100, drive_strength: R0_4, pull_keeper_select: Keeper, pull_keeper_enable: Enable, pull_up_down_config: Pull_Down_100K_Ohm, hysteresis_enable: Disable}
+  - {pin_num: '51', peripheral: PWM1, signal: 'FAULT, 2', pin_signal: GPIO_AD_07, identifier: '', slew_rate: Slow, software_input_on: Disable, open_drain: Disable,
+    speed: MHZ_100, drive_strength: R0_4, pull_keeper_select: Keeper, pull_keeper_enable: Enable, pull_up_down_config: Pull_Down_100K_Ohm, hysteresis_enable: Disable}
+  - {pin_num: '51', peripheral: PWM1, signal: 'FAULT, 1', pin_signal: GPIO_AD_07, identifier: '', slew_rate: Slow, software_input_on: Disable, open_drain: Disable,
+    speed: MHZ_100, drive_strength: R0_4, pull_keeper_select: Keeper, pull_keeper_enable: Enable, pull_up_down_config: Pull_Down_100K_Ohm, hysteresis_enable: Disable}
+  - {pin_num: '10', peripheral: PWM1, signal: 'B, 1', pin_signal: GPIO_03, direction: OUTPUT, slew_rate: Slow, software_input_on: Disable, open_drain: Disable, speed: MHZ_100,
+    drive_strength: R0_4, pull_keeper_select: Keeper, pull_keeper_enable: Enable, pull_up_down_config: Pull_Down_100K_Ohm, hysteresis_enable: Disable}
+  - {pin_num: '6', peripheral: PWM1, signal: 'A, 2', pin_signal: GPIO_06, direction: OUTPUT, slew_rate: Slow, software_input_on: Disable, open_drain: Disable, speed: MHZ_100,
+    drive_strength: R0_4, pull_keeper_select: Keeper, pull_keeper_enable: Enable, pull_up_down_config: Pull_Down_100K_Ohm, hysteresis_enable: Disable}
+  - {pin_num: '8', peripheral: PWM1, signal: 'B, 2', pin_signal: GPIO_05, direction: OUTPUT, slew_rate: Slow, software_input_on: Disable, open_drain: Disable, speed: MHZ_100,
+    drive_strength: R0_4, pull_keeper_select: Keeper, pull_keeper_enable: Enable, pull_up_down_config: Pull_Down_100K_Ohm, hysteresis_enable: Disable}
+  - {pin_num: '51', peripheral: PWM1, signal: 'FAULT, 0', pin_signal: GPIO_AD_07, slew_rate: Slow, software_input_on: Disable, open_drain: Disable, speed: MHZ_100,
+    drive_strength: R0_4, pull_keeper_select: Keeper, pull_keeper_enable: Enable, pull_up_down_config: Pull_Down_100K_Ohm, hysteresis_enable: Disable}
+  - {pin_num: '49', peripheral: JTAG, signal: TRSTB, pin_signal: GPIO_AD_08, slew_rate: Slow, software_input_on: Disable, open_drain: Disable, speed: MHZ_100, drive_strength: R0_4,
+    pull_keeper_select: Pull, pull_keeper_enable: Enable, pull_up_down_config: Pull_Up_47K_Ohm, hysteresis_enable: Disable}
+  - {pin_num: '44', peripheral: JTAG, signal: TMS, pin_signal: GPIO_AD_13, slew_rate: Slow, software_input_on: Disable, open_drain: Disable, speed: MHZ_100, drive_strength: R0_4,
+    pull_keeper_select: Pull, pull_keeper_enable: Enable, pull_up_down_config: Pull_Up_47K_Ohm, hysteresis_enable: Disable}
+  - {pin_num: '48', peripheral: JTAG, signal: TDO, pin_signal: GPIO_AD_09, slew_rate: Fast, software_input_on: Disable, open_drain: Disable, speed: MHZ_100, drive_strength: R0_6,
+    pull_keeper_select: Keeper, pull_keeper_enable: Enable, pull_up_down_config: Pull_Up_100K_Ohm, hysteresis_enable: Disable}
+  - {pin_num: '47', peripheral: JTAG, signal: TDI, pin_signal: GPIO_AD_10, slew_rate: Slow, software_input_on: Disable, open_drain: Disable, speed: MHZ_100, drive_strength: R0_4,
+    pull_keeper_select: Pull, pull_keeper_enable: Enable, pull_up_down_config: Pull_Up_47K_Ohm, hysteresis_enable: Disable}
+  - {pin_num: '45', peripheral: JTAG, signal: TCK, pin_signal: GPIO_AD_12, slew_rate: Slow, software_input_on: Disable, open_drain: Disable, speed: MHZ_100, drive_strength: R0_4,
+    pull_keeper_select: Pull, pull_keeper_enable: Enable, pull_up_down_config: Pull_Down_100K_Ohm, hysteresis_enable: Disable}
+  - {pin_num: '58', peripheral: GPIO1, signal: 'gpiomux_io, 16', pin_signal: GPIO_AD_02, identifier: IMU_INT0, direction: INPUT, gpio_interrupt: kGPIO_NoIntmode,
+    slew_rate: Slow, software_input_on: Disable, open_drain: Disable, speed: MHZ_100, drive_strength: R0_4, pull_keeper_select: Keeper, pull_keeper_enable: Enable,
+    pull_up_down_config: Pull_Down_100K_Ohm, hysteresis_enable: Disable}
+  - {pin_num: '43', peripheral: GPIO1, signal: 'gpiomux_io, 28', pin_signal: GPIO_AD_14, identifier: IMU_INT1, direction: INPUT, gpio_interrupt: kGPIO_NoIntmode,
+    slew_rate: Slow, software_input_on: Disable, open_drain: Disable, speed: MHZ_100, drive_strength: R0_4, pull_keeper_select: Keeper, pull_keeper_enable: Enable,
+    pull_up_down_config: Pull_Down_100K_Ohm, hysteresis_enable: Disable}
+  - {pin_num: '55', peripheral: PWM1, signal: 'B, 3', pin_signal: GPIO_AD_05, identifier: PWM1_B_3, direction: OUTPUT, slew_rate: Slow, software_input_on: Disable,
+    open_drain: Disable, speed: MHZ_100, drive_strength: R0_4, pull_keeper_select: Keeper, pull_keeper_enable: Enable, pull_up_down_config: Pull_Down_100K_Ohm, hysteresis_enable: Disable}
+  - {pin_num: '52', peripheral: PWM1, signal: 'A, 3', pin_signal: GPIO_AD_06, identifier: PWM1_A_3, direction: OUTPUT, slew_rate: Slow, software_input_on: Disable,
+    open_drain: Disable, speed: MHZ_100, drive_strength: R0_4, pull_keeper_select: Keeper, pull_keeper_enable: Enable, pull_up_down_config: Pull_Down_100K_Ohm, hysteresis_enable: Disable}
  * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS ***********
  */
 
@@ -169,6 +189,21 @@ void BOARD_InitPins(void) {
   XBARA_SetSignalsConnection(XBARA, kXBARA1_InputIomuxXbarInout03, kXBARA1_OutputFlexpwm1Fault1); 
   XBARA_SetSignalsConnection(XBARA, kXBARA1_InputIomuxXbarInout03, kXBARA1_OutputFlexpwm1Fault2); 
   XBARA_SetSignalsConnection(XBARA, kXBARA1_InputIomuxXbarInout03, kXBARA1_OutputFlexpwm1Fault3); 
+  IOMUXC_SetPinConfig(IOMUXC_GPIO_01_LPI2C1_SDA, 0x10A0U); 
+  IOMUXC_SetPinConfig(IOMUXC_GPIO_02_LPI2C1_SCL, 0x10A0U); 
+  IOMUXC_SetPinConfig(IOMUXC_GPIO_03_FLEXPWM1_PWM1_B, 0x10A0U); 
+  IOMUXC_SetPinConfig(IOMUXC_GPIO_05_FLEXPWM1_PWM2_B, 0x10A0U); 
+  IOMUXC_SetPinConfig(IOMUXC_GPIO_06_FLEXPWM1_PWM2_A, 0x10A0U); 
+  IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_02_GPIOMUX_IO16, 0x10A0U); 
+  IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_05_FLEXPWM1_PWM3_B, 0x10A0U); 
+  IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_06_FLEXPWM1_PWM3_A, 0x10A0U); 
+  IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_07_XBAR1_INOUT03, 0x10A0U); 
+  IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_08_JTAG_TRSTB, 0x70A0U); 
+  IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_09_JTAG_TDO, 0x90B1U); 
+  IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_10_JTAG_TDI, 0x70A0U); 
+  IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_12_JTAG_TCK, 0x30A0U); 
+  IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_13_JTAG_TMS, 0x70A0U); 
+  IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_14_GPIOMUX_IO28, 0x10A0U); 
 }
 
 

@@ -165,7 +165,7 @@ instance:
           - pairOperation: 'kPWM_Independent'
           - operationMode: 'kPWM_EdgeAligned'
           - initializationControl: 'kPWM_Initialize_LocalSync'
-          - reloadLogic: 'kPWM_ReloadImmediate'
+          - reloadLogic: 'kPWM_ReloadPwmFullCycle'
           - reloadSelect: 'kPWM_LocalReload'
           - reloadFrequency: 'kPWM_LoadEveryOportunity'
           - forceTrigger: 'kPWM_Force_Local'
@@ -218,7 +218,7 @@ instance:
           - pairOperation: 'kPWM_Independent'
           - operationMode: 'kPWM_EdgeAligned'
           - initializationControl: 'kPWM_Initialize_LocalSync'
-          - reloadLogic: 'kPWM_ReloadImmediate'
+          - reloadLogic: 'kPWM_ReloadPwmFullCycle'
           - reloadSelect: 'kPWM_LocalReload'
           - reloadFrequency: 'kPWM_LoadEveryOportunity'
           - forceTrigger: 'kPWM_Force_Local'
@@ -281,7 +281,7 @@ instance:
           - pairOperation: 'kPWM_Independent'
           - operationMode: 'kPWM_EdgeAligned'
           - initializationControl: 'kPWM_Initialize_LocalSync'
-          - reloadLogic: 'kPWM_ReloadImmediate'
+          - reloadLogic: 'kPWM_ReloadPwmFullCycle'
           - reloadSelect: 'kPWM_LocalReload'
           - reloadFrequency: 'kPWM_LoadEveryOportunity'
           - forceTrigger: 'kPWM_Force_Local'
@@ -385,7 +385,7 @@ pwm_config_t PWM1_SM1_config = {
   .prescale = kPWM_Prescale_Divide_1,
   .pairOperation = kPWM_Independent,
   .initializationControl = kPWM_Initialize_LocalSync,
-  .reloadLogic = kPWM_ReloadImmediate,
+  .reloadLogic = kPWM_ReloadPwmFullCycle,
   .reloadSelect = kPWM_LocalReload,
   .reloadFrequency = kPWM_LoadEveryOportunity,
   .forceTrigger = kPWM_Force_Local,
@@ -408,7 +408,7 @@ pwm_config_t PWM1_SM2_config = {
   .prescale = kPWM_Prescale_Divide_64,
   .pairOperation = kPWM_Independent,
   .initializationControl = kPWM_Initialize_LocalSync,
-  .reloadLogic = kPWM_ReloadImmediate,
+  .reloadLogic = kPWM_ReloadPwmFullCycle,
   .reloadSelect = kPWM_LocalReload,
   .reloadFrequency = kPWM_LoadEveryOportunity,
   .forceTrigger = kPWM_Force_Local,
@@ -438,7 +438,7 @@ pwm_config_t PWM1_SM3_config = {
   .prescale = kPWM_Prescale_Divide_64,
   .pairOperation = kPWM_Independent,
   .initializationControl = kPWM_Initialize_LocalSync,
-  .reloadLogic = kPWM_ReloadImmediate,
+  .reloadLogic = kPWM_ReloadPwmFullCycle,
   .reloadSelect = kPWM_LocalReload,
   .reloadFrequency = kPWM_LoadEveryOportunity,
   .forceTrigger = kPWM_Force_Local,

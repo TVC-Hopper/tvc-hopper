@@ -9,6 +9,7 @@
 
 #include <fslhal/fsl_lpuart_freertos.h>
 #include <fslhal/fsl_lpuart.h>
+#include <fslhal/fsl_xbara.h>
 
 #include "modules/command_control_comms.h"
 
@@ -34,6 +35,12 @@ int main(void)
     BOARD_InitBootPins();
     BOARD_InitBootClocks();
     BOARD_InitDebugConsole();
+
+    XBARA_Init(XBARA);
+    XBARA_SetSignalsConnection(XBARA, kXBARA1_InputLogicHigh, kXBARA1_OutputFlexpwm1Fault0);
+    XBARA_SetSignalsConnection(XBARA, kXBARA1_InputLogicHigh, kXBARA1_OutputFlexpwm1Fault1);
+    XBARA_SetSignalsConnection(XBARA, kXBARA1_InputLogicHigh, kXBARA1_OutputFlexpwm1Fault2);
+    XBARA_SetSignalsConnection(XBARA, kXBARA1_InputLogicHigh, kXBARA1_OutputFlexpwm1Fault3);
 
     // this needs to be after debug console init
     // for some reason

@@ -26,14 +26,21 @@ extern void HwEsc_Task() {
 }
 
 extern void HwEsc_SetOutput(float output) {
+    if (output > MAX_OUTPUT) {
+        output = MAX_OUTPUT;
+    } else if (output < 0.0) {
+        output = 0.0;
+    }
+
     esc_output = output;
-    PWM_UpdatePwmDutycycleHighAccuracy(
+    PWM_UpdatePwmDutycycle(
             ESC_PWM,
             ESC_SM,
             ESC_CH,
             ESC_PWM_MODE,
-            output * (MAX_DUTY_CYCLE / MAX_OUTPUT)
+            output
     );
+    PWM_SetPwmLdok(ESC_PWM, kPWM_Control_Module_1, true);
 }
 
 
