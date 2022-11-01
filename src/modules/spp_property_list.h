@@ -14,7 +14,7 @@
 #include <sppclient/defs.h>
 #include <sppclient/api.h>
 
-#define SPP_PROP_COUNT 15
+#define SPP_PROP_COUNT 16
 
 #define PROP_start_ID ((uint16_t) 0)
 #define PROP_stop_ID ((uint16_t) 1)
@@ -31,6 +31,7 @@
 #define PROP_servo_positions_ID ((uint16_t) 40)
 #define PROP_target_position_ID ((uint16_t) 41)
 #define PROP_param_bounds_ID ((uint16_t) 42)
+#define PROP_raw_lidar_ID ((uint16_t) 50)
 
 
 const SppPropertyDefinition_t* SppGetPropertyList();

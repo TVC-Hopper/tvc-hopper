@@ -17,6 +17,8 @@
 #include "fsl_lpi2c.h"
 #include "fsl_lpi2c_freertos.h"
 #include "fsl_gpio.h"
+#include "fsl_lpspi.h"
+#include "fsl_lpspi_freertos.h"
 
 #if defined(__cplusplus)
 extern "C" {
@@ -113,6 +115,17 @@ extern "C" {
 #define GPIO2_GPIO_COMB_0_15_IRQ_PRIORITY 3
 /* GPIO2 interrupt handler identifier. */
 #define GPIO2_0_15_IRQn GPIO2_Combined_0_15_IRQHandler
+/* BOARD_InitPeripherals defines for LPSPI1 */
+/* Definition of peripheral ID */
+#define LPSPI1_PERIPHERAL LPSPI1
+/* Definition of clock source */
+#define LPSPI1_CLOCK_FREQ 105600000UL
+/* LPSPI1 interrupt vector ID (number). */
+#define LPSPI1_IRQN LPSPI1_IRQn
+/* LPSPI1 interrupt vector priority. */
+#define LPSPI1_IRQ_PRIORITY 4
+/* Transfer buffer size */
+#define LPSPI1_BUFFER_SIZE 10
 
 /***********************************************************************************************************************
  * Global variables
@@ -138,6 +151,11 @@ extern const lpi2c_master_config_t LPI2C1_masterConfig;
 extern lpi2c_master_transfer_t LPI2C1_masterTransfer;
 extern uint8_t LPI2C1_masterBuffer[LPI2C1_MASTER_BUFFER_SIZE];
 extern lpi2c_rtos_handle_t LPI2C1_masterHandle;
+extern const lpspi_master_config_t LPSPI1_config;
+extern lpspi_transfer_t LPSPI1_transfer;
+extern lpspi_rtos_handle_t LPSPI1_handle;
+extern uint8_t LPSPI1_txBuffer[LPSPI1_BUFFER_SIZE];
+extern uint8_t LPSPI1_rxBuffer[LPSPI1_BUFFER_SIZE];
 
 /***********************************************************************************************************************
  * Initialization functions

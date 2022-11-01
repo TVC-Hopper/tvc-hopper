@@ -19,12 +19,6 @@ extern void HwEsc_Init() {
     HwEsc_SetOutput(esc_output);
 }
 
-extern void HwEsc_Task() {
-    while(1) {
-        vTaskSuspend(NULL);
-    }
-}
-
 extern void HwEsc_SetOutput(float output) {
     if (output > MAX_OUTPUT) {
         output = MAX_OUTPUT;

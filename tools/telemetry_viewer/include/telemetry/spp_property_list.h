@@ -18,6 +18,7 @@
 #define PROP_servo_positions_ID ((uint16_t) 40)
 #define PROP_target_position_ID ((uint16_t) 41)
 #define PROP_param_bounds_ID ((uint16_t) 42)
+#define PROP_raw_lidar_ID ((uint16_t) 50)
 
 
 #endif

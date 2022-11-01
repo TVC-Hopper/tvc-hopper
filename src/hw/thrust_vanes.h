@@ -4,7 +4,6 @@
 #include <stdint.h>
 
 extern void HwThrustVane_Init();
-extern void HwThrustVane_Task();
 
 /**
  * Provide 4 float array of positions

@@ -49,9 +49,9 @@ expansion_headers:
     - {id: 2, name: D0, pin_num: '3', pin_signal: GPIO_09}
     - {id: 4, name: D1, pin_num: '2', pin_signal: GPIO_10}
     - {id: 6, name: D2, pin_num: '55', pin_signal: GPIO_AD_05}
-    - {id: 8, name: D3, pin_num: '52', pin_signal: GPIO_AD_06}
+    - {id: 8, name: D3, pin_num: '4', pin_signal: GPIO_08}
     - {id: 10, pin_num: '52', pin_signal: GPIO_AD_06}
-    - {id: 14, name: D6, pin_num: '59', pin_signal: GPIO_AD_01}
+    - {id: 14, name: D6, pin_num: '5', pin_signal: GPIO_07}
     - {id: 16, name: D7, pin_num: '58', pin_signal: GPIO_AD_02}
   - id: C4
     name: J26
@@ -63,12 +63,16 @@ expansion_headers:
     - {id: 10, name: A4, pin_num: '59', pin_signal: GPIO_AD_01}
     - {id: 12, name: A5, pin_num: '58', pin_signal: GPIO_AD_02}
 pin_labels:
+- {pin_num: '5', pin_signal: GPIO_07, label: 'SAI1_TX_SYNC/U10[13]', identifier: SAI1_TX_SYNC;PWM1_B_3}
+- {pin_num: '4', pin_signal: GPIO_08, label: 'SAI1_MCLK/U10[11]', identifier: SAI1_MCLK;PWM1_A_3}
 - {pin_num: '58', pin_signal: GPIO_AD_02, label: 'ADC12_2/J26[12]/J56[16]', identifier: ADC12_2;IMU_INT0}
 - {pin_num: '57', pin_signal: GPIO_AD_03, label: 'LPSPI1_SDI/J57[10]/U27[2]', identifier: LPSPI1_SDI;PWM1_B_2}
 - {pin_num: '56', pin_signal: GPIO_AD_04, label: 'LPSPI1_SDO/J57[8]/U27[5]', identifier: LPSPI1_SDO;PWM_A_2;PWM1_A_2}
 - {pin_num: '55', pin_signal: GPIO_AD_05, label: 'LPSPI1_PCS0/INT1_COMBO/J56[6]/J57[6]/U26[11]/U27[1]', identifier: LPSPI1_PCS0;PWM1_B_3}
 - {pin_num: '52', pin_signal: GPIO_AD_06, label: 'LPSPI1_SCK/INT2_COMBO/J56[8]/J57[12]/U26[9]/U27[6]', identifier: LPSPI1_SCK;PWM1_A_3}
 - {pin_num: '51', pin_signal: GPIO_AD_07, label: 'SAI1_TX_SYNC/U10[13]', identifier: ADC12_3}
+- {pin_num: '13', pin_signal: GPIO_00, label: 'AUD_INT/U10[15]', identifier: AUD_INT;LPSPI_PCS3}
+- {pin_num: '60', pin_signal: GPIO_AD_00, label: USB_OTG1_PWR, identifier: USB_OTG1_PWR;LPSPI_PCS1;LPSPI_PCS2}
 - {pin_num: '43', pin_signal: GPIO_AD_14, label: 'ADC12_6/J26[8]', identifier: ADC12_6;IMU_INT1}
 - {pin_num: '74', pin_signal: GPIO_SD_02, label: 'GPIO_SD_02/BT_CFG[0]/J57[2]/TP34', identifier: GPIO_SD_02;PWM1_A_0}
 power_domains: {NVCC_GPIO: '3.3'}
@@ -131,9 +135,21 @@ BOARD_InitPins:
   - {pin_num: '43', peripheral: GPIO1, signal: 'gpiomux_io, 28', pin_signal: GPIO_AD_14, identifier: IMU_INT1, direction: INPUT, gpio_interrupt: kGPIO_NoIntmode,
     slew_rate: Slow, software_input_on: Disable, open_drain: Disable, speed: MHZ_100, drive_strength: R0_4, pull_keeper_select: Keeper, pull_keeper_enable: Enable,
     pull_up_down_config: Pull_Down_100K_Ohm, hysteresis_enable: Disable}
-  - {pin_num: '55', peripheral: PWM1, signal: 'B, 3', pin_signal: GPIO_AD_05, identifier: PWM1_B_3, direction: OUTPUT, slew_rate: Slow, software_input_on: Disable,
+  - {pin_num: '4', peripheral: PWM1, signal: 'A, 3', pin_signal: GPIO_08, identifier: PWM1_A_3, direction: OUTPUT, slew_rate: Slow, software_input_on: Disable, open_drain: Disable,
+    speed: MHZ_100, drive_strength: R0_4, pull_keeper_select: Keeper, pull_keeper_enable: Enable, pull_up_down_config: Pull_Down_100K_Ohm, hysteresis_enable: Disable}
+  - {pin_num: '52', peripheral: LPSPI1, signal: SCK, pin_signal: GPIO_AD_06, identifier: LPSPI1_SCK, direction: OUTPUT, slew_rate: Slow, software_input_on: Disable,
     open_drain: Disable, speed: MHZ_100, drive_strength: R0_4, pull_keeper_select: Keeper, pull_keeper_enable: Enable, pull_up_down_config: Pull_Down_100K_Ohm, hysteresis_enable: Disable}
-  - {pin_num: '52', peripheral: PWM1, signal: 'A, 3', pin_signal: GPIO_AD_06, identifier: PWM1_A_3, direction: OUTPUT, slew_rate: Slow, software_input_on: Disable,
+  - {pin_num: '57', peripheral: LPSPI1, signal: SDI, pin_signal: GPIO_AD_03, identifier: LPSPI1_SDI, direction: INPUT, slew_rate: Slow, software_input_on: Disable,
+    open_drain: Disable, speed: MHZ_100, drive_strength: R0_4, pull_keeper_select: Keeper, pull_keeper_enable: Enable, pull_up_down_config: Pull_Down_100K_Ohm, hysteresis_enable: Disable}
+  - {pin_num: '56', peripheral: LPSPI1, signal: SDO, pin_signal: GPIO_AD_04, identifier: LPSPI1_SDO, direction: OUTPUT, slew_rate: Slow, software_input_on: Disable,
+    open_drain: Disable, speed: MHZ_100, drive_strength: R0_4, pull_keeper_select: Keeper, pull_keeper_enable: Enable, pull_up_down_config: Pull_Down_100K_Ohm, hysteresis_enable: Disable}
+  - {pin_num: '55', peripheral: LPSPI1, signal: PCS0, pin_signal: GPIO_AD_05, identifier: LPSPI1_PCS0, direction: OUTPUT, slew_rate: Slow, software_input_on: Disable,
+    open_drain: Disable, speed: MHZ_100, drive_strength: R0_4, pull_keeper_select: Keeper, pull_keeper_enable: Enable, pull_up_down_config: Pull_Down_100K_Ohm, hysteresis_enable: Disable}
+  - {pin_num: '5', peripheral: PWM1, signal: 'B, 3', pin_signal: GPIO_07, identifier: PWM1_B_3, direction: OUTPUT, slew_rate: Slow, software_input_on: Disable, open_drain: Disable,
+    speed: MHZ_100, drive_strength: R0_4, pull_keeper_select: Keeper, pull_keeper_enable: Enable, pull_up_down_config: Pull_Down_100K_Ohm, hysteresis_enable: Disable}
+  - {pin_num: '60', peripheral: LPSPI1, signal: PCS2, pin_signal: GPIO_AD_00, identifier: LPSPI_PCS2, direction: OUTPUT, slew_rate: Slow, software_input_on: Disable,
+    open_drain: Disable, speed: MHZ_100, drive_strength: R0_4, pull_keeper_select: Keeper, pull_keeper_enable: Enable, pull_up_down_config: Pull_Down_100K_Ohm, hysteresis_enable: Disable}
+  - {pin_num: '13', peripheral: LPSPI1, signal: PCS3, pin_signal: GPIO_00, identifier: LPSPI_PCS3, direction: OUTPUT, slew_rate: Slow, software_input_on: Disable,
     open_drain: Disable, speed: MHZ_100, drive_strength: R0_4, pull_keeper_select: Keeper, pull_keeper_enable: Enable, pull_up_down_config: Pull_Down_100K_Ohm, hysteresis_enable: Disable}
  * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS ***********
  */
@@ -166,14 +182,20 @@ void BOARD_InitPins(void) {
   /* Initialize GPIO functionality on GPIO_AD_14 (pin 43) */
   GPIO_PinInit(GPIO1, 28U, &IMU_INT1_config);
 
+  IOMUXC_SetPinMux(IOMUXC_GPIO_00_LPSPI1_PCS3, 0U); 
   IOMUXC_SetPinMux(IOMUXC_GPIO_01_LPI2C1_SDA, 0U); 
   IOMUXC_SetPinMux(IOMUXC_GPIO_02_LPI2C1_SCL, 0U); 
   IOMUXC_SetPinMux(IOMUXC_GPIO_03_FLEXPWM1_PWM1_B, 0U); 
   IOMUXC_SetPinMux(IOMUXC_GPIO_05_FLEXPWM1_PWM2_B, 0U); 
   IOMUXC_SetPinMux(IOMUXC_GPIO_06_FLEXPWM1_PWM2_A, 0U); 
+  IOMUXC_SetPinMux(IOMUXC_GPIO_07_FLEXPWM1_PWM3_B, 0U); 
+  IOMUXC_SetPinMux(IOMUXC_GPIO_08_FLEXPWM1_PWM3_A, 0U); 
+  IOMUXC_SetPinMux(IOMUXC_GPIO_AD_00_LPSPI1_PCS2, 0U); 
   IOMUXC_SetPinMux(IOMUXC_GPIO_AD_02_GPIOMUX_IO16, 0U); 
-  IOMUXC_SetPinMux(IOMUXC_GPIO_AD_05_FLEXPWM1_PWM3_B, 0U); 
-  IOMUXC_SetPinMux(IOMUXC_GPIO_AD_06_FLEXPWM1_PWM3_A, 0U); 
+  IOMUXC_SetPinMux(IOMUXC_GPIO_AD_03_LPSPI1_SDI, 0U); 
+  IOMUXC_SetPinMux(IOMUXC_GPIO_AD_04_LPSPI1_SDO, 0U); 
+  IOMUXC_SetPinMux(IOMUXC_GPIO_AD_05_LPSPI1_PCS0, 0U); 
+  IOMUXC_SetPinMux(IOMUXC_GPIO_AD_06_LPSPI1_SCK, 0U); 
   IOMUXC_SetPinMux(IOMUXC_GPIO_AD_07_XBAR1_INOUT03, 0U); 
   IOMUXC_SetPinMux(IOMUXC_GPIO_AD_08_JTAG_TRSTB, 0U); 
   IOMUXC_SetPinMux(IOMUXC_GPIO_AD_09_JTAG_TDO, 0U); 
@@ -189,14 +211,20 @@ void BOARD_InitPins(void) {
   XBARA_SetSignalsConnection(XBARA, kXBARA1_InputIomuxXbarInout03, kXBARA1_OutputFlexpwm1Fault1); 
   XBARA_SetSignalsConnection(XBARA, kXBARA1_InputIomuxXbarInout03, kXBARA1_OutputFlexpwm1Fault2); 
   XBARA_SetSignalsConnection(XBARA, kXBARA1_InputIomuxXbarInout03, kXBARA1_OutputFlexpwm1Fault3); 
+  IOMUXC_SetPinConfig(IOMUXC_GPIO_00_LPSPI1_PCS3, 0x10A0U); 
   IOMUXC_SetPinConfig(IOMUXC_GPIO_01_LPI2C1_SDA, 0x10A0U); 
   IOMUXC_SetPinConfig(IOMUXC_GPIO_02_LPI2C1_SCL, 0x10A0U); 
   IOMUXC_SetPinConfig(IOMUXC_GPIO_03_FLEXPWM1_PWM1_B, 0x10A0U); 
   IOMUXC_SetPinConfig(IOMUXC_GPIO_05_FLEXPWM1_PWM2_B, 0x10A0U); 
   IOMUXC_SetPinConfig(IOMUXC_GPIO_06_FLEXPWM1_PWM2_A, 0x10A0U); 
+  IOMUXC_SetPinConfig(IOMUXC_GPIO_07_FLEXPWM1_PWM3_B, 0x10A0U); 
+  IOMUXC_SetPinConfig(IOMUXC_GPIO_08_FLEXPWM1_PWM3_A, 0x10A0U); 
+  IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_00_LPSPI1_PCS2, 0x10A0U); 
   IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_02_GPIOMUX_IO16, 0x10A0U); 
-  IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_05_FLEXPWM1_PWM3_B, 0x10A0U); 
-  IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_06_FLEXPWM1_PWM3_A, 0x10A0U); 
+  IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_03_LPSPI1_SDI, 0x10A0U); 
+  IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_04_LPSPI1_SDO, 0x10A0U); 
+  IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_05_LPSPI1_PCS0, 0x10A0U); 
+  IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_06_LPSPI1_SCK, 0x10A0U); 
   IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_07_XBAR1_INOUT03, 0x10A0U); 
   IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_08_JTAG_TRSTB, 0x70A0U); 
   IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_09_JTAG_TDO, 0x90B1U); 

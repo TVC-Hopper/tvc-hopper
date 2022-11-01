@@ -61,11 +61,7 @@ void GPIO1_GPIO_COMB_0_15_IRQHANDLER(void) {
 void GPIO1_GPIO_COMB_16_31_IRQHANDLER(void) {
     uint32_t pins_flags = GPIO_GetPinsInterruptFlags(GPIO1); 
 
-    if ((pins_flags >> IMU_ACCEL_INTTERRUPT_GPIO) & 0b1) {
-        HwImu_ReleaseAccTaskFromISR();
-    } else if ((pins_flags >> IMU_GYRO_INTTERRUPT_GPIO) & 0b1) {
-        HwImu_ReleaseAccTaskFromISR();
-    }
+    // code goes here
 
     GPIO_ClearPinsInterruptFlags(GPIO1, pins_flags); 
 

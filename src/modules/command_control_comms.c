@@ -15,6 +15,7 @@
 #include "app_hal_xconnect.h"
 
 #include "hw/imu.h"
+#include "hw/lidar.h"
 #include "hw/thrust_vanes.h"
 
 
@@ -172,6 +173,12 @@ static SPP_STATUS_T GetValue(uint16_t id, void* value, void* instance_data) {
         {
             break;
         }
+        case PROP_raw_lidar_ID:
+        {
+            uint32_t dist = HwLidar_GetDistance();
+            memcpy((uint8_t*)value, &dist, sizeof(dist));
+            break;
+        }
         default:
         {
             return SPP_STATUS_UNKNOWN_PROPERTY;
@@ -199,13 +206,10 @@ static void GetTelemetry(uint8_t* value) {
         value_f[idx++] = placeholder;
         value_f[idx++] = placeholder;
 
-        float x, y, z;
-        HwImu_GetAccValues(&x, &y, &z);
-
         // accel
-        value_f[idx++] = x;
-        value_f[idx++] = y;
-        value_f[idx++] = z;
+        value_f[idx++] = placeholder;
+        value_f[idx++] = placeholder;
+        value_f[idx++] = placeholder;
 
         // att
         value_f[idx++] = placeholder;
@@ -214,7 +218,6 @@ static void GetTelemetry(uint8_t* value) {
 
         // alt
         value_f[idx++] = placeholder;
-
     }
 }
 

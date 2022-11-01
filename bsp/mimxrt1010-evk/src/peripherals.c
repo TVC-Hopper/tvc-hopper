@@ -129,6 +129,7 @@ instance:
       - 1: []
       - 2: []
       - 3: []
+      - 4: []
     - interrupts: []
  * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS **********/
 /* clang-format on */
@@ -692,6 +693,87 @@ static void GPIO2_init(void) {
 }
 
 /***********************************************************************************************************************
+ * LPSPI1 initialization code
+ **********************************************************************************************************************/
+/* clang-format off */
+/* TEXT BELOW IS USED AS SETTING FOR TOOLS *************************************
+instance:
+- name: 'LPSPI1'
+- type: 'lpspi'
+- mode: 'freertos'
+- custom_name_enabled: 'false'
+- type_id: 'lpspi_6e21a1e0a09f0a012d683c4f91752db8'
+- functional_group: 'BOARD_InitPeripherals'
+- peripheral: 'LPSPI1'
+- config_sets:
+  - transfer:
+    - config:
+      - transmitBuffer:
+        - init: 'true'
+      - receiveBuffer:
+        - init: 'true'
+      - dataSize: '10'
+      - enableTransferStruct: 'defined'
+      - flags: 'kLPSPI_MasterPcs0'
+  - main:
+    - mode: 'kLPSPI_Master'
+    - clockSource: 'LpspiClock'
+    - clockSourceFreq: 'BOARD_BootClockRUN'
+    - master:
+      - baudRate: '500000'
+      - bitsPerFrame: '8'
+      - cpol: 'kLPSPI_ClockPolarityActiveHigh'
+      - cpha: 'kLPSPI_ClockPhaseFirstEdge'
+      - direction: 'kLPSPI_MsbFirst'
+      - pcsToSckDelayInNanoSec: '1000'
+      - lastSckToPcsDelayInNanoSec: '1000'
+      - betweenTransferDelayInNanoSec: '1000'
+      - whichPcs: 'kLPSPI_Pcs0'
+      - pcsActiveHighOrLow: 'kLPSPI_PcsActiveLow'
+      - pinCfg: 'kLPSPI_SdiInSdoOut'
+      - dataOutConfig: 'kLpspiDataOutRetained'
+    - allPcsPolarityEnable: 'false'
+    - allPcsPolarity:
+      - kLPSPI_Pcs1Active: 'kLPSPI_PcsActiveLow'
+      - kLPSPI_Pcs2Active: 'kLPSPI_PcsActiveLow'
+      - kLPSPI_Pcs3Active: 'kLPSPI_PcsActiveLow'
+    - interrupt_priority:
+      - IRQn: 'LPSPI1_IRQn'
+      - enable_priority: 'true'
+      - priority: '4'
+ * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS **********/
+/* clang-format on */
+const lpspi_master_config_t LPSPI1_config = {
+  .baudRate = 500000UL,
+  .bitsPerFrame = 8UL,
+  .cpol = kLPSPI_ClockPolarityActiveHigh,
+  .cpha = kLPSPI_ClockPhaseFirstEdge,
+  .direction = kLPSPI_MsbFirst,
+  .pcsToSckDelayInNanoSec = 1000UL,
+  .lastSckToPcsDelayInNanoSec = 1000UL,
+  .betweenTransferDelayInNanoSec = 1000UL,
+  .whichPcs = kLPSPI_Pcs0,
+  .pcsActiveHighOrLow = kLPSPI_PcsActiveLow,
+  .pinCfg = kLPSPI_SdiInSdoOut,
+  .dataOutConfig = kLpspiDataOutRetained
+};
+lpspi_transfer_t LPSPI1_transfer = {
+  .txData = LPSPI1_txBuffer,
+  .rxData = LPSPI1_rxBuffer,
+  .dataSize = 10,
+  .configFlags = kLPSPI_MasterPcs0
+};
+lpspi_rtos_handle_t LPSPI1_handle;
+uint8_t LPSPI1_txBuffer[LPSPI1_BUFFER_SIZE];
+uint8_t LPSPI1_rxBuffer[LPSPI1_BUFFER_SIZE];
+
+static void LPSPI1_init(void) {
+  /* Interrupt vector LPSPI1_IRQn priority settings in the NVIC. */
+  NVIC_SetPriority(LPSPI1_IRQN, LPSPI1_IRQ_PRIORITY);
+  LPSPI_RTOS_Init(&LPSPI1_handle, LPSPI1_PERIPHERAL, &LPSPI1_config, LPSPI1_CLOCK_FREQ);
+}
+
+/***********************************************************************************************************************
  * Initialization functions
  **********************************************************************************************************************/
 void BOARD_InitPeripherals(void)
@@ -702,6 +784,7 @@ void BOARD_InitPeripherals(void)
   LPI2C1_init();
   GPIO1_init();
   GPIO2_init();
+  LPSPI1_init();
 }
 
 /***********************************************************************************************************************

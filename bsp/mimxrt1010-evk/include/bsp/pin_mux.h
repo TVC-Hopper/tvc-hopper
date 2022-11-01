@@ -103,17 +103,47 @@ void BOARD_InitBootPins(void);
 #define BOARD_INITPINS_IMU_INT1_SIGNAL                                gpiomux_io   /*!< Signal name */
 #define BOARD_INITPINS_IMU_INT1_CHANNEL                                      28U   /*!< Signal channel */
 
+/* GPIO_08 (number 4), SAI1_MCLK/U10[11] */
+/* Routed pin properties */
+#define BOARD_INITPINS_PWM1_A_3_PERIPHERAL                                  PWM1   /*!< Peripheral name */
+#define BOARD_INITPINS_PWM1_A_3_SIGNAL                                         A   /*!< Signal name */
+#define BOARD_INITPINS_PWM1_A_3_CHANNEL                                       3U   /*!< Signal channel */
+
+/* GPIO_AD_06 (number 52), LPSPI1_SCK/INT2_COMBO/J56[8]/J57[12]/U26[9]/U27[6] */
+/* Routed pin properties */
+#define BOARD_INITPINS_LPSPI1_SCK_PERIPHERAL                              LPSPI1   /*!< Peripheral name */
+#define BOARD_INITPINS_LPSPI1_SCK_SIGNAL                                     SCK   /*!< Signal name */
+
+/* GPIO_AD_03 (number 57), LPSPI1_SDI/J57[10]/U27[2] */
+/* Routed pin properties */
+#define BOARD_INITPINS_LPSPI1_SDI_PERIPHERAL                              LPSPI1   /*!< Peripheral name */
+#define BOARD_INITPINS_LPSPI1_SDI_SIGNAL                                     SDI   /*!< Signal name */
+
+/* GPIO_AD_04 (number 56), LPSPI1_SDO/J57[8]/U27[5] */
+/* Routed pin properties */
+#define BOARD_INITPINS_LPSPI1_SDO_PERIPHERAL                              LPSPI1   /*!< Peripheral name */
+#define BOARD_INITPINS_LPSPI1_SDO_SIGNAL                                     SDO   /*!< Signal name */
+
 /* GPIO_AD_05 (number 55), LPSPI1_PCS0/INT1_COMBO/J56[6]/J57[6]/U26[11]/U27[1] */
+/* Routed pin properties */
+#define BOARD_INITPINS_LPSPI1_PCS0_PERIPHERAL                             LPSPI1   /*!< Peripheral name */
+#define BOARD_INITPINS_LPSPI1_PCS0_SIGNAL                                   PCS0   /*!< Signal name */
+
+/* GPIO_07 (number 5), SAI1_TX_SYNC/U10[13] */
 /* Routed pin properties */
 #define BOARD_INITPINS_PWM1_B_3_PERIPHERAL                                  PWM1   /*!< Peripheral name */
 #define BOARD_INITPINS_PWM1_B_3_SIGNAL                                         B   /*!< Signal name */
 #define BOARD_INITPINS_PWM1_B_3_CHANNEL                                       3U   /*!< Signal channel */
 
-/* GPIO_AD_06 (number 52), LPSPI1_SCK/INT2_COMBO/J56[8]/J57[12]/U26[9]/U27[6] */
+/* GPIO_AD_00 (number 60), USB_OTG1_PWR */
 /* Routed pin properties */
-#define BOARD_INITPINS_PWM1_A_3_PERIPHERAL                                  PWM1   /*!< Peripheral name */
-#define BOARD_INITPINS_PWM1_A_3_SIGNAL                                         A   /*!< Signal name */
-#define BOARD_INITPINS_PWM1_A_3_CHANNEL                                       3U   /*!< Signal channel */
+#define BOARD_INITPINS_LPSPI_PCS2_PERIPHERAL                              LPSPI1   /*!< Peripheral name */
+#define BOARD_INITPINS_LPSPI_PCS2_SIGNAL                                    PCS2   /*!< Signal name */
+
+/* GPIO_00 (number 13), AUD_INT/U10[15] */
+/* Routed pin properties */
+#define BOARD_INITPINS_LPSPI_PCS3_PERIPHERAL                              LPSPI1   /*!< Peripheral name */
+#define BOARD_INITPINS_LPSPI_PCS3_SIGNAL                                    PCS3   /*!< Signal name */
 
 /*!
  * @brief Configures pin routing and optionally pin electrical features.

@@ -4,7 +4,6 @@
 #include <stdint.h>
 
 extern void HwEsc_Init();
-extern void HwEsc_Task();
 
 extern void HwEsc_SetOutput(float output);
 extern float HwEsc_GetOutput();

@@ -127,4 +127,17 @@ size = 36
 writeable = true
 readable = true
 
+[[props]]
+name = "raw_lidar"
+id = 50
+type = "U32"
+size = 4
+readable = true
+
+
+
+
+
+
+
 

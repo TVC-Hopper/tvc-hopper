@@ -130,6 +130,14 @@ static const SppPropertyDefinition_t property_list[SPP_PROP_COUNT] = {
         .name        = "param_bounds\0",
         .name_length = 13,
     },
+    {
+        .id          = PROP_raw_lidar_ID,
+        .type        = SPP_PROP_T_U32,
+        .size        = 4,
+        .flags       = {SPP_FLAG_WRITEABLE},
+        .name        = "raw_lidar\0",
+        .name_length = 10,
+    },
 };
 
 

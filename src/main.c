@@ -83,44 +83,4 @@ static void CreateTasks() {
     {
         while (1) {}
     }
-
-    if (xTaskCreate(HwImu_GyroTask,
-                        "hw_imu_gyro",
-                        configMINIMAL_STACK_SIZE + 128,
-                        NULL,
-                        PRIORITY_IMU_GYRO,
-                        NULL) != pdPASS)
-    {
-        while (1) {}
-    }
-
-    if (xTaskCreate(HwImu_AccTask,
-                        "hw_imu_acc",
-                        configMINIMAL_STACK_SIZE + 128,
-                        NULL,
-                        PRIORITY_IMU_ACC,
-                        NULL) != pdPASS)
-    {
-        while (1) {}
-    }
-
-    if (xTaskCreate(HwThrustVane_Task,
-                        "hw_thrustvanes",
-                        configMINIMAL_STACK_SIZE + 128,
-                        NULL,
-                        PRIORITY_THRUST_VANES,
-                        NULL) != pdPASS)
-    {
-        while (1) {}
-    }
-
-    if (xTaskCreate(HwEsc_Task,
-                        "hw_esc",
-                        configMINIMAL_STACK_SIZE + 128,
-                        NULL,
-                        PRIORITY_THRUST_VANES,
-                        NULL) != pdPASS)
-    {
-        while (1) {}
-    }
 }
