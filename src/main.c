@@ -51,7 +51,9 @@ int main(void)
     UartListener_Init();
     CommandControlComms_Init();
 
-//    HwImu_Init();
+    // taskless wrappers for drivers
+    HwImu_Init();
+    HwLidar_Init();
     HwEsc_Init();
     HwThrustVane_Init();
 
