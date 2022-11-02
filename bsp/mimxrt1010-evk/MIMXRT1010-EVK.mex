@@ -96,7 +96,7 @@
                            <pin id="4" pin_num="2" pin_signal="GPIO_10" name="D1"/>
                            <pin id="6" pin_num="55" pin_signal="GPIO_AD_05" name="D2"/>
                            <pin id="8" pin_num="4" pin_signal="GPIO_08" name="D3"/>
-                           <pin id="10" pin_num="52" pin_signal="GPIO_AD_06"/>
+                           <pin id="10" pin_num="4" pin_signal="GPIO_08"/>
                            <pin id="14" pin_num="5" pin_signal="GPIO_07" name="D6"/>
                            <pin id="16" pin_num="58" pin_signal="GPIO_AD_02" name="D7"/>
                         </pins>

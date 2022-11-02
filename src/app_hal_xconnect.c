@@ -83,12 +83,12 @@ extern StcpStatus_t XCCb_StcpSendPacket(void* buffer, uint16_t len, void* instan
     }
 }
 
-extern uint8_t XCCb_I2CWrite(uint8_t address, uint8_t* data, uint16_t size) {
+extern uint8_t XCCb_I2CWrite(uint8_t address, uint8_t subaddress, uint8_t* data, uint16_t size) {
     xSemaphoreTake(i2c_mx, 0xFFFF);
     
     LPI2C1_masterTransfer.slaveAddress = address;
     LPI2C1_masterTransfer.direction = kLPI2C_Write;
-    LPI2C1_masterTransfer.subaddress = 0; // TODO
+    LPI2C1_masterTransfer.subaddress = subaddress;
     LPI2C1_masterTransfer.data = data;
     LPI2C1_masterTransfer.dataSize = size;
 
@@ -99,12 +99,12 @@ extern uint8_t XCCb_I2CWrite(uint8_t address, uint8_t* data, uint16_t size) {
     return 0;
 }
 
-extern uint8_t XCCb_I2CRead(uint8_t address, uint8_t* data, uint16_t size) {
+extern uint8_t XCCb_I2CRead(uint8_t address, uint8_t subaddress, uint8_t* data, uint16_t size) {
     xSemaphoreTake(i2c_mx, 0xFFFF);
 
     LPI2C1_masterTransfer.slaveAddress = address;
     LPI2C1_masterTransfer.direction = kLPI2C_Read;
-    LPI2C1_masterTransfer.subaddress = 0; // TODO
+    LPI2C1_masterTransfer.subaddress = subaddress;
     LPI2C1_masterTransfer.data = data;
     LPI2C1_masterTransfer.dataSize = size;
 

@@ -1,6 +1,6 @@
 add_library(drivers STATIC
-    src/imu.c
-    src/lidar.c
+    src/bno085_i2c.c
+    src/tfl_i2c.c
 )
 
 target_include_directories(drivers

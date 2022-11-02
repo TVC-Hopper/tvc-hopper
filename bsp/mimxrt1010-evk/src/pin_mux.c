@@ -50,7 +50,7 @@ expansion_headers:
     - {id: 4, name: D1, pin_num: '2', pin_signal: GPIO_10}
     - {id: 6, name: D2, pin_num: '55', pin_signal: GPIO_AD_05}
     - {id: 8, name: D3, pin_num: '4', pin_signal: GPIO_08}
-    - {id: 10, pin_num: '52', pin_signal: GPIO_AD_06}
+    - {id: 10, pin_num: '4', pin_signal: GPIO_08}
     - {id: 14, name: D6, pin_num: '5', pin_signal: GPIO_07}
     - {id: 16, name: D7, pin_num: '58', pin_signal: GPIO_AD_02}
   - id: C4
