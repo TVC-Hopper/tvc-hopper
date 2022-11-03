@@ -140,6 +140,12 @@ void BOARD_InitBootPins(void);
 #define BOARD_INITPINS_LPSPI_PCS3_PERIPHERAL                              LPSPI1   /*!< Peripheral name */
 #define BOARD_INITPINS_LPSPI_PCS3_SIGNAL                                    PCS3   /*!< Signal name */
 
+/* GPIO_AD_01 (number 59), ADC12_1/J26[10]/J56[14] */
+/* Routed pin properties */
+#define BOARD_INITPINS_ADC12_1_PERIPHERAL                                   ADC1   /*!< Peripheral name */
+#define BOARD_INITPINS_ADC12_1_SIGNAL                                         IN   /*!< Signal name */
+#define BOARD_INITPINS_ADC12_1_CHANNEL                                        1U   /*!< Signal channel */
+
 /*!
  * @brief Configures pin routing and optionally pin electrical features.
  *
