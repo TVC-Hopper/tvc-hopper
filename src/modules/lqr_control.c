@@ -1,60 +1,66 @@
-#include "lqr_control.h"
+#include "modules/lqr_control.h"
+
 #include <freertos/FreeRTOS.h>
-#include <freertos/task.h>
+#include <freertos/semphr.h>
 
 #include "hw/thrust_vanes.h"
 #include "hw/esc.h"
-#include "hw/lidar.h"
+#include "modules/controls_inputs.h"
 
-// Had to change include path for portmacro.h in portable.h and add the portable folder to the .gitignore
+extern void HoverControl_Init() {
+    control_status_t hover_status = CONTROL_STATUS_STATIONARY;
+
+    // TODO set reference
+}
 
 extern void HoverControl_Task(void* task_args) {
     uint32_t xLastWakeTime = xTaskGetTickCount();
     for(;;) {        
-        // (1) get state
-        // get sensor readings
-        // estimator (if used) is run in another task
+        float ref[STATE_VECTOR_SIZE] = {0};
+        float curr_state[STATE_VECTOR_SIZE] = {0};
+        float error[STATE_VECTOR_SIZE][1] = {0};
 
-        float ref[STATE_VECTOR_SIZE][1];
-        float curr_state[STATE_VECTOR_SIZE][1];
+        // TODO get last base station command to set reference
 
-        // (2) get error
-        // get refernce
-        // error = ref - current state
+        ControlsInputs_GetIMU(&curr_state[STATE_IDX_GX]); // FIXME 
 
-        float error[STATE_VECTOR_SIZE][1];
-        MatrixSubtract(error, ref, curr_state, STATE_VECTOR_SIZE, 1, STATE_VECTOR_SIZE, 1);
+        ControlsInputs_GetLidar(&curr_state[STATE_IDX_Z]); 
+        curr_state[STATE_IDX_Z] /= 100; // FIXME convert cm to m in getter instead
 
-        // (3) matrix multiply
+        Vector_Subtract(error, ref, curr_state, STATE_VECTOR_SIZE, STATE_VECTOR_SIZE);
 
-        // ControlsInputs_NotifyStart();
+        ControlsInputs_NotifyStart();
+
         float actuator_input[ACTUATION_VECTOR_SIZE];
-        if (MatrixMultiply(actuator_input, K_hover, error, STATE_VECTOR_SIZE, ACTUATION_VECTOR_SIZE, STATE_VECTOR_SIZE, 1) == HOVCTRL_STATUS_ERROR) {
+        /*
+        if (HOVCTRL_STATUS_ERROR == Matrix_Multiply(actuator_input, K_hover, error, ACTUATION_VECTOR_SIZE, STATE_VECTOR_SIZE, STATE_VECTOR_SIZE, 1)) {
             HwThrustVane_GetPositions(actuator_input);
             actuator_input[4] = HwEsc_GetOutput();
-        } // if matrix multiply is not successful, return error status and keep previous actuation values
+        } // if matrix multiply is not successful, keep previous actuation values
+        */
+        if (HOVCTRL_STATUS_OK == Matrix_Multiply(actuator_input, K_hover, error, ACTUATION_VECTOR_SIZE, STATE_VECTOR_SIZE, STATE_VECTOR_SIZE, 1)) {
+            // TODO filter actuation?
+            HwThrustVane_SetPositions(actuator_input);
+            HwEsc_SetOutput(actuator_input[4]); // FIXME verify units
+        }
 
-        // (4) send actuation signals
-        // TODO filter actuation?
+        xTaskDelayUntil(&xLastWakeTime, CONTROL_LOOP_INTERVAL * portTICK_PERIOD_MS);
 
-        HwThrustVane_SetPositions(actuator_input);
-        HwEsc_SetOutput(actuator_input[4]);
-
-        xTaskDelayUntil(&xLastWakeTime, 5 * portTICK_PERIOD_MS); // 200Hz
+        // TODO telemetry
     }
 }
 
-HOVCTRL_STATUS_T MatrixMultiply(float** Result, float** A, float** B, uint32_t A_rows, uint32_t A_cols, uint32_t B_rows, uint32_t B_cols) {
-
-    if (A_cols != B_rows) {
+HOVCTRL_STATUS_T Matrix_Multiply(float* Result, float** A, float** B, uint32_t A_rows, uint32_t A_cols, uint32_t B_rows, uint32_t B_cols) {
+    // Return float* to make result compatible with setters
+    if (A_cols != B_rows || B_cols != 1) {
         return HOVCTRL_STATUS_ERROR;
     } 
 
     for (uint32_t r = 0; r < A_rows; ++r) {
         for (uint32_t c = 0; c < B_cols; ++c) {
-            Result[r][c] = 0;
+            Result[r] = 0;
             for (uint32_t i = 0; i < A_cols; ++i) {
-                Result[r][c] += A[r][i] * B[i][c];
+                Result[r] += A[r][i] * B[i][c];
             }
         }
     }
@@ -62,17 +68,19 @@ HOVCTRL_STATUS_T MatrixMultiply(float** Result, float** A, float** B, uint32_t A
     return HOVCTRL_STATUS_OK;
 }
 
-HOVCTRL_STATUS_T MatrixSubtract(float** Result, float** A, float** B, uint32_t A_rows, uint32_t A_cols, uint32_t B_rows, uint32_t B_cols) {
-
-    if (A_rows != B_rows || A_cols != B_cols) {
+HOVCTRL_STATUS_T Vector_Subtract(float** Result, float** A, float** B, uint32_t A_size, uint32_t B_size) {
+    // Return float** to make result compatible with Matrix_Multiply()
+    if (A_size != B_size) {
         return HOVCTRL_STATUS_ERROR;
     }
 
-    for (uint32_t r = 0; r < A_rows; ++r) {
-        for (uint32_t c = 0; c < A_cols; ++c) {
-            Result[r][c] = A[r][c] - B[r][c];
-        }
+    for (uint32_t i = 0; i < A_size; ++i) {
+        Result[i][0] = A[i][0] - B[i][0];
     }
 
     return HOVCTRL_STATUS_OK;
+}
+
+void SetReference() {
+
 }
