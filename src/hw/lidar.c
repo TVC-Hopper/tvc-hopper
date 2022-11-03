@@ -1,5 +1,8 @@
 #include "lidar.h"
 
+#include <freertos/FreeRTOS.h>
+#include <freertos/semphr.h>
+
 #include <drivers/tfl_i2c.h>
 
 #include "app_hal_xconnect.h"
@@ -7,6 +10,7 @@
 TfLidar_t lidar;
 
 extern void HwLidar_Init() {
+
     TfLidarInitParams_t ip;
     ip.address = TFL_DEFAULT_I2C;
     ip.onWrite = XCCb_I2CWrite;

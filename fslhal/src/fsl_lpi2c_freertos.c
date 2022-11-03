@@ -65,6 +65,7 @@ status_t LPI2C_RTOS_Init(lpi2c_rtos_handle_t *handle,
 
     handle->base = base;
 
+    LPI2C_MasterReset(handle->base);
     LPI2C_MasterInit(handle->base, masterConfig, srcClock_Hz);
     LPI2C_MasterTransferCreateHandle(base, &handle->drv_handle, LPI2C_RTOS_Callback, (void *)handle);
 

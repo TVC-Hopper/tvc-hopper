@@ -27,6 +27,7 @@ add_executable(${PROJECT_NAME}.elf
 
     src/modules/command_control_comms.c
     src/modules/spp_property_list.c
+    src/modules/control_inputs.c
 
     src/hw/imu.c
     src/hw/thrust_vanes.c

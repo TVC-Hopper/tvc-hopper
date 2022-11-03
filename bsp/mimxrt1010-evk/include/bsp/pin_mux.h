@@ -37,11 +37,6 @@ extern "C" {
  */
 void BOARD_InitBootPins(void);
 
-/* GPIO_02 (number 11), I2C1_SCL/U10[17]/J57[20]/U26[4] */
-/* Routed pin properties */
-#define BOARD_INITPINS_I2C1_SCL_PERIPHERAL                                LPI2C1   /*!< Peripheral name */
-#define BOARD_INITPINS_I2C1_SCL_SIGNAL                                       SCL   /*!< Signal name */
-
 /* GPIO_03 (number 10), SAI1_RXD0/U10[16] */
 /* Routed pin properties */
 #define BOARD_INITPINS_SAI1_RXD0_PERIPHERAL                                 PWM1   /*!< Peripheral name */
@@ -233,16 +228,6 @@ void BOARD_InitLEDPins(void);
  *
  */
 void BOARD_InitBUTTONPins(void);
-
-/* GPIO_02 (number 11), I2C1_SCL/U10[17]/J57[20]/U26[4] */
-/* Routed pin properties */
-#define BOARD_INITCOMBO_SENSORPINS_I2C1_SCL_PERIPHERAL                    LPI2C1   /*!< Peripheral name */
-#define BOARD_INITCOMBO_SENSORPINS_I2C1_SCL_SIGNAL                           SCL   /*!< Signal name */
-
-/* GPIO_01 (number 12), I2C1_SDA/U10[18]/J57[18]/U26[6] */
-/* Routed pin properties */
-#define BOARD_INITCOMBO_SENSORPINS_I2C1_SDA_PERIPHERAL                    LPI2C1   /*!< Peripheral name */
-#define BOARD_INITCOMBO_SENSORPINS_I2C1_SDA_SIGNAL                           SDA   /*!< Signal name */
 
 /*!
  * @brief Configures pin routing and optionally pin electrical features.
