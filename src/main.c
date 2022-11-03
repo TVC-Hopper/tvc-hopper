@@ -13,6 +13,8 @@
 
 #include "modules/command_control_comms.h"
 
+#include "lqr_control.h"
+
 #include "hw/imu.h"
 #include "hw/esc.h"
 #include "hw/lidar.h"
@@ -26,6 +28,7 @@
 #define PRIORITY_IMU_GYRO                   5
 #define PRIORITY_COMMAND_CONTROL_COMMS      2
 #define PROIRITY_UART_LISTENER              1
+#define PRIORITY_HOVER_CONTROL              4 // FIXME
 
 static void CreateTasks();
 
@@ -81,6 +84,16 @@ static void CreateTasks() {
                         configMINIMAL_STACK_SIZE + 128,
                         NULL,
                         PROIRITY_UART_LISTENER,
+                        NULL) != pdPASS)
+    {
+        while (1) {}
+    }
+
+    if(xTaskCreate(HoverControl_Task,
+                        "hov_ctrl",
+                        configMINIMAL_STACK_SIZE + 128,
+                        NULL,
+                        PRIORITY_HOVER_CONTROL,
                         NULL) != pdPASS)
     {
         while (1) {}
