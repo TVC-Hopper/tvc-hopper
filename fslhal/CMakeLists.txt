@@ -1,5 +1,6 @@
 
 add_library(fslhal
+    src/fsl_adc.c
     src/fsl_assert.c
     src/fsl_clock.c
     src/fsl_debug_console.c

@@ -15,6 +15,7 @@
 #include "app_hal_xconnect.h"
 
 #include "hw/imu.h"
+#include "hw/batt_monitor.h"
 #include "hw/lidar.h"
 #include "hw/thrust_vanes.h"
 
@@ -151,7 +152,7 @@ static SPP_STATUS_T GetValue(uint16_t id, void* value, void* instance_data) {
         }
         case PROP_battery_v_ID:
         {
-            float v = 22.11;
+            float v = BattMon_GetVoltage();
             memcpy((uint8_t*)value, &v, sizeof(v));
             break;
         }

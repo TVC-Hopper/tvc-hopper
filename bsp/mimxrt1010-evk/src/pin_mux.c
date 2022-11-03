@@ -148,8 +148,6 @@ BOARD_InitPins:
     open_drain: Disable, speed: MHZ_100, drive_strength: R0_4, pull_keeper_select: Keeper, pull_keeper_enable: Enable, pull_up_down_config: Pull_Down_100K_Ohm, hysteresis_enable: Disable}
   - {pin_num: '13', peripheral: LPSPI1, signal: PCS3, pin_signal: GPIO_00, identifier: LPSPI_PCS3, direction: OUTPUT, slew_rate: Slow, software_input_on: Disable,
     open_drain: Disable, speed: MHZ_100, drive_strength: R0_4, pull_keeper_select: Keeper, pull_keeper_enable: Enable, pull_up_down_config: Pull_Down_100K_Ohm, hysteresis_enable: Disable}
-  - {pin_num: '59', peripheral: ADC1, signal: 'IN, 1', pin_signal: GPIO_AD_01, slew_rate: Slow, software_input_on: Disable, open_drain: Disable, speed: MHZ_100, drive_strength: R0_4,
-    pull_keeper_select: Keeper, pull_keeper_enable: Enable, pull_up_down_config: Pull_Down_100K_Ohm, hysteresis_enable: Disable}
  * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS ***********
  */
 
@@ -188,7 +186,6 @@ void BOARD_InitPins(void) {
   IOMUXC_SetPinMux(IOMUXC_GPIO_07_FLEXPWM1_PWM3_B, 0U); 
   IOMUXC_SetPinMux(IOMUXC_GPIO_08_FLEXPWM1_PWM3_A, 0U); 
   IOMUXC_SetPinMux(IOMUXC_GPIO_AD_00_LPSPI1_PCS2, 0U); 
-  IOMUXC_SetPinMux(IOMUXC_GPIO_AD_01_GPIOMUX_IO15, 0U); 
   IOMUXC_SetPinMux(IOMUXC_GPIO_AD_02_GPIOMUX_IO16, 0U); 
   IOMUXC_SetPinMux(IOMUXC_GPIO_AD_03_LPSPI1_SDI, 0U); 
   IOMUXC_SetPinMux(IOMUXC_GPIO_AD_04_LPSPI1_SDO, 0U); 
@@ -216,7 +213,6 @@ void BOARD_InitPins(void) {
   IOMUXC_SetPinConfig(IOMUXC_GPIO_07_FLEXPWM1_PWM3_B, 0x10A0U); 
   IOMUXC_SetPinConfig(IOMUXC_GPIO_08_FLEXPWM1_PWM3_A, 0x10A0U); 
   IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_00_LPSPI1_PCS2, 0x10A0U); 
-  IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_01_GPIOMUX_IO15, 0x10A0U); 
   IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_02_GPIOMUX_IO16, 0x10A0U); 
   IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_03_LPSPI1_SDI, 0x10A0U); 
   IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_04_LPSPI1_SDO, 0x10A0U); 

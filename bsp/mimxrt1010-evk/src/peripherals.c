@@ -818,8 +818,13 @@ instance:
       - enable_priority: 'false'
       - priority: '0'
       - enable_custom_name: 'false'
-    - adc_channels_config: []
-    - quick_selection: 'QS_ADC_1'
+    - adc_channels_config:
+      - 0:
+        - channelNumber: 'IN.14'
+        - channelName: ''
+        - channelGroup: '0'
+        - initializeChannel: 'true'
+        - enableInterruptOnConversionCompleted: 'false'
  * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS **********/
 /* clang-format on */
 const adc_config_t ADC1_config = {
@@ -835,10 +840,17 @@ const adc_config_t ADC1_config = {
   .clockDriver = kADC_ClockDriver2,
   .resolution = kADC_Resolution12Bit
 };
-
+const adc_channel_config_t ADC1_channels_config[1] = {
+  {
+    .channelNumber = 14U,
+    .enableInterruptOnConversionCompleted = false
+  }
+};
 static void ADC1_init(void) {
   /* Initialize ADC1 peripheral. */
   ADC_Init(ADC1_PERIPHERAL, &ADC1_config);
+  /* Initialize ADC1 channel 14. */
+  ADC_SetChannelConfig(ADC1_PERIPHERAL, ADC1_CH0_CONTROL_GROUP, &ADC1_channels_config[0]);
 }
 
 /***********************************************************************************************************************

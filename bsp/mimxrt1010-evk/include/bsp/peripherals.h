@@ -132,6 +132,8 @@ extern "C" {
 #define ADC1_PERIPHERAL ADC1
 /* Definition of special channel interconnected with ADC_ETC which takes real channel to be measured from ADC_ETC. */
 #define ADC1_CHANNEL_DRIVEN_BY_ADC_ETC 16U
+/* Channel 0 (IN.14) conversion control group. */
+#define ADC1_CH0_CONTROL_GROUP 0U
 
 /***********************************************************************************************************************
  * Global variables
@@ -163,6 +165,7 @@ extern lpspi_rtos_handle_t LPSPI1_handle;
 extern uint8_t LPSPI1_txBuffer[LPSPI1_BUFFER_SIZE];
 extern uint8_t LPSPI1_rxBuffer[LPSPI1_BUFFER_SIZE];
 extern const adc_config_t ADC1_config;
+extern const adc_channel_config_t ADC1_channels_config[1];
 
 /***********************************************************************************************************************
  * Initialization functions

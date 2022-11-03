@@ -67,7 +67,7 @@ int main(void)
 static void CreateTasks() {
     if (xTaskCreate(CommandControlComms_Task,
                         "cc_comms",
-                        configMINIMAL_STACK_SIZE + 640,
+                        configMINIMAL_STACK_SIZE + 128,
                         NULL,
                         PRIORITY_COMMAND_CONTROL_COMMS,
                         NULL
@@ -78,7 +78,7 @@ static void CreateTasks() {
 
     if (xTaskCreate(UartListener_Task,
                         "uart_comms",
-                        configMINIMAL_STACK_SIZE + 64,
+                        configMINIMAL_STACK_SIZE + 256,
                         NULL,
                         PRIORITY_UART_LISTENER,
                         NULL) != pdPASS)

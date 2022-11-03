@@ -33,6 +33,7 @@ add_executable(${PROJECT_NAME}.elf
     src/hw/thrust_vanes.c
     src/hw/lidar.c
     src/hw/esc.c
+    src/hw/batt_monitor.c
 )
 
 target_include_directories(${PROJECT_NAME}.elf
