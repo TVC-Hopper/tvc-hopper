@@ -57,11 +57,9 @@ HOVCTRL_STATUS_T Matrix_Multiply(float* Result, float** A, float** B, uint32_t A
     } 
 
     for (uint32_t r = 0; r < A_rows; ++r) {
-        for (uint32_t c = 0; c < B_cols; ++c) {
-            Result[r] = 0;
-            for (uint32_t i = 0; i < A_cols; ++i) {
-                Result[r] += A[r][i] * B[i][c];
-            }
+        Result[r] = 0;
+        for (uint32_t i = 0; i < A_cols; ++i) {
+            Result[r] += A[r][i] * B[i][0];
         }
     }
 
@@ -82,5 +80,5 @@ HOVCTRL_STATUS_T Vector_Subtract(float** Result, float** A, float** B, uint32_t 
 }
 
 void SetReference() {
-
+    // TODO command module should set 
 }
