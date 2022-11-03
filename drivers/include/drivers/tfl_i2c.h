@@ -21,7 +21,7 @@
 #define TFL_VER_MIN         ((uint8_t) 0x0B)
 #define TFL_VER_MAJ         ((uint8_t) 0x0C)
 
-#define TFL_SAVE_SETTINGS   ((uint8_t) 0x21)
+#define TFL_SAVE_SETTINGS   ((uint8_t) 0x20)
 #define TFL_SOFT_RESET      ((uint8_t) 0x21)
 
 

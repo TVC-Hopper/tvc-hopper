@@ -556,7 +556,7 @@ instance:
     - config:
       - enableMaster: 'true'
       - enableDoze: 'true'
-      - debugEnable: 'false'
+      - debugEnable: 'true'
       - ignoreAck: 'false'
       - pinConfig: 'kLPI2C_2PinOpenDrain'
       - baudRate_Hz: '100000'
@@ -584,7 +584,7 @@ instance:
 const lpi2c_master_config_t LPI2C1_masterConfig = {
   .enableMaster = true,
   .enableDoze = true,
-  .debugEnable = false,
+  .debugEnable = true,
   .ignoreAck = false,
   .pinConfig = kLPI2C_2PinOpenDrain,
   .baudRate_Hz = 100000UL,

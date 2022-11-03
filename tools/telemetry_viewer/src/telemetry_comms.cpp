@@ -72,6 +72,9 @@ void onIncomingMsg(const std::string &clientIP, const uint8_t * msg, size_t size
         SppHostStartStream(spp, &default_client, id, period, SPP_STREAM_READ, s);
     } else if (cmd == "get") {
         std::lock_guard<std::mutex> lg(stcp_mx_);
+        SppHostGetValue(spp, &default_client, id);
+        std::cout << "get " << id << std::endl;
+
     } else if (cmd =="val") {
         PropValue* value = TelemetryComms::getInstance()->getValue(id);
 
@@ -89,9 +92,11 @@ void onIncomingMsg(const std::string &clientIP, const uint8_t * msg, size_t size
 
         TelemetryComms* tc = TelemetryComms::getInstance();
         tc->getServer()->sendToClient(tc->getViewerSock(), msg, msg_len);
+        std::cout << "val " << id << std::endl;
     } else if (cmd == "set") {
         std::lock_guard<std::mutex> lg(stcp_mx_);
         SppHostSetValue(spp, &default_client, id, (void*)(msg + body_idx));
+        std::cout << "set " << id << std::endl;
     }
 }
 

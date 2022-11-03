@@ -94,6 +94,7 @@ power_domains: {NVCC_GPIO: '3.3'}
 void BOARD_InitBootPins(void) {
     BOARD_InitPins();
     BOARD_InitDEBUG_UARTPins();
+    BOARD_InitCOMBO_SENSORPins();
 }
 
 /*
@@ -101,10 +102,6 @@ void BOARD_InitBootPins(void) {
 BOARD_InitPins:
 - options: {callFromInitBoot: 'true', coreID: core0, enableClock: 'true', fullInit: 'true'}
 - pin_list:
-  - {pin_num: '11', peripheral: LPI2C1, signal: SCL, pin_signal: GPIO_02, slew_rate: Slow, software_input_on: Disable, open_drain: Disable, speed: MHZ_100, drive_strength: R0_4,
-    pull_keeper_select: Keeper, pull_keeper_enable: Enable, pull_up_down_config: Pull_Down_100K_Ohm, hysteresis_enable: Disable}
-  - {pin_num: '12', peripheral: LPI2C1, signal: SDA, pin_signal: GPIO_01, identifier: '', slew_rate: Slow, software_input_on: Disable, open_drain: Disable, speed: MHZ_100,
-    drive_strength: R0_4, pull_keeper_select: Keeper, pull_keeper_enable: Enable, pull_up_down_config: Pull_Down_100K_Ohm, hysteresis_enable: Disable}
   - {pin_num: '51', peripheral: PWM1, signal: 'FAULT, 3', pin_signal: GPIO_AD_07, identifier: '', slew_rate: Slow, software_input_on: Disable, open_drain: Disable,
     speed: MHZ_100, drive_strength: R0_4, pull_keeper_select: Keeper, pull_keeper_enable: Enable, pull_up_down_config: Pull_Down_100K_Ohm, hysteresis_enable: Disable}
   - {pin_num: '51', peripheral: PWM1, signal: 'FAULT, 2', pin_signal: GPIO_AD_07, identifier: '', slew_rate: Slow, software_input_on: Disable, open_drain: Disable,
@@ -183,8 +180,6 @@ void BOARD_InitPins(void) {
   GPIO_PinInit(GPIO1, 28U, &IMU_INT1_config);
 
   IOMUXC_SetPinMux(IOMUXC_GPIO_00_LPSPI1_PCS3, 0U); 
-  IOMUXC_SetPinMux(IOMUXC_GPIO_01_LPI2C1_SDA, 0U); 
-  IOMUXC_SetPinMux(IOMUXC_GPIO_02_LPI2C1_SCL, 0U); 
   IOMUXC_SetPinMux(IOMUXC_GPIO_03_FLEXPWM1_PWM1_B, 0U); 
   IOMUXC_SetPinMux(IOMUXC_GPIO_05_FLEXPWM1_PWM2_B, 0U); 
   IOMUXC_SetPinMux(IOMUXC_GPIO_06_FLEXPWM1_PWM2_A, 0U); 
@@ -212,8 +207,6 @@ void BOARD_InitPins(void) {
   XBARA_SetSignalsConnection(XBARA, kXBARA1_InputIomuxXbarInout03, kXBARA1_OutputFlexpwm1Fault2); 
   XBARA_SetSignalsConnection(XBARA, kXBARA1_InputIomuxXbarInout03, kXBARA1_OutputFlexpwm1Fault3); 
   IOMUXC_SetPinConfig(IOMUXC_GPIO_00_LPSPI1_PCS3, 0x10A0U); 
-  IOMUXC_SetPinConfig(IOMUXC_GPIO_01_LPI2C1_SDA, 0x10A0U); 
-  IOMUXC_SetPinConfig(IOMUXC_GPIO_02_LPI2C1_SCL, 0x10A0U); 
   IOMUXC_SetPinConfig(IOMUXC_GPIO_03_FLEXPWM1_PWM1_B, 0x10A0U); 
   IOMUXC_SetPinConfig(IOMUXC_GPIO_05_FLEXPWM1_PWM2_B, 0x10A0U); 
   IOMUXC_SetPinConfig(IOMUXC_GPIO_06_FLEXPWM1_PWM2_A, 0x10A0U); 
@@ -368,12 +361,10 @@ void BOARD_InitBUTTONPins(void) {
 /*
  * TEXT BELOW IS USED AS SETTING FOR TOOLS *************************************
 BOARD_InitCOMBO_SENSORPins:
-- options: {callFromInitBoot: 'false', coreID: core0, enableClock: 'true'}
+- options: {callFromInitBoot: 'true', coreID: core0, enableClock: 'true'}
 - pin_list:
-  - {pin_num: '11', peripheral: LPI2C1, signal: SCL, pin_signal: GPIO_02, slew_rate: Slow, software_input_on: Enable, open_drain: Enable, drive_strength: R0_4, pull_keeper_select: Keeper,
-    pull_keeper_enable: Enable, pull_up_down_config: Pull_Up_22K_Ohm, hysteresis_enable: Disable}
-  - {pin_num: '12', peripheral: LPI2C1, signal: SDA, pin_signal: GPIO_01, slew_rate: Slow, software_input_on: Enable, open_drain: Enable, drive_strength: R0_4, pull_keeper_select: Keeper,
-    pull_keeper_enable: Enable, pull_up_down_config: Pull_Up_22K_Ohm, hysteresis_enable: Disable}
+  - {pin_num: '11', peripheral: LPI2C1, signal: SCL, pin_signal: GPIO_02, identifier: '', software_input_on: Enable, open_drain: Enable, drive_strength: R0_6, pull_up_down_config: Pull_Up_22K_Ohm}
+  - {pin_num: '12', peripheral: LPI2C1, signal: SDA, pin_signal: GPIO_01, identifier: '', software_input_on: Enable, open_drain: Enable, drive_strength: R0_6, pull_up_down_config: Pull_Up_22K_Ohm}
  * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS ***********
  */
 
@@ -388,8 +379,8 @@ void BOARD_InitCOMBO_SENSORPins(void) {
 
   IOMUXC_SetPinMux(IOMUXC_GPIO_01_LPI2C1_SDA, 1U); 
   IOMUXC_SetPinMux(IOMUXC_GPIO_02_LPI2C1_SCL, 1U); 
-  IOMUXC_SetPinConfig(IOMUXC_GPIO_01_LPI2C1_SDA, 0xD8A0U); 
-  IOMUXC_SetPinConfig(IOMUXC_GPIO_02_LPI2C1_SCL, 0xD8A0U); 
+  IOMUXC_SetPinConfig(IOMUXC_GPIO_01_LPI2C1_SDA, 0xD8B0U); 
+  IOMUXC_SetPinConfig(IOMUXC_GPIO_02_LPI2C1_SCL, 0xD8B0U); 
 }
 
 /***********************************************************************************************************************

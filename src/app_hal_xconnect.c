@@ -41,6 +41,7 @@ static lpuart_rtos_handle_t* uart_handle = &COMMS_UART_rtos_handle;
 static SemaphoreHandle_t i2c_mx;
 
 extern void AppHal_Init() {
+    NVIC_SetPriority(LPI2C1_IRQn, 8);
     i2c_mx = xSemaphoreCreateMutex();
 }
 
