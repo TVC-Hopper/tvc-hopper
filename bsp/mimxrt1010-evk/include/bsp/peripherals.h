@@ -11,11 +11,14 @@
  **********************************************************************************************************************/
 #include "fsl_common.h"
 #include "fsl_lpuart.h"
+#include "fsl_lpuart_freertos.h"
 #include "fsl_clock.h"
-#include "fsl_gpio.h"
 #include "fsl_pwm.h"
 #include "fsl_lpi2c.h"
-#include "fsl_flexspi.h"
+#include "fsl_lpi2c_freertos.h"
+#include "fsl_gpio.h"
+#include "fsl_lpspi.h"
+#include "fsl_lpspi_freertos.h"
 
 #if defined(__cplusplus)
 extern "C" {
@@ -26,29 +29,15 @@ extern "C" {
  **********************************************************************************************************************/
 /* Definitions for BOARD_InitPeripherals functional group */
 /* Definition of peripheral ID */
-#define DEBUG_UART_PERIPHERAL LPUART1
-/* Definition of the clock source frequency */
-#define DEBUG_UART_CLOCK_SOURCE 80000000UL
-/* USER_BUTTON interrupt vector ID (number). */
-#define USER_BUTTON_GPIO_COMB_0_15_IRQN GPIO2_Combined_0_15_IRQn
-/* USER_BUTTON interrupt handler identifier. */
-#define USER_BUTTON_GPIO_COMB_0_15_IRQHANDLER GPIO2_Combined_0_15_IRQHandler
+#define COMMS_UART_PERIPHERAL LPUART1
+/* Definition of the backround buffer size */
+#define COMMS_UART_BACKGROUND_BUFFER_SIZE 32
+/* COMMS_UART interrupt vector ID (number). */
+#define COMMS_UART_IRQN LPUART1_IRQn
+/* COMMS_UART interrupt vector priority. */
+#define COMMS_UART_IRQ_PRIORITY 5
 /* Definition of peripheral ID */
 #define PWM1_PERIPHERAL PWM1
-/* Definition of submodule 0 ID */
-#define PWM1_SM0 kPWM_Module_0
-/* Definition of clock source of submodule 0 frequency in Hertz */
-#define PWM1_SM0_SM_CLK_SOURCE_FREQ_HZ 125000000U
-/* Definition of submodule 0 counter clock source frequency in Hertz - PWM1_SM0_SM_CLK_SOURCE_FREQ_HZ divided by prescaler */
-#define PWM1_SM0_COUNTER_CLK_SOURCE_FREQ_HZ 125000000U
-/* Definition of submodule 0 counter (PWM) frequency in Hertz */
-#define PWM1_SM0_COUNTER_FREQ_HZ 16001U
-/* Definition of submodule 0 channel A ID */
-#define PWM1_SM0_A kPWM_PwmA
-/* Definition of submodule 0 channel B ID */
-#define PWM1_SM0_B kPWM_PwmB
-/* Definition of submodule 0 channel X ID */
-#define PWM1_SM0_X kPWM_PwmX
 /* Definition of submodule 1 ID */
 #define PWM1_SM1 kPWM_Module_1
 /* Definition of clock source of submodule 1 frequency in Hertz */
@@ -68,9 +57,9 @@ extern "C" {
 /* Definition of clock source of submodule 2 frequency in Hertz */
 #define PWM1_SM2_SM_CLK_SOURCE_FREQ_HZ 125000000U
 /* Definition of submodule 2 counter clock source frequency in Hertz - PWM1_SM2_SM_CLK_SOURCE_FREQ_HZ divided by prescaler */
-#define PWM1_SM2_COUNTER_CLK_SOURCE_FREQ_HZ 125000000U
+#define PWM1_SM2_COUNTER_CLK_SOURCE_FREQ_HZ 1953125U
 /* Definition of submodule 2 counter (PWM) frequency in Hertz */
-#define PWM1_SM2_COUNTER_FREQ_HZ 16001U
+#define PWM1_SM2_COUNTER_FREQ_HZ 50U
 /* Definition of submodule 2 channel A ID */
 #define PWM1_SM2_A kPWM_PwmA
 /* Definition of submodule 2 channel B ID */
@@ -82,9 +71,9 @@ extern "C" {
 /* Definition of clock source of submodule 3 frequency in Hertz */
 #define PWM1_SM3_SM_CLK_SOURCE_FREQ_HZ 125000000U
 /* Definition of submodule 3 counter clock source frequency in Hertz - PWM1_SM3_SM_CLK_SOURCE_FREQ_HZ divided by prescaler */
-#define PWM1_SM3_COUNTER_CLK_SOURCE_FREQ_HZ 125000000U
+#define PWM1_SM3_COUNTER_CLK_SOURCE_FREQ_HZ 1953125U
 /* Definition of submodule 3 counter (PWM) frequency in Hertz */
-#define PWM1_SM3_COUNTER_FREQ_HZ 16001U
+#define PWM1_SM3_COUNTER_FREQ_HZ 50U
 /* Definition of submodule 3 channel A ID */
 #define PWM1_SM3_A kPWM_PwmA
 /* Definition of submodule 3 channel B ID */
@@ -105,25 +94,48 @@ extern "C" {
 /* Definition of clock source */
 #define LPI2C1_CLOCK_FREQ 60000000UL
 /* Transfer buffer size */
-#define LPI2C1_MASTER_BUFFER_SIZE 1
+#define LPI2C1_MASTER_BUFFER_SIZE 16
 /* Definition of slave address */
 #define LPI2C1_MASTER_SLAVE_ADDRESS 0
+/* GPIO1 interrupt vector ID (number). */
+#define GPIO1_GPIO_COMB_0_15_IRQN GPIO1_Combined_0_15_IRQn
+/* GPIO1 interrupt vector priority. */
+#define GPIO1_GPIO_COMB_0_15_IRQ_PRIORITY 5
+/* GPIO1 interrupt handler identifier. */
+#define GPIO1_GPIO_COMB_0_15_IRQHANDLER GPIO1_Combined_0_15_IRQHandler
+/* GPIO1 interrupt vector ID (number). */
+#define GPIO1_GPIO_COMB_16_31_IRQN GPIO1_Combined_16_31_IRQn
+/* GPIO1 interrupt vector priority. */
+#define GPIO1_GPIO_COMB_16_31_IRQ_PRIORITY 5
+/* GPIO1 interrupt handler identifier. */
+#define GPIO1_GPIO_COMB_16_31_IRQHANDLER GPIO1_Combined_16_31_IRQHandler
+/* GPIO2 interrupt vector ID (number). */
+#define GPIO2_GPIO_COMB_0_15_IRQN GPIO2_Combined_0_15_IRQn
+/* GPIO2 interrupt vector priority. */
+#define GPIO2_GPIO_COMB_0_15_IRQ_PRIORITY 3
+/* GPIO2 interrupt handler identifier. */
+#define GPIO2_0_15_IRQn GPIO2_Combined_0_15_IRQHandler
+/* BOARD_InitPeripherals defines for LPSPI1 */
 /* Definition of peripheral ID */
-#define FLEXSPI_PERIPHERAL FLEXSPI
-/* FLEXSPI interrupt vector ID (number). */
-#define FLEXSPI_IRQN FLEXSPI_IRQn
-/* FLEXSPI interrupt handler identifier. */
-#define FLEXSPI_IRQHANDLER FLEXSPI_IRQHandler
+#define LPSPI1_PERIPHERAL LPSPI1
+/* Definition of clock source */
+#define LPSPI1_CLOCK_FREQ 105600000UL
+/* LPSPI1 interrupt vector ID (number). */
+#define LPSPI1_IRQN LPSPI1_IRQn
+/* LPSPI1 interrupt vector priority. */
+#define LPSPI1_IRQ_PRIORITY 4
+/* Transfer buffer size */
+#define LPSPI1_BUFFER_SIZE 10
 
 /***********************************************************************************************************************
  * Global variables
  **********************************************************************************************************************/
-extern const lpuart_config_t DEBUG_UART_config;
-extern pwm_config_t PWM1_SM0_config;
-
-extern pwm_signal_param_t PWM1_SM0_pwm_function_config[1];
+extern lpuart_rtos_handle_t COMMS_UART_rtos_handle;
+extern lpuart_handle_t COMMS_UART_lpuart_handle;
+extern lpuart_rtos_config_t COMMS_UART_rtos_config;
 extern pwm_config_t PWM1_SM1_config;
 
+extern pwm_signal_param_t PWM1_SM1_pwm_function_config[1];
 extern pwm_config_t PWM1_SM2_config;
 
 extern pwm_signal_param_t PWM1_SM2_pwm_function_config[2];
@@ -138,8 +150,12 @@ extern const pwm_fault_param_t PWM1_Fault3_fault_config;
 extern const lpi2c_master_config_t LPI2C1_masterConfig;
 extern lpi2c_master_transfer_t LPI2C1_masterTransfer;
 extern uint8_t LPI2C1_masterBuffer[LPI2C1_MASTER_BUFFER_SIZE];
-extern lpi2c_master_handle_t LPI2C1_masterHandle;
-extern const flexspi_config_t FLEXSPI_config;
+extern lpi2c_rtos_handle_t LPI2C1_masterHandle;
+extern const lpspi_master_config_t LPSPI1_config;
+extern lpspi_transfer_t LPSPI1_transfer;
+extern lpspi_rtos_handle_t LPSPI1_handle;
+extern uint8_t LPSPI1_txBuffer[LPSPI1_BUFFER_SIZE];
+extern uint8_t LPSPI1_rxBuffer[LPSPI1_BUFFER_SIZE];
 
 /***********************************************************************************************************************
  * Initialization functions

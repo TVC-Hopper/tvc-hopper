@@ -11,6 +11,7 @@
 static SPP_STATUS_T SppGetDefinition(SppClientEngine_t *client, uint16_t id, SppPropertyDefinition_t **pdef);
 static uint16_t SppFillMessageHeader(uint8_t address_length, uint8_t* buffer, SppAddress_t *host, SppAddress_t* client, uint8_t message_id);
 static SPP_STATUS_T SppGetStream(SppClientEngine_t *client, uint16_t stream_id, SppStream_t **s);
+static SPP_STATUS_T SppSendPropertyList(SppClientEngine_t *client, uint8_t* message, uint8_t* host_address);
 
 static SPP_STATUS_T SppGetDefinition(SppClientEngine_t *client, uint16_t id, SppPropertyDefinition_t **pdef) {
     for (uint8_t i = 0; i < client->property_count; ++i) {
@@ -68,6 +69,56 @@ void SppClientStart(SppClientEngine_t* client) {
     client->callbacks.Send(connect_msg, msg_len, client->instance_data);
 }
 
+SPP_STATUS_T SppSendPropertyList(SppClientEngine_t *client, uint8_t* message, uint8_t* host_address) {
+    uint8_t addr_len = client->address_length;
+
+    memcpy(client->host_address_buffer, host_address, client->address_length);
+    uint8_t status =  message[SPP_MSG_HDR_SIZE(addr_len)];
+    if(SPP_STATUS_DUPLICATE_CLIENT == status) {
+        client->is_duplicate = true;
+        return SPP_STATUS_DUPLICATE_CLIENT;
+    } else if (SPP_STATUS_BUSY == status) {
+        return SPP_STATUS_BUSY;
+    } else {
+        uint16_t num_bytes = 0;
+
+        for (uint8_t i = 0; i < client->property_count; ++i) {
+            num_bytes += client->properties[i].size;
+        }
+        
+        uint8_t prop_response_len = SPP_MSG_HDR_SIZE(addr_len) + SPP_MSG_PROP_LIST_RESPONSE_SIZE;
+        uint8_t prop_response_msg[prop_response_len];
+
+        uint8_t body_idx = SppFillMessageHeader(addr_len, prop_response_msg, &client->host_address, &client->client_address, SPP_MSG_PROP_LIST_RESPONSE_ID);
+        prop_response_msg[body_idx++] = client->property_count;
+        *((uint16_t*)(prop_response_msg + body_idx)) = num_bytes;
+
+        client->callbacks.Send(prop_response_msg, prop_response_len, client->instance_data);
+
+        for (uint8_t i = 0; i < client->property_count; ++i) {
+            SppPropertyDefinition_t *pd = &client->properties[i];
+            uint8_t pdef_msg_len = SPP_MSG_HDR_SIZE(addr_len) + SPP_MSG_PROP_DEF_SIZE + strlen(pd->name) + 1;
+
+            uint8_t pdef_msg[pdef_msg_len];
+            body_idx = SppFillMessageHeader(addr_len, pdef_msg, &client->host_address, &client->client_address, SPP_MSG_PROP_DEF_ID);
+
+            uint16_t props_remaining = client->property_count - i - 1;
+
+            pdef_msg[4] = pd->size;
+            
+            pdef_msg[5] = props_remaining > 0xFF ? 0xFF : props_remaining;
+            memcpy(pdef_msg + 6, &pd->id, sizeof(uint16_t));
+            pdef_msg[8] = pd->type;
+            pdef_msg[9] = pd->flags.value;
+            memcpy(&pdef_msg[10], pd->name, strlen(pd->name) + 1);
+
+            client->callbacks.Send(pdef_msg, pdef_msg_len, client->instance_data);
+        }
+    }
+    
+    return SPP_STATUS_OK;
+}
+
 SPP_STATUS_T SppClientProcessMessage(SppClientEngine_t* client, uint8_t* message, uint16_t len) {
     if (len < SPP_MSG_HDR_SIZE(client->address_length)) {
         return SPP_STATUS_SHORT_MESSAGE;
@@ -88,49 +139,7 @@ SPP_STATUS_T SppClientProcessMessage(SppClientEngine_t* client, uint8_t* message
     memcpy(host_address, &message[2 + addr_len - 1], addr_len);
 
     if (SPP_MSG_CONNECT_RESPONSE_ID == msg_id) {
-        memcpy(client->host_address_buffer, host_address, client->address_length);
-        uint8_t status =  message[SPP_MSG_HDR_SIZE(addr_len)];
-        if(SPP_STATUS_DUPLICATE_CLIENT == status) {
-            client->is_duplicate = true;
-            return SPP_STATUS_DUPLICATE_CLIENT;
-        } else if (SPP_STATUS_BUSY == status) {
-            return SPP_STATUS_BUSY;
-        } else {
-            uint16_t num_bytes = 0;
-
-            for (uint8_t i = 0; i < client->property_count; ++i) {
-                num_bytes += client->properties[i].size;
-            }
-            
-            uint8_t prop_response_len = SPP_MSG_HDR_SIZE(addr_len) + SPP_MSG_PROP_LIST_RESPONSE_SIZE;
-            uint8_t prop_response_msg[prop_response_len];
-
-            uint8_t body_idx = SppFillMessageHeader(addr_len, prop_response_msg, &client->host_address, &client->client_address, SPP_MSG_PROP_LIST_RESPONSE_ID);
-            prop_response_msg[body_idx++] = client->property_count;
-            *((uint16_t*)(prop_response_msg + body_idx)) = num_bytes;
-
-            client->callbacks.Send(prop_response_msg, prop_response_len, client->instance_data);
-
-            for (uint8_t i = 0; i < client->property_count; ++i) {
-                SppPropertyDefinition_t *pd = &client->properties[i];
-                uint8_t pdef_msg_len = SPP_MSG_HDR_SIZE(addr_len) + SPP_MSG_PROP_DEF_SIZE + strlen(pd->name) + 1;
-
-                uint8_t pdef_msg[pdef_msg_len];
-                body_idx = SppFillMessageHeader(addr_len, pdef_msg, &client->host_address, &client->client_address, SPP_MSG_PROP_DEF_ID);
-
-                uint16_t props_remaining = client->property_count - i - 1;
-
-                pdef_msg[4] = pd->size;
-                
-                pdef_msg[5] = props_remaining > 0xFF ? 0xFF : props_remaining;
-                memcpy(pdef_msg + 6, &pd->id, sizeof(uint16_t));
-                pdef_msg[8] = pd->type;
-                pdef_msg[9] = pd->flags.value;
-                memcpy(&pdef_msg[10], pd->name, strlen(pd->name) + 1);
-
-                client->callbacks.Send(pdef_msg, pdef_msg_len, client->instance_data);
-            }
-        }
+        return SppSendPropertyList(client, message, host_address);
     } else if (SPP_MSG_GET_REQUEST_ID == msg_id) {
         uint8_t body_idx = SPP_MSG_HDR_SIZE(addr_len);
         uint16_t token = message[body_idx++];
@@ -206,7 +215,7 @@ extern void SppProcessStreams(SppClientEngine_t* client, uint32_t timestamp, uin
         s->elapsed_time += elapsed_time;
 
         if (s->elapsed_time > s->period) {
-            uint16_t msg_size = MESSAGE_SIZE(SPP_MSG_STREAM_BASE_SIZE, client->address_length);
+            uint16_t msg_size = MESSAGE_SIZE(SPP_MSG_STREAM_BASE_SIZE, client->address_length) + s->def->size;
             uint8_t msg[msg_size];
             uint16_t body_idx = SppFillMessageHeader(client->address_length, msg, &client->host_address, &client->client_address, SPP_MSG_STREAM_ID);
             memcpy(msg + body_idx, &s->stream_id, sizeof(s->stream_id));
@@ -214,14 +223,10 @@ extern void SppProcessStreams(SppClientEngine_t* client, uint32_t timestamp, uin
             memcpy(msg + body_idx, &timestamp, sizeof(timestamp));
             body_idx += sizeof(timestamp);
             
-            uint8_t value[s->def->size];
-            client->callbacks.GetValue(s->def->id, value, client->instance_data);
-            
-            memcpy(msg + body_idx, value, sizeof(value));
-            body_idx += sizeof(value);
+            client->callbacks.GetValue(s->def->id, msg + body_idx, client->instance_data);
+            body_idx += s->def->size;
 
             client->callbacks.Send(msg, body_idx, client->instance_data);
-           
             client->streams[i].elapsed_time = 0;
         }
     }

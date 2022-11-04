@@ -1,7 +1,6 @@
 add_library(drivers STATIC
-    src/imu.c
-    src/esc.c
-    src/servo.c
+    src/bno085_i2c.c
+    src/tfl_i2c.c
 )
 
 target_include_directories(drivers

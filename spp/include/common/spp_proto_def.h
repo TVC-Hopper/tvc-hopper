@@ -36,7 +36,7 @@
 #define SPP_MSG_STREAM_RESPONSE_ID          ((uint8_t)0xB5)
 #define SPP_MSG_STREAM_RESPONSE_SIZE        (3)
 #define SPP_MSG_STREAM_ID                   ((uint8_t)0xB6)
-#define SPP_MSG_STREAM_BASE_SIZE            (2)
+#define SPP_MSG_STREAM_BASE_SIZE            (8)
 
 /**
  * Property types

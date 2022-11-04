@@ -7,9 +7,10 @@
 
 #include "spp_property_list.h"
 
-void CommandControlComms_Init();
+extern StcpEngine_t* GetStcpEngine();
 
-void CommandControlComms_Task(void* task_args);
+extern void CommandControlComms_Init();
+extern void CommandControlComms_Task(void* task_args);
 
 
 #endif

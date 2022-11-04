@@ -10,6 +10,15 @@ but also with custom tools, build needs, flashing, and testing.
 ### Dependencies
 
 - `cmake` (>=3.17)
+    Windows WSL users:
+    ```
+    $ sudo apt-get update
+    $ sudo apt-get install apt-transport-https ca-certificates gnupg software-properties-common wget
+    $ wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | sudo apt-key add -
+    $ sudo apt-add-repository 'deb https://apt.kitware.com/ubuntu/ bionic main'
+    $ sudo apt-get update
+    $ sudo apt-get install cmake
+    ```
 - `arm-none-eabi-gcc` (>=10.3.1)
 - MCUXpresso Config Tools v12
 - MCUXpresso IDE
@@ -37,6 +46,9 @@ Debug as normal using the IDE's GDB interface.
 
 This will be the normal method of debugging and testing you'll use on the System on a Board.
 
+When connecting the development board, MCUXpresso sometimes has issues connecting if the board is connected before
+the IDE is launched. For a most reproducible and consistent environment, launch the IDE first.
+
 #### Programming Flight Controller
 
 TBD. This may be difficult to get working.
@@ -51,24 +63,21 @@ The build supports 3 different targets:
 - FlexSPI NOR flash release: loaded to external flash memory, no debug symols
 - Tests: build and run tests
 
-```
-make clean
 
-# debug build
-make debug
+### `make` targets
 
-# release build
-make release 
+- `clean`: remove all build artifacts
+- `debug`: debug build
+- `release`: release build
+- `flexspi_nor_debug`: debug build for flexspi nor flash
+- `flexspi_nor_release`: release build for flexspi nor flash
+- `test`: build and run unit tests
+- `generate_spp_headers`: regenerate or update SPP property lists in various directories
+- `telemetry_server`: build telemetry server
+- `telemetry_emulator`: build telemetry emulator for testing
+- `start_telemetry_server`: starts telemetry server
+- `start_telemetry_emulator`: starts telemetry emulator (start from different terminal)
 
-# flexspi nor debug build
-make flexspi_nor_debug
-
-# flexspi nor release build
-make flexspi_nor_release
-
-# build, run tests
-make test
-```
 
 ## Design and Architecture
 
@@ -115,6 +124,45 @@ Unit tests are run using Catch2, a standard C/C++ unit test framework.
 The unit tests are focused on only testing the drivers and application code.
 
 All tests are located in `tests` directory
+
+### Telemetry Viewer
+
+Start the server using `make start_telemetry_server mode=s`.
+Use MATLAB, switch working directory to `tools/telemetry_viewer`. Run the script to plot incoming data.
+To add new data, modify the server and the matlab script to accept and plot new values.
+
+Unless using the telemetry emulator, the order of connections does not matter. The flight software, telemetry server, and telemetry viewer may be started in any sequence.
+Additionally, the telemetry server can be restarted without needing to restart the flight software. Same is true for the flight software.
+
+The telemetry server operates an SPP host instance that streams data from the client (either vehicle or emulated). The MATLAB visualization/viewer client connects to the server and reads data to plot.
+
+![Telemetry Viewer plotting data streams](docs/readme-assets/matlab-telemetry.png)
+
+#### Server API
+
+- `id`: property id (2 bytes)
+- `period`: period in milliseconds (4 bytes)
+- `value`: property value (size bytes)
+
+***Requests***
+
+- `get/<id:2>`: Request property value from SPP client
+- `val/<id:2>`: Request property value from telemetry server
+- `str/<id:2><period:4>`: Start stream
+- `set/<id:2><value:size>`: Set property value
+- `emdat/<id:2><value:size>`: Provide emulated data
+
+***Response***
+- Value response: `<id:2><size:1><timestamp:4><value:size>`
+
+#### Data emulation
+
+Modify `tools/telemetry_emulator/src/main.cpp` to generate whatever telemetry data you'd like, may need to update property
+lists.
+Open a terminal and run `make telemetry_emulator start_telemetry_emulator`.
+If starting the server with the emulator, use `make start_telemetry_server mode=e`
+
+When using the emulator, the telemetry emulator must be started before the MATLAB viewer is launched.
 
 
 

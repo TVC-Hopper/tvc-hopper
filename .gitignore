@@ -1,5 +1,15 @@
 build
 build-*
-
-.DS_Store
 .vscode
+*.bak
+.DS_Store
+*.asv
+.mcuxpressoide_packages_support/
+.metadata/
+AzureRTOS_TAD_logs/
+FreeRTOS_TAD_logs/
+ZephyrRTOS_TAD_logs/
+support/tvc_ide_build/.mcuxpressoide_packages_support/
+support/tvc_ide_build/.metadata/
+support/tvc_ide_build/Debug/
+support/tvc_ide_build/tvc_ide_build.mex

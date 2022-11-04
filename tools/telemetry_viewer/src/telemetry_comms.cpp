@@ -4,8 +4,12 @@
 #include <iostream>
 #include <sstream>
 #include <future>
+#include <mutex>
 #include <utility>
 #include <thread>
+#include <chrono>
+
+#include <iomanip>
 
 #include <mutex>
 
@@ -16,6 +20,8 @@
 
 #include "spp_property_list.h"
 #include "rs232.h"
+
+std::mutex stcp_mx_;
 
 TelemetryComms* TelemetryComms::instance_ = nullptr;
 uint8_t default_addr = 0x1;
@@ -42,8 +48,8 @@ void onIncomingMsg(const std::string &clientIP, const uint8_t * msg, size_t size
         for (size_t i = start; i < size - 1; ++i) {
             if (msg[i] == STCP_FOOTER && msg[i + 1] == STCP_FOOTER) {
                 StcpEngine_t* stcp = TelemetryComms::getInstance()->getStcp();
+                std::lock_guard<std::mutex> lg(stcp_mx_);
                 SPP_STATUS_T ret = StcpHandleMessage(stcp, (uint8_t*)(msg + start), (i + 2 - start));
-                std::cout << "Got msg, ret=" << (int)ret << std::endl;
 
                 start = i + cmd.length() + 3;
                 i++; // skip last footer
@@ -53,71 +59,44 @@ void onIncomingMsg(const std::string &clientIP, const uint8_t * msg, size_t size
         return;
     }
 
-    std::string body = msg_str.substr(cmd_end + 1, msg_str.length());
-    int id_end = body.find('/');
-    std::string id_str = body.substr(0, id_end);
-    uint16_t id = std::stoi(id_str);
-
+    size_t body_idx = cmd_end + 1;
+    uint16_t id;
+    memcpy(&id, msg + body_idx, sizeof(uint16_t));
+    body_idx += sizeof(uint16_t);
 
     if (cmd == "str") {
-        uint16_t period = std::stoi(body.substr(id_end + 1, body.length()));
-        std::cout << "stream request " << id << " " << period << std::endl;
+        uint16_t period;
+        memcpy(&period, msg + body_idx, sizeof(uint16_t));
         SppStream_t* s = TelemetryComms::getInstance()->getNextStream();
+        std::lock_guard<std::mutex> lg(stcp_mx_);
         SppHostStartStream(spp, &default_client, id, period, SPP_STREAM_READ, s);
     } else if (cmd == "get") {
-        std::cout << "get request " << id << std::endl;
-        std::cout << (int)SppHostGetValue(spp, &default_client, id) << std::endl;
+        std::lock_guard<std::mutex> lg(stcp_mx_);
+        SppHostGetValue(spp, &default_client, id);
+        std::cout << "get " << id << std::endl;
+
     } else if (cmd =="val") {
-        std::cout << "value request " << id << std::endl;
         PropValue* value = TelemetryComms::getInstance()->getValue(id);
 
         uint16_t type = value->def->type;
-
-        std::ostringstream oss;
-        oss << id << "/";
-
-        std::unique_lock<std::mutex> ul(value->mx);
-        if (type == SPP_PROP_T_BOOL) {
-            oss << *((bool*)&value->buffer[0]);
-        } else if (type == SPP_PROP_T_U32) {
-            oss << *((uint32_t*)&value->buffer[0]);
-        } else if (type == SPP_PROP_T_I32) {
-            oss << *((int32_t*)&value->buffer[0]);
-        } else if (type == SPP_PROP_T_I16) {
-            oss << *((uint16_t*)&value->buffer[0]);
-        } else if (type == SPP_PROP_T_I16) {
-            oss << *((int16_t*)&value->buffer[0]);
-        } else if (type == SPP_PROP_T_ARR) {
-            for (auto &i : value->buffer) {
-                oss << i;
-            }
-            std::cout << "arr: " << oss.str() << std::endl;
+        uint16_t size = value->def->size;
+        uint8_t msg_len = 2 + 1 + 4 + size;
+        uint8_t msg[msg_len];
+        {
+            std::unique_lock<std::mutex> ul(value->mx);
+            memcpy(msg, &id, sizeof(uint16_t));
+            memcpy(msg + 2, &size, sizeof(uint8_t));
+            memcpy(msg + 2 + 1, &value->timestamp, sizeof(uint32_t));
+            memcpy(msg + 2 + 1 + 4, &value->buffer[0], size);
         }
-        ul.unlock();
-        
-        std::string response = "val/" + oss.str();
+
         TelemetryComms* tc = TelemetryComms::getInstance();
-        tc->getServer()->sendToClient(tc->getViewerSock(), (uint8_t*)response.c_str(), response.length());
+        tc->getServer()->sendToClient(tc->getViewerSock(), msg, msg_len);
+        std::cout << "val " << id << std::endl;
     } else if (cmd == "set") {
-        std::string value_str = body.substr(id_end + 1, body.length());
-        std::cout << "set request " << id << " " << value_str << std::endl;
-        SppPropertyDefinition_t *def;
-        SppHostGetDefinition(spp, &default_client, id, &def);
-
-        uint8_t value[def->size];
-
-        if (def->type == SPP_PROP_T_BOOL) {
-            value[0] = std::stoi(value_str);
-        } else if (def->type == SPP_PROP_T_U32) {
-            uint32_t value_tmp = std::stoul(value_str);
-            memcpy(value, &value_tmp, sizeof(value_tmp));
-        } else if (def->type == SPP_PROP_T_I32) {
-            int32_t value_tmp = std::stoi(value_str);
-            memcpy(value, &value_tmp, sizeof(value_tmp));
-        }
-            
-        
-        SppHostSetValue(spp, &default_client, id, value);
+        std::lock_guard<std::mutex> lg(stcp_mx_);
+        SppHostSetValue(spp, &default_client, id, (void*)(msg + body_idx));
+        std::cout << "set " << id << std::endl;
     }
 }
 
@@ -146,8 +125,13 @@ SppStream_t* TelemetryComms::getNextStream() {
 
 PropValue* TelemetryComms::getValue(uint16_t id) {
     if (prop_values_.find(id) == prop_values_.end()) {
+        prop_values_[id].timestamp = 0;
         SppHostGetDefinition(getSpp(), &default_client, id, &prop_values_[id].def);
-        prop_values_[id].buffer = std::vector<uint8_t>(prop_values_[id].def->size, 0);
+        if (prop_values_[id].def == nullptr) {
+            std::cout << "null prop def" << std::endl;
+        } else {
+            prop_values_[id].buffer = std::vector<uint8_t>(prop_values_[id].def->size, 0);
+        }
     }
     return &prop_values_[id];
 }
@@ -170,43 +154,14 @@ int TelemetryComms::acceptClient() {
 SPP_STATUS_T onValueResponse(SppAddress_t *client, uint16_t id, void* value, void* instance_data) {
 
     PropValue *pv = TelemetryComms::getInstance()->getValue(id);
-    switch(id) {
-        case PROP_start_ID:
-        {
-            std::cout << *((bool*)value) << std::endl;
-            std::lock_guard<std::mutex> lg(pv->mx);
-            memcpy(&pv->buffer[0], (uint8_t*)value, pv->def->size);
-            break;
-        }
-        case PROP_stop_ID:
-        {
-            std::cout << *((bool*)value) << std::endl;
-            std::lock_guard<std::mutex> lg(pv->mx);
-            memcpy(&pv->buffer[0], (uint8_t*)value, pv->def->size);
-            break;
-        }
-        case PROP_status_ID:
-        {
-            std::cout << *((uint32_t*)value) << std::endl;
-            std::lock_guard<std::mutex> lg(pv->mx);
-            memcpy(&pv->buffer[0], (uint8_t*)value, pv->def->size);
-            break;
-        }
-        case PROP_telemetry_ID:
-        {
-            uint8_t* data = (uint8_t*)value;
-            for (int i = 0; i < 10; ++i) {
-                std::cout << data[i] << " ";
-            }
-            std::cout << std::endl;
-            std::lock_guard<std::mutex> lg(pv->mx);
-            memcpy(&pv->buffer[0], (uint8_t*)value, pv->def->size);
-            break;
-        }
-        default:
-        {
-            return SPP_STATUS_UNKNOWN_PROPERTY;
-        }
+    
+    if (instance_data) {
+        std::lock_guard<std::mutex> lg(pv->mx);
+        pv->timestamp = *((uint32_t*)instance_data);
+        memcpy(&pv->buffer[0], (uint8_t*)value, pv->def->size);
+    } else {
+        std::lock_guard<std::mutex> lg(pv->mx);
+        memcpy(&pv->buffer[0], (uint8_t*)value, pv->def->size);
     }
 
     return SPP_STATUS_OK;
@@ -217,8 +172,7 @@ void onStatusResponse(SPP_STATUS_T status, void* instance_data) {
 }
 
 void onStreamResponse(uint32_t timestamp, SppStream_t* stream, void* instance_data) {
-    std::cout << timestamp << " ";
-    onValueResponse(nullptr, stream->def->id, stream->value, instance_data);
+    onValueResponse(nullptr, stream->def->id, stream->value, &timestamp);
 }
 
 TelemetryComms* TelemetryComms::getInstance() {
@@ -281,34 +235,59 @@ void TelemetryComms::start() {
     // accept emulator
     emulator_fd_ = acceptClient();
 
-    // std::promise<int> viewer_fd_promise;
-    // std::future<int> fd_future = viewer_fd_promise.get_future();
-
     while(1) {
         viewer_fd_ = TelemetryComms::getInstance()->acceptClient();
     }
 }
 
-void TelemetryComms::start(int comport, int baud) {
+void TelemetryComms::start(const char* port, int baud) {
     // start with hardware connection
     is_data_src_emulated_ = false;
-    comport_ = comport;
     baud_ = baud;
 
-    char mode[] = {'8', 'N', '1', 0};
+    comport_ = open_serial_port(port, baud);
 
-    if (RS232_OpenComport(comport, baud, mode, 0)) {
-        std::cout << "ERROR: failed to open com port " << comport << std::endl;
+    if (comport_ == -1) {
+        exit(1);
     }
 
-    acceptClient();
+    SppConnectToClient(&spp_, &default_client);
+    wait_for_viewer_ = std::thread(&TelemetryComms::waitForViewer, this);
+    serial_listener_ = std::thread(&TelemetryComms::startListener, this);
 
-    // TODO: start listener for serial communications
+}
+
+void TelemetryComms::waitForViewer() {
+    viewer_fd_ = acceptClient();
+}
+
+void TelemetryComms::startListener() {
+    uint8_t buffer[4096];
+    uint8_t msg[512];
+    uint32_t msg_idx = 0;
+
+    while(true) {
+        uint32_t n = read_port(comport_, buffer, 4096);
+
+        if (n > 0) {
+            for (int j = 0; j < n; ++j) {
+                msg[msg_idx++] = buffer[j];
+
+                if (msg_idx >= 2) {
+                    if (msg[msg_idx - 2] == STCP_FOOTER && msg[msg_idx - 1] == STCP_FOOTER) {
+                        std::lock_guard<std::mutex> lg(stcp_mx_);
+                        int ret = StcpHandleMessage(&stcp_, msg, msg_idx);
+                        msg_idx = 0;
+                    }
+                }
+            }
+        }
+    }
 }
 
 TelemetryComms::~TelemetryComms() {
     if (!is_data_src_emulated_) {
-        RS232_CloseComport(comport_);
+        close(comport_);
     }
     delete instance_;
 }
@@ -330,9 +309,7 @@ StcpStatus_t handleStcpPacket(void* bytes, uint16_t len, void* instance_data) {
     SPP_STATUS_T ret = SppHostProcessMessage(spp, (uint8_t*)bytes, len);
 
     if (ret != SPP_STATUS_OK) {
-        //for (int i = 0; i < len; ++i) printf("\\x%.2x", ((uint8_t*)bytes)[i]);
-        //std::cout << std::endl;
-        std::cout << (int)ret << std::endl;
+        std::cout << "Error: " << (int)ret << std::endl;
         return STCP_STATUS_UNDEFINED_ERROR;
     } else {
         return STCP_STATUS_SUCCESS;
@@ -346,7 +323,7 @@ StcpStatus_t sendStcpPacket(void *bytes, uint16_t len, void* instance_data) {
        tc->getServer()->sendToClient(tc->getEmulatorSock(), (uint8_t*)bytes, len);
     } else {
         int com = tc->getComport();
-        RS232_SendBuf(com, (uint8_t*)bytes, len);
+        write_port(com, (uint8_t*)bytes, len);
     }
 
     return STCP_STATUS_SUCCESS;

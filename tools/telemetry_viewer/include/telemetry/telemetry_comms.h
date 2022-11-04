@@ -7,12 +7,15 @@
 
 #include <unordered_map>
 
+#include <mutex>
+
 #include "tcp_server.h"
 #include "rs232.h"
 
 struct PropValue {
     std::mutex mx{};
     SppPropertyDefinition_t* def{nullptr};
+    uint32_t timestamp;
     std::vector<uint8_t> buffer;
 };
 
@@ -21,7 +24,7 @@ class TelemetryComms {
 public:
     static TelemetryComms* getInstance();
 
-    void start(int comport, int baud);
+    void start(const char* comport, int baud);
     void start();
 
     int getComport();
@@ -46,10 +49,16 @@ private:
     ~TelemetryComms();
     static TelemetryComms* instance_;
 
+    void startListener();
+    void waitForViewer();
+
     TcpServer server_;
     server_observer_t listener_;
+    std::thread serial_listener_;
+    std::thread wait_for_viewer_;
 
     std::unordered_map<uint16_t, PropValue> prop_values_;
+
 
     static const int BUFFER_SIZE = 100;
     const uint8_t address_raw = 0x0;

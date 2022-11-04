@@ -7,7 +7,8 @@
     <booleanAttribute key="com.crt.ctrlcenter.crtInit" value="true"/>
     <stringAttribute key="com.crt.ctrlcenter.currentWireType" value="SWD"/>
     <booleanAttribute key="com.crt.ctrlcenter.mainBreakIsHardware" value="true"/>
-    <stringAttribute key="com.crt.ctrlcenter.serialNumber" value="LinkServerARMDAPLink CMSIS-DAP0227000007b2e42d00000000000000000000000097969905"/>
+    <booleanAttribute key="com.crt.ctrlcenter.saveState" value="true"/>
+    <stringAttribute key="com.crt.ctrlcenter.serialNumber" value="LinkServerNXP SemiconductorsMCU-LINK r0FF CMSIS-DAP V0.078BDKFB2JOKHWH3"/>
     <mapAttribute key="com.crt.ctrlcenter.symbolsGroupSettings"/>
     <intAttribute key="com.crt.ctrlcenter.version" value="6"/>
     <stringAttribute key="com.nxp.mcuxpresso.flash.base.address" value="0x00000000"/>
@@ -17,8 +18,8 @@
     <stringAttribute key="com.nxp.mcuxpresso.flash.executable" value="axf"/>
     <stringAttribute key="com.nxp.mcuxpresso.flash.program.action" value="Program"/>
     <booleanAttribute key="com.nxp.mcuxpresso.flash.reset.target" value="true"/>
-    <stringAttribute key="com.nxp.mcuxpresso.ide.probe.manufacturer" value="ARM"/>
-    <stringAttribute key="com.nxp.mcuxpresso.ide.probe.name" value="DAPLink CMSIS-DAP"/>
+    <stringAttribute key="com.nxp.mcuxpresso.ide.probe.manufacturer" value="NXP Semiconductors"/>
+    <stringAttribute key="com.nxp.mcuxpresso.ide.probe.name" value="MCU-LINK r0FF CMSIS-DAP V0.078"/>
     <stringAttribute key="com.nxp.mcuxpresso.ide.probe.type" value="LinkServer"/>
     <stringAttribute key="debug.level" value="2"/>
     <stringAttribute key="emu.speed" value=""/>
@@ -76,7 +77,7 @@
     <intAttribute key="org.eclipse.cdt.launch.ATTR_BUILD_BEFORE_LAUNCH_ATTR" value="0"/>
     <stringAttribute key="org.eclipse.cdt.launch.DEBUGGER_ID" value="gdb"/>
     <stringAttribute key="org.eclipse.cdt.launch.DEBUGGER_START_MODE" value="remote"/>
-    <stringAttribute key="org.eclipse.cdt.launch.PROGRAM_NAME" value="${resource_loc:/tvc_ide_build/.cproject}/../../../build-debug/hopper.elf"/>
+    <stringAttribute key="org.eclipse.cdt.launch.PROGRAM_NAME" value="${resource_loc:/tvc_ide_build/.cproject}/../../../build-debug-fsnor/hopper.elf"/>
     <stringAttribute key="org.eclipse.cdt.launch.PROJECT_ATTR" value="tvc_ide_build"/>
     <booleanAttribute key="org.eclipse.cdt.launch.PROJECT_BUILD_CONFIG_AUTO_ATTR" value="false"/>
     <stringAttribute key="org.eclipse.cdt.launch.PROJECT_BUILD_CONFIG_ID_ATTR" value=""/>

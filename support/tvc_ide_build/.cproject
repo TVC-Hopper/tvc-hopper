@@ -647,7 +647,7 @@
 	<storageModule moduleId="com.crt.config">
 		<projectStorage>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
 &lt;TargetConfig&gt;
-&lt;Properties property_3="NXP" property_4="MIMXRT1011xxxxx" property_count="5" version="100300"/&gt;
+&lt;Properties property_2="MIMXRT1010_SFDP_QSPI.cfx" property_3="NXP" property_4="MIMXRT1011xxxxx" property_count="5" version="100300"/&gt;
 &lt;infoList vendor="NXP"&gt;
 &lt;info chip="MIMXRT1011xxxxx" name="MIMXRT1011xxxxx"&gt;
 &lt;chip&gt;
@@ -656,6 +656,7 @@
 &lt;vendor&gt;NXP&lt;/vendor&gt;
 &lt;memory can_program="true" id="Flash" is_ro="true" size="0" type="Flash"/&gt;
 &lt;memory id="RAM" size="128" type="RAM"/&gt;
+&lt;memoryInstance derived_from="Flash" driver="MIMXRT1010_SFDP_QSPI.cfx" edited="true" id="BOARD_FLASH" location="0x60000000" size="0x10000000"/&gt;
 &lt;memoryInstance derived_from="RAM" edited="true" id="SRAM_DTC" location="0x20000000" size="0x8000"/&gt;
 &lt;memoryInstance derived_from="RAM" edited="true" id="SRAM_ITC" location="0x0" size="0x8000"/&gt;
 &lt;memoryInstance derived_from="RAM" edited="true" id="SRAM_OC" location="0x20200000" size="0x8000"/&gt;
@@ -672,4 +673,5 @@
 	<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets">
 		<buildTargets/>
 	</storageModule>
+	<storageModule moduleId="refreshScope"/>
 </cproject>

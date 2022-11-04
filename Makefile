@@ -17,12 +17,14 @@ generate_spp_headers:
 
 .PHONY: clean
 clean:
+	rm -rf build
 	rm -rf $(BUILD_DIR)
 	rm -rf $(BUILD_FSNOR_DIR)
 	rm -rf $(DEBUG_FSNOR_DIR)
 	rm -rf $(DEBUG_DIR)
 	rm -rf $(TEST_BUILD_DIR)
 	rm -rf $(BUILD_TELEM_SERVER_DIR)
+	rm -rf $(BUILD_TELEM_EMULATOR_DIR)
 
 .PHONY: release
 release: generate_spp_headers
@@ -60,7 +62,7 @@ start_telemetry_emulator:
 
 .PHONY: start_telemetry_server
 start_telemetry_server:
-	./$(BUILD_TELEM_SERVER_DIR)/telemetry_server
+	./$(BUILD_TELEM_SERVER_DIR)/telemetry_server /dev/cu.usbserial-A9I4RQDF $(mode)
 
 
 .PHONY: test

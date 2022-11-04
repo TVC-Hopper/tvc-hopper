@@ -7,12 +7,16 @@ add_library(fslhal
     src/fsl_flexspi_nor_boot.c
     src/fsl_gpio.c
     src/fsl_lpi2c.c
+    src/fsl_lpspi.c
     src/fsl_lpuart.c
     src/fsl_memcpy.S
     src/fsl_pwm.c
     src/fsl_sbrk.c
     src/fsl_str.c
     src/fsl_xbara.c
+    src/fsl_lpuart_freertos.c
+    src/fsl_lpi2c_freertos.c
+    src/fsl_lpspi_freertos.c
 
     component/fsl_adapter_lpuart.c
     component/fsl_component_generic_list.c
