@@ -13,8 +13,8 @@ extern void HwLidar_Init() {
 
     TfLidarInitParams_t ip;
     ip.address = TFL_DEFAULT_I2C;
-    ip.onWrite = XCCb_I2CWrite;
-    ip.onRead = XCCb_I2CRead;
+    ip.onWrite = XCCb_I2CRegisterWrite;
+    ip.onRead = XCCb_I2CRegisterRead;
 
     Tfl_Init(&lidar, &ip);
 

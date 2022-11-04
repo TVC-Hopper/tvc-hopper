@@ -96,7 +96,7 @@ static int Open(sh2_Hal_t *self) {
     Bno085_t* imu = (Bno085_t*)self->instance_data;
     uint8_t soft_reset[5] = {5, 0, 1, 0, 1};
 
-    imu->onWrite(BNO085_I2C_ADDR, 0, soft_reset, 5);
+    imu->onWrite(BNO085_I2C_ADDR, soft_reset, 5);
 
     return 0;
 }
@@ -108,7 +108,7 @@ static int Read(sh2_Hal_t *self, uint8_t *buffer, unsigned length, uint32_t *t_u
     uint8_t header[4];
     
     Bno085_t* imu = (Bno085_t*)self->instance_data;
-    imu->onRead(BNO085_I2C_ADDR, 0, header, 4);
+    imu->onRead(BNO085_I2C_ADDR, header, 4);
 
     uint16_t packet_size = (uint16_t)header[0] | (uint16_t)header[1] << 8;
     packet_size &= ~0x8000;
@@ -126,7 +126,7 @@ static int Read(sh2_Hal_t *self, uint8_t *buffer, unsigned length, uint32_t *t_u
           read_size = min(imu->buffer_size, (size_t)cargo_remaining + 4);
         }
 
-        imu->onRead(BNO085_I2C_ADDR, 0, i2c_buffer, read_size);
+        imu->onRead(BNO085_I2C_ADDR, i2c_buffer, read_size);
 
         if (first_read) {
           cargo_read_amount = read_size;
@@ -148,7 +148,7 @@ static int Write(sh2_Hal_t *self, uint8_t *buffer, unsigned length) {
     Bno085_t* imu = (Bno085_t*)self->instance_data;
 
     uint32_t write_size = min(length, imu->buffer_size);
-    imu->onWrite(BNO085_I2C_ADDR, 0, buffer, write_size);
+    imu->onWrite(BNO085_I2C_ADDR, buffer, write_size);
 
     if (length - write_size == 0) {
         return 0;
