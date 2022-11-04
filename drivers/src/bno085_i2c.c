@@ -26,7 +26,6 @@ static uint32_t min(uint32_t a, uint32_t b) {
 }
 
 extern bool Bno085_Init(Bno085_t *b, Bno085InitParams_t *bip) {
-    b->sensor_id = bip->sensor_id;
     b->buffer_size = bip->buffer_size;
     b->getTime_us = bip->getTime_us;
     b->onWrite = bip->onWrite;
@@ -55,7 +54,7 @@ extern bool Bno085_Init(Bno085_t *b, Bno085InitParams_t *bip) {
     return true;
 }
 
-extern bool Bno085_GetSensorEvent(Bno085_t *b, sh2_SensorValue_t *value) {
+extern bool Bno085_GetSensorEvent(Bno085_t *b, sh2_SensorId_t sensor, sh2_SensorValue_t *value) {
     b->sensor_value = value;
 
     value->timestamp = 0;
@@ -82,7 +81,7 @@ extern bool Bno085_EnableReport(Bno085_t *b, sh2_SensorId_t sensor, uint32_t int
     config.sensorSpecific = 0;
 
     config.reportInterval_us = interval_us;
-    int status = sh2_setSensorConfig(b->sensor_id, &config);
+    int status = sh2_setSensorConfig(sensor, &config);
 
     if (status != SH2_OK) {
         return false;

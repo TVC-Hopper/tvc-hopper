@@ -52,10 +52,10 @@ int main(void)
     CommandControlComms_Init();
 
     // taskless wrappers for drivers
-    HwImu_Init();
-    HwLidar_Init();
     HwEsc_Init();
     HwThrustVane_Init();
+    HwImu_Init();
+    HwLidar_Init();
 
     CreateTasks();
 
