@@ -877,6 +877,16 @@
                   <data type="Version">2.0.3</data>
                </feature>
             </dependency>
+            <dependency resourceType="SWComponent" resourceId="platform.drivers.adc_12b1msps_sar" description="ADC Driver not found in the toolchain/IDE project. Project will not compile!" problem_level="2" source="Peripherals">
+               <feature name="enabled" evaluation="equal">
+                  <data type="Boolean">true</data>
+               </feature>
+            </dependency>
+            <dependency resourceType="SWComponent" resourceId="platform.drivers.adc_12b1msps_sar" description="Unsupported version of the ADC Driver in the toolchain/IDE project. Required: ${required_value}, actual: ${actual_value}. Project might not compile correctly." problem_level="1" source="Peripherals">
+               <feature name="version" evaluation="equivalent">
+                  <data type="Version">2.0.0</data>
+               </feature>
+            </dependency>
          </dependencies>
          <generated_project_files>
             <file path="include/bsp/peripherals.h" update_enabled="true"/>
@@ -1038,6 +1048,11 @@
                   <dependency resourceType="SWComponent" resourceId="platform.drivers.lpspi_freertos" description="The compatible version of the fsl_lpspi_freertos driver is not available in the project  (required for the FreeRTOS mode)." problem_level="1" source="Peripherals:BOARD_InitPeripherals">
                      <feature name="version" evaluation="compatible">
                         <data type="Version">2.0.2</data>
+                     </feature>
+                  </dependency>
+                  <dependency resourceType="PeripheralUnifiedSignal" resourceId="ADC1.adc_in.14" description="Signal IN, channel 14 is not routed." problem_level="1" source="Peripherals:BOARD_InitPeripherals">
+                     <feature name="routed" evaluation="">
+                        <data type="Boolean">true</data>
                      </feature>
                   </dependency>
                </dependencies>
@@ -1400,7 +1415,7 @@
                            <setting name="debugEnable" value="true"/>
                            <setting name="ignoreAck" value="false"/>
                            <setting name="pinConfig" value="kLPI2C_2PinOpenDrain"/>
-                           <setting name="baudRate_Hz" value="100000"/>
+                           <setting name="baudRate_Hz" value="200000"/>
                            <setting name="busIdleTimeout_ns" value="0"/>
                            <setting name="pinLowTimeout_ns" value="0"/>
                            <setting name="sdaGlitchFilterWidth_ns" value="0"/>
@@ -1587,6 +1602,54 @@
                            <setting name="enable_priority" value="true"/>
                            <setting name="priority" value="4"/>
                         </struct>
+                     </config_set>
+                  </instance>
+                  <instance name="ADC1" uuid="19b2e209-1185-4627-a568-ccbd637f8d9f" type="adc_12b1msps_sar" type_id="adc_12b1msps_sar_6a490e886349a7b2b07bed10ce7b299b" mode="ADC_GENERAL" peripheral="ADC1" enabled="true" comment="" custom_name_enabled="false" editing_lock="false">
+                     <config_set name="fsl_adc">
+                        <struct name="clockConfig">
+                           <setting name="clockSource" value="kADC_ClockSourceAD"/>
+                           <setting name="clockSourceFreq" value="custom:10 MHz"/>
+                           <setting name="clockDriver" value="kADC_ClockDriver2"/>
+                           <setting name="samplePeriodMode" value="kADC_SamplePeriodShort2Clocks"/>
+                           <setting name="enableAsynchronousClockOutput" value="true"/>
+                        </struct>
+                        <struct name="conversionConfig">
+                           <setting name="resolution" value="kADC_Resolution12Bit"/>
+                           <setting name="hardwareAverageMode" value="kADC_HardwareAverageDisable"/>
+                           <setting name="enableHardwareTrigger" value="software"/>
+                           <setting name="enableHighSpeed" value="false"/>
+                           <setting name="enableLowPower" value="false"/>
+                           <setting name="enableContinuousConversion" value="false"/>
+                           <setting name="enableOverWrite" value="false"/>
+                           <setting name="enableDma" value="false"/>
+                        </struct>
+                        <struct name="resultingTime"/>
+                        <struct name="resultCorrection">
+                           <setting name="doAutoCalibration" value="false"/>
+                           <setting name="offset" value="0"/>
+                        </struct>
+                        <struct name="hardwareCompareConfiguration">
+                           <setting name="hardwareCompareMode" value="disabled"/>
+                           <setting name="value1" value="0"/>
+                           <setting name="value2" value="0"/>
+                        </struct>
+                        <setting name="enableInterrupt" value="false"/>
+                        <struct name="adc_interrupt">
+                           <setting name="IRQn" value="ADC1_IRQn"/>
+                           <setting name="enable_interrrupt" value="enabled"/>
+                           <setting name="enable_priority" value="false"/>
+                           <setting name="priority" value="0"/>
+                           <setting name="enable_custom_name" value="false"/>
+                        </struct>
+                        <array name="adc_channels_config">
+                           <struct name="0">
+                              <setting name="channelNumber" value="IN.14"/>
+                              <setting name="channelName" value=""/>
+                              <setting name="channelGroup" value="0"/>
+                              <setting name="initializeChannel" value="true"/>
+                              <setting name="enableInterruptOnConversionCompleted" value="false"/>
+                           </struct>
+                        </array>
                      </config_set>
                   </instance>
                </instances>

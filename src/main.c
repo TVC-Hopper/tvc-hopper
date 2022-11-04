@@ -11,9 +11,9 @@
 #include <fslhal/fsl_lpuart.h>
 #include <fslhal/fsl_xbara.h>
 
+#include "modules/lqr_control.h"
 #include "modules/command_control_comms.h"
 #include "modules/controls_inputs.h"
-#include "modules/lqr_control.h"
 
 #include "hw/imu.h"
 #include "hw/esc.h"
@@ -55,10 +55,10 @@ int main(void)
     HoverControl_Init();
 
     // taskless wrappers for drivers
-    HwImu_Init();
-    HwLidar_Init();
     HwEsc_Init();
     HwThrustVane_Init();
+    HwImu_Init();
+    HwLidar_Init();
 
     CreateTasks();
 
@@ -81,7 +81,7 @@ static void CreateTasks() {
 
     if (xTaskCreate(UartListener_Task,
                         "uart_comms",
-                        configMINIMAL_STACK_SIZE + 64,
+                        configMINIMAL_STACK_SIZE + 256,
                         NULL,
                         PRIORITY_UART_LISTENER,
                         NULL) != pdPASS)

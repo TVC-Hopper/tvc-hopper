@@ -559,7 +559,7 @@ instance:
       - debugEnable: 'true'
       - ignoreAck: 'false'
       - pinConfig: 'kLPI2C_2PinOpenDrain'
-      - baudRate_Hz: '100000'
+      - baudRate_Hz: '200000'
       - busIdleTimeout_ns: '0'
       - pinLowTimeout_ns: '0'
       - sdaGlitchFilterWidth_ns: '0'
@@ -587,7 +587,7 @@ const lpi2c_master_config_t LPI2C1_masterConfig = {
   .debugEnable = true,
   .ignoreAck = false,
   .pinConfig = kLPI2C_2PinOpenDrain,
-  .baudRate_Hz = 100000UL,
+  .baudRate_Hz = 200000UL,
   .busIdleTimeout_ns = 0UL,
   .pinLowTimeout_ns = 0UL,
   .sdaGlitchFilterWidth_ns = 0U,
@@ -774,6 +774,86 @@ static void LPSPI1_init(void) {
 }
 
 /***********************************************************************************************************************
+ * ADC1 initialization code
+ **********************************************************************************************************************/
+/* clang-format off */
+/* TEXT BELOW IS USED AS SETTING FOR TOOLS *************************************
+instance:
+- name: 'ADC1'
+- type: 'adc_12b1msps_sar'
+- mode: 'ADC_GENERAL'
+- custom_name_enabled: 'false'
+- type_id: 'adc_12b1msps_sar_6a490e886349a7b2b07bed10ce7b299b'
+- functional_group: 'BOARD_InitPeripherals'
+- peripheral: 'ADC1'
+- config_sets:
+  - fsl_adc:
+    - clockConfig:
+      - clockSource: 'kADC_ClockSourceAD'
+      - clockSourceFreq: 'custom:10 MHz'
+      - clockDriver: 'kADC_ClockDriver2'
+      - samplePeriodMode: 'kADC_SamplePeriodShort2Clocks'
+      - enableAsynchronousClockOutput: 'true'
+    - conversionConfig:
+      - resolution: 'kADC_Resolution12Bit'
+      - hardwareAverageMode: 'kADC_HardwareAverageDisable'
+      - enableHardwareTrigger: 'software'
+      - enableHighSpeed: 'false'
+      - enableLowPower: 'false'
+      - enableContinuousConversion: 'false'
+      - enableOverWrite: 'false'
+      - enableDma: 'false'
+    - resultingTime: []
+    - resultCorrection:
+      - doAutoCalibration: 'false'
+      - offset: '0'
+    - hardwareCompareConfiguration:
+      - hardwareCompareMode: 'disabled'
+      - value1: '0'
+      - value2: '0'
+    - enableInterrupt: 'false'
+    - adc_interrupt:
+      - IRQn: 'ADC1_IRQn'
+      - enable_interrrupt: 'enabled'
+      - enable_priority: 'false'
+      - priority: '0'
+      - enable_custom_name: 'false'
+    - adc_channels_config:
+      - 0:
+        - channelNumber: 'IN.14'
+        - channelName: ''
+        - channelGroup: '0'
+        - initializeChannel: 'true'
+        - enableInterruptOnConversionCompleted: 'false'
+ * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS **********/
+/* clang-format on */
+const adc_config_t ADC1_config = {
+  .enableOverWrite = false,
+  .enableContinuousConversion = false,
+  .enableHighSpeed = false,
+  .enableLowPower = false,
+  .enableLongSample = false,
+  .enableAsynchronousClockOutput = true,
+  .referenceVoltageSource = kADC_ReferenceVoltageSourceAlt0,
+  .samplePeriodMode = kADC_SamplePeriodShort2Clocks,
+  .clockSource = kADC_ClockSourceAD,
+  .clockDriver = kADC_ClockDriver2,
+  .resolution = kADC_Resolution12Bit
+};
+const adc_channel_config_t ADC1_channels_config[1] = {
+  {
+    .channelNumber = 14U,
+    .enableInterruptOnConversionCompleted = false
+  }
+};
+static void ADC1_init(void) {
+  /* Initialize ADC1 peripheral. */
+  ADC_Init(ADC1_PERIPHERAL, &ADC1_config);
+  /* Initialize ADC1 channel 14. */
+  ADC_SetChannelConfig(ADC1_PERIPHERAL, ADC1_CH0_CONTROL_GROUP, &ADC1_channels_config[0]);
+}
+
+/***********************************************************************************************************************
  * Initialization functions
  **********************************************************************************************************************/
 void BOARD_InitPeripherals(void)
@@ -785,6 +865,7 @@ void BOARD_InitPeripherals(void)
   GPIO1_init();
   GPIO2_init();
   LPSPI1_init();
+  ADC1_init();
 }
 
 /***********************************************************************************************************************

@@ -40,22 +40,6 @@
 #define HOVCTRL_MATH_STATUS_OK               ((uint8_t)0x00)
 #define HOVCTRL_MATH_STATUS_ERROR            ((uint8_t)0x01)
 
-static hovctrl_status_t hover_status;
-static float ref[STATE_VECTOR_SIZE] = {0};
-static float curr_state[STATE_VECTOR_SIZE] = {0};
-static float actuator_input_now[ACTUATION_VECTOR_SIZE] = {0};
-
-static float error_zint = 0;
-
-static const float K_hover[ACTUATION_VECTOR_SIZE][STATE_VECTOR_SIZE] = {    
-    70.711,   0.000,      5.000,      12.161,     0.000,      5.217,      0.000,    0.000,    0.000,
-    0.000,    -70.711,    -5.000,     0.000,      -12.162,    -5.217,     0.000,    0.000,    0.000,
-    70.711,   0.000,      -5.000,     12.161,     0.000,      -5.217,     0.000,    0.000,    0.000,
-    0.000,    -70.711,    5.000,      0.000,      -12.162,    5.217,      0.000,    0.000,    0.000,
-    0.000,    0.000,      0.000,      0.000,      0.000,      0.000,      7.716,    4.140,    7.071 
-};
-//  roll,     pitch,      yaw,        gx,         gy,         gz,         z,        vz,       zint
-
 typedef enum{
     HOVCTRL_STATUS_STATIONARY = 0,
     HOVCTRL_STATUS_TAKEOFF,
@@ -74,14 +58,11 @@ typedef enum{
 } control_setpoint_t;
 
 extern void HoverControl_Init();
-extern void HoverControl_Task(void* task_args);
 
-HOVCTRL_MATH_STATUS_T Multiply_Matrix(float* Result, float** A, float** B, uint32_t A_rows, uint32_t A_cols, uint32_t B_rows, uint32_t B_cols);
-HOVCTRL_MATH_STATUS_T Subtract_Vector(float** Result, float** A, float** B, uint32_t A_size, uint32_t B_size);
-void Correct_Yaw(float* error);
-void RateLimit_VaneActuation(float* actuator_input_last, float* actuator_input_now, float alpha);
-float Limit(float value, float min, float max);
+extern void HoverControl_Task();
 
-void SetRefPosition();
+extern void HoverControl_SetReference(float* setpoints);
+
+extern hovctrl_status_t HoverControl_SetStatus(float** error);
 
 #endif

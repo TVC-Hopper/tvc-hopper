@@ -5,4 +5,6 @@
 
 extern void HwImu_Init();
 
+extern void HwImu_GetReadings(float* readings);
+
 #endif

@@ -7,6 +7,29 @@
 #include "hw/esc.h"
 #include "modules/controls_inputs.h"
 
+static hovctrl_status_t hover_status;
+static float ref[STATE_VECTOR_SIZE] = {0};
+static float curr_state[STATE_VECTOR_SIZE] = {0};
+static float actuator_input_now[ACTUATION_VECTOR_SIZE] = {0};
+
+static float error_zint = 0;
+
+static const float K_hover[ACTUATION_VECTOR_SIZE][STATE_VECTOR_SIZE] = {    
+    70.711,   0.000,      5.000,      12.161,     0.000,      5.217,      0.000,    0.000,    0.000,
+    0.000,    -70.711,    -5.000,     0.000,      -12.162,    -5.217,     0.000,    0.000,    0.000,
+    70.711,   0.000,      -5.000,     12.161,     0.000,      -5.217,     0.000,    0.000,    0.000,
+    0.000,    -70.711,    5.000,      0.000,      -12.162,    5.217,      0.000,    0.000,    0.000,
+    0.000,    0.000,      0.000,      0.000,      0.000,      0.000,      7.716,    4.140,    7.071 
+};
+//  roll,     pitch,      yaw,        gx,         gy,         gz,         z,        vz,       zint
+
+
+static HOVCTRL_MATH_STATUS_T Multiply_Matrix(float* Result, float** A, float** B, uint32_t A_rows, uint32_t A_cols, uint32_t B_rows, uint32_t B_cols);
+static HOVCTRL_MATH_STATUS_T Subtract_Vector(float** Result, float** A, float** B, uint32_t A_size, uint32_t B_size);
+static void Correct_Yaw(float* error);
+static void RateLimit_VaneActuation(float* actuator_input_last, float* actuator_input_now, float alpha);
+static float Limit(float value, float min, float max);
+
 extern void HoverControl_Init() {
     hover_status = HOVCTRL_STATUS_STATIONARY;
     // reference already initialized to 0, incl roll/pitch/yaw/gx/gy/gz
@@ -24,7 +47,7 @@ extern void HoverControl_Task(void* task_args) {
 
         float error[STATE_VECTOR_SIZE][1] = {0};
 
-        hover_status = HovCtrl_SetStatus(error);
+        hover_status = HoverControl_SetStatus(error);
         float error_z = error[STATE_IDX_Z][0];
         switch (hover_status) {
             case HOVCTRL_STATUS_STATIONARY:
@@ -122,11 +145,11 @@ float Limit(float value, float min, float max){
     return output;
 }
 
-extern void HovCtrl_SetReference(float* setpoints) {
+extern void HoverControl_SetReference(float* setpoints) {
     ref[STATE_IDX_Z] = setpoints[SETPOINT_Z];
 }
 
-extern hovctrl_status_t HovCtrl_SetStatus(float** error) {
+extern hovctrl_status_t HoverControl_SetStatus(float** error) {
     float z_error = error[STATE_IDX_Z][0];
 
     if (ref[STATE_IDX_Z] == 0) {

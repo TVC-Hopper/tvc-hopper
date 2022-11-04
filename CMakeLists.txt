@@ -16,6 +16,7 @@ add_subdirectory(freertos)
 add_subdirectory(drivers)
 add_subdirectory(bsp)
 add_subdirectory(fslhal)
+add_subdirectory(sensor-hub)
 
 add_executable(${PROJECT_NAME}.elf
     #    device/startup_mimxrt1011.c
@@ -28,11 +29,13 @@ add_executable(${PROJECT_NAME}.elf
     src/modules/command_control_comms.c
     src/modules/spp_property_list.c
     src/modules/control_inputs.c
+    src/modules/lqr_control.c
 
     src/hw/imu.c
     src/hw/thrust_vanes.c
     src/hw/lidar.c
     src/hw/esc.c
+    src/hw/batt_monitor.c
 )
 
 target_include_directories(${PROJECT_NAME}.elf
@@ -44,6 +47,8 @@ target_include_directories(${PROJECT_NAME}.elf
         CMSIS 
         stcp/include
         spp/include
+
+        sensor-hub/include
 
         freertos/freertos_kernel/include
         freertos/freertos_kernel/include/freertos
