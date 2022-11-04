@@ -93,11 +93,11 @@ extern uint8_t XCCb_I2CWrite(uint8_t address, uint8_t subaddress, uint8_t* data,
     LPI2C1_masterTransfer.data = data;
     LPI2C1_masterTransfer.dataSize = size;
 
-    LPI2C_RTOS_Transfer(&LPI2C1_masterHandle, &LPI2C1_masterTransfer);
+    status_t status = LPI2C_RTOS_Transfer(&LPI2C1_masterHandle, &LPI2C1_masterTransfer);
 
     xSemaphoreGive(i2c_mx);
 
-    return 0;
+    return status;
 }
 
 extern uint8_t XCCb_I2CRead(uint8_t address, uint8_t subaddress, uint8_t* data, uint16_t size) {
@@ -109,11 +109,11 @@ extern uint8_t XCCb_I2CRead(uint8_t address, uint8_t subaddress, uint8_t* data, 
     LPI2C1_masterTransfer.data = data;
     LPI2C1_masterTransfer.dataSize = size;
 
-    LPI2C_RTOS_Transfer(&LPI2C1_masterHandle, &LPI2C1_masterTransfer);
+    status_t status = LPI2C_RTOS_Transfer(&LPI2C1_masterHandle, &LPI2C1_masterTransfer);
 
     xSemaphoreGive(i2c_mx);
 
-    return 0;
+    return status;
 }
 
 extern void XCCb_DelayMs(uint32_t ms) {
