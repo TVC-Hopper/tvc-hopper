@@ -7,7 +7,7 @@
 #include "hw/esc.h"
 #include "modules/controls_inputs.h"
 
-enum hovctrl_status_t hover_status = HOVCTRL_STATUS_STATIONARY;
+enum hovctrl_status_t hover_status;
 static float ref[STATE_VECTOR_SIZE] = {0};
 static float curr_state[STATE_VECTOR_SIZE] = {0};
 static float actuator_input_now[ACTUATION_VECTOR_SIZE] = {0};
@@ -37,7 +37,6 @@ extern void HoverControl_Init() {
 
 extern void HoverControl_Task(void* task_args) {
     uint32_t xLastWakeTime = xTaskGetTickCount();
-    enum hovctrl_status_t hover_status = HOVCTRL_STATUS_STATIONARY;
 
     for(;;) {                
         ControlsInputs_GetIMUProcessed(&curr_state[STATE_IDX_ROLL]); 
@@ -82,9 +81,9 @@ extern void HoverControl_GetState(float* tlm) {
     }
 }
 
-// extern enum hovctrl_status_t HoverControl_GetStatus() {
-//     return hover_status;
-// }
+extern enum hovctrl_status_t HoverControl_GetStatus() {
+    return hover_status;
+}
 
 void HoverControl_SetStatus(float error_z) {
     if (ref[STATE_IDX_Z] == 0) {

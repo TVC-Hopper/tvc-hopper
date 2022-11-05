@@ -65,6 +65,6 @@ extern void HoverControl_SetReference(float* setpoints);
 
 extern void HoverControl_GetState(float* tlm);
 
-// extern enum hovctrl_status_t HoverControl_GetStatus();
+extern enum hovctrl_status_t HoverControl_GetStatus();
 
 #endif
