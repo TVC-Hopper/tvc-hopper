@@ -6,7 +6,7 @@
 #define SETPOINT_MAX_PITCH              0.1 // Max pitch (radians)
 
 // Maps the kRPM output of the controller to % ESC actuation.
-#define MOTOR_KRPM_TO_ESC_PERCENT       72.43 // placeholder, FIXME
+#define MOTOR_KRPM_TO_ESC_PERCENT       72.43 // FIXME: placeholder
 #define CONTROL_LOOP_INTERVAL           5.0 // (milliseconds)
 
 // Math
@@ -36,9 +36,9 @@
 #define ACTUATOR_IDX_VANE4              ((uint16_t)0x03)
 #define ACTUATOR_IDX_ESC                ((uint16_t)0x04)
 
-#define HOVCTRL_MATH_STATUS_T                uint8_t
-#define HOVCTRL_MATH_STATUS_OK               ((uint8_t)0x00)
-#define HOVCTRL_MATH_STATUS_ERROR            ((uint8_t)0x01)
+#define HOVCTRL_MATH_STATUS_T           uint8_t
+#define HOVCTRL_MATH_STATUS_OK          ((uint8_t)0x00)
+#define HOVCTRL_MATH_STATUS_ERROR       ((uint8_t)0x01)
 
 typedef enum{
     HOVCTRL_STATUS_STATIONARY = 0,
@@ -63,6 +63,8 @@ extern void HoverControl_Task();
 
 extern void HoverControl_SetReference(float* setpoints);
 
-extern hovctrl_status_t HoverControl_SetStatus(float** error);
+extern void HoverControl_GetCurrState();
+
+extern hovctrl_status_t HoverControl_GetStatus();
 
 #endif
