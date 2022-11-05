@@ -6,17 +6,17 @@
 #define SETPOINT_MAX_PITCH              0.1 // Max pitch (radians)
 
 // Maps the kRPM output of the controller to % ESC actuation.
-#define MOTOR_KRPM_TO_ESC_PERCENT       72.43 // FIXME: placeholder
-#define CONTROL_LOOP_INTERVAL           5.0 // (milliseconds)
+#define MOTOR_KRPM_TO_ESC_PERCENT       72.43f // FIXME: placeholder
+#define CONTROL_LOOP_INTERVAL           5 // (milliseconds)
 
 // Math
-#define PI                              3.142857
+#define PI                              3.142857f
 
 #define STATE_VECTOR_SIZE               9
 #define ACTUATION_VECTOR_SIZE           5
 
-#define LANDING_SPEED_FACTOR_CLOSE      1.2
-#define LANDING_SPEED_FACTOR_FAR        0.2
+#define LANDING_SPEED_FACTOR_CLOSE      1.2f
+#define LANDING_SPEED_FACTOR_FAR        0.2f
 
 #define STATE_IDX_T                     uint16_t
 #define STATE_IDX_ROLL                  ((uint16_t)0x00)
@@ -40,22 +40,22 @@
 #define HOVCTRL_MATH_STATUS_OK          ((uint8_t)0x00)
 #define HOVCTRL_MATH_STATUS_ERROR       ((uint8_t)0x01)
 
-typedef enum{
+typedef enum hovctrl_status_t {
     HOVCTRL_STATUS_STATIONARY = 0,
     HOVCTRL_STATUS_TAKEOFF,
     HOVCTRL_STATUS_FLYING,
     HOVCTRL_STATUS_LANDING_CLOSE,
     HOVCTRL_STATUS_LANDING_FAR
-} hovctrl_status_t; 
+}; 
 
-typedef enum{
+typedef enum control_setpoint_t {
     SETPOINT_X = 0,
     SETPOINT_Y,
     SETPOINT_Z,
     SETPOINT_ROLL,
     SETPOINT_PITCH,
     SETPOINT_YAW
-} control_setpoint_t;
+};
 
 extern void HoverControl_Init();
 
@@ -63,8 +63,8 @@ extern void HoverControl_Task();
 
 extern void HoverControl_SetReference(float* setpoints);
 
-extern void HoverControl_GetCurrState();
+extern void HoverControl_GetState(float* tlm);
 
-extern hovctrl_status_t HoverControl_GetStatus();
+// extern enum hovctrl_status_t HoverControl_GetStatus();
 
 #endif

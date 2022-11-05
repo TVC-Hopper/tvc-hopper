@@ -7,7 +7,7 @@
 #include "hw/esc.h"
 #include "modules/controls_inputs.h"
 
-static hovctrl_status_t hover_status;
+enum hovctrl_status_t hover_status = HOVCTRL_STATUS_STATIONARY;
 static float ref[STATE_VECTOR_SIZE] = {0};
 static float curr_state[STATE_VECTOR_SIZE] = {0};
 static float actuator_input_now[ACTUATION_VECTOR_SIZE] = {0};
@@ -22,24 +22,26 @@ static const float K_hover[ACTUATION_VECTOR_SIZE][STATE_VECTOR_SIZE] = {
 };
 //  roll,     pitch,      yaw,        gx,         gy,         gz,         z,        vz,       zint
 
-static hovctrl_status_t HoverControl_SetStatus(float error_z);
-static HOVCTRL_MATH_STATUS_T MultiplyMatrix(float* Result, float** A, float** B, uint32_t A_rows, uint32_t A_cols, uint32_t B_rows, uint32_t B_cols);
-static HOVCTRL_MATH_STATUS_T ComputeError(float** Result, float** A, float** B, uint32_t A_size, uint32_t B_size);
-static void CorrectYaw(float** error);
+static void HoverControl_SetStatus(float error_z);
+static HOVCTRL_MATH_STATUS_T MultiplyMatrix(float* Result, float** A, float* B, uint32_t A_rows, uint32_t A_cols, uint32_t B_rows);
+static HOVCTRL_MATH_STATUS_T ComputeError(float* Result, float* A, float* B, uint32_t A_size, uint32_t B_size);
+static void CorrectYaw(float* error);
 static void RateLimit_VaneActuation(float* actuator_input_last, float* actuator_input_now, float alpha);
 static float Limit(float value, float min, float max);
 static void ComputeZint (float error_z);
 
-extern void HovCtrl_Init() {
+extern void HoverControl_Init() {
     hover_status = HOVCTRL_STATUS_STATIONARY;
     // reference already initialized to 0, incl roll/pitch/yaw/gx/gy/gz
 }
 
 extern void HoverControl_Task(void* task_args) {
     uint32_t xLastWakeTime = xTaskGetTickCount();
-    for(;;) {        
-        ControlsInputs_GetIMU(&curr_state[STATE_IDX_ROLL]); 
-            // TODO: verify reading 6 floats
+    enum hovctrl_status_t hover_status = HOVCTRL_STATUS_STATIONARY;
+
+    for(;;) {                
+        ControlsInputs_GetIMUProcessed(&curr_state[STATE_IDX_ROLL]); 
+            // TODO: verify reading 6 floats [roll, pitch, yaw, gx, gy, gz]
 
         ControlsInputs_GetLidar(&curr_state[STATE_IDX_Z]); 
         curr_state[STATE_IDX_Z] /= (float)100; // convert cm to m
@@ -80,11 +82,11 @@ extern void HoverControl_GetState(float* tlm) {
     }
 }
 
-extern hovctrl_status_t HoverControl_GetStatus() {
-    return hover_status;
-}
+// extern enum hovctrl_status_t HoverControl_GetStatus() {
+//     return hover_status;
+// }
 
-void hovctrl_status_t HoverControl_SetStatus(float error_z) {
+void HoverControl_SetStatus(float error_z) {
     if (ref[STATE_IDX_Z] == 0) {
         if (error_z > -0.01) {
             hover_status = HOVCTRL_STATUS_STATIONARY;
