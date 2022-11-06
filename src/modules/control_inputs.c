@@ -1,9 +1,9 @@
 #include "modules/controls_inputs.h"
 
 #include <string.h>
+#include <math.h>
 
 #include <freertos/FreeRTOS.h>
-// needed to change to [ #include "portable/GCC/ARM_CM4F/portmacro.h" ] from [ #include "portmacro.h" ] in [ freertos/freertos_kernel/include/freertos/portable.h ]
 #include <freertos/semphr.h>
 
 #include "hw/lidar.h"
@@ -31,11 +31,11 @@ static float Qreal = 0;
 static float norm = 0;
 
 static void ComputeQuaternions();
-static float FixedToFloat(int16_t fixedp_value, uint8_t q_point);
+static float FixedToFloat(int16_t fixedp_value, uint16_t q_point);
 static void ProcessIMU();
-static float GetRoll();
-static float GetPitch();
-static float GetYaw();
+static void ComputeRoll();
+static void ComputePitch();
+static void ComputeYaw();
 static void SetGyro();
 
 extern void ControlsInputs_Init() {
@@ -74,9 +74,9 @@ extern void ControlsInputs_NotifyStart() {
     xSemaphoreGive(start_capture_sem);
 }
 
-extern void ControlsInputs_GetLidar(uint32_t *distance) {
+extern void ControlsInputs_GetLidar(float *distance) {
     xSemaphoreTake(lidar_data_mx, 0xFFFF);
-    *distance = lidar_distance;
+    *distance = (float)lidar_distance;
     xSemaphoreGive(lidar_data_mx);
 }
 
@@ -92,7 +92,7 @@ extern void ControlsInputs_GetIMUProcessed(float *data) {
     xSemaphoreGive(imu_data_proc_mx);
 }
 
-void ComputeQuaternions() {
+static void ComputeQuaternions() {
     xSemaphoreTake(imu_data_raw_mx, 0xFFFF);
 
 	Qreal = FixedToFloat(imu_data_raw[IMU_RAW_IDX_QUATREAL], ROTV_QPOINT);
@@ -109,12 +109,12 @@ void ComputeQuaternions() {
     xSemaphoreGive(imu_data_raw_mx);
 }
 
-float FixedToFloat(int16_t fixedp_value, uint16_t q_point) {
+static float FixedToFloat(int16_t fixedp_value, uint16_t q_point) {
 	float floatp_value = fixedp_value * pow(2, q_point * -1);
 	return floatp_value;
 }
 
-void ProcessIMU() {
+static void ProcessIMU() {
     // take and give mx from here to prevent access to a partially updated state
     xSemaphoreTake(imu_data_raw_mx, 0xFFFF);
     xSemaphoreTake(imu_data_proc_mx, 0xFFFF);
@@ -128,7 +128,7 @@ void ProcessIMU() {
     xSemaphoreGive(imu_data_proc_mx);
 }
 
-void ComputeRoll() {
+static void ComputeRoll() {
 	// x-axis rotation
 	float t0 = +2.0 * (Qreal * Qi + Qj * Qk);
 	float t1 = +1.0 - 2.0 * (Qi * Qi + Qj * Qj);
@@ -137,7 +137,7 @@ void ComputeRoll() {
 	imu_data_proc[IMU_PROC_IDX_ROLL] = roll;
 }
 
-void ComputePitch() {
+static void ComputePitch() {
 	// y-axis rotation
 	float t2 = +2.0 * (Qreal * Qj - Qk * Qi);
 	t2 = t2 > 1.0 ? 1.0 : t2;
@@ -147,7 +147,7 @@ void ComputePitch() {
 	imu_data_proc[IMU_PROC_IDX_PITCH] = pitch;
 }
 
-void ComputeYaw() {
+static void ComputeYaw() {
 	// z-axis rotation
 	float t3 = +2.0 * (Qreal * Qk + Qi * Qj);
 	float t4 = +1.0 - 2.0 * (Qj * Qj + Qk * Qk);
@@ -156,6 +156,6 @@ void ComputeYaw() {
     imu_data_proc[IMU_PROC_IDX_YAW] = yaw;
 }
 
-void SetGyro() {
-    memcpy(imu_data_proc[IMU_PROC_IDX_GYRO], imu_data_raw[IMU_RAW_IDX_GYRO], 3 * sizeof(float));
+static void SetGyro() {
+    memcpy(&imu_data_proc[IMU_PROC_IDX_GYRO], &imu_data_raw[IMU_RAW_IDX_GYRO], 3 * sizeof(float));
 }

@@ -127,9 +127,9 @@ static SPP_STATUS_T SetValue(uint16_t id, void* value, void* instance_data) {
         case PROP_target_position_ID:
         {
             float* setpoints = (float*)value;
-            // TODO: verify this follows enum control_setpoint_t indexing [x, y, z]
+            // TODO: verify this follows indexing [x, y, z]
             // only z_pos will be used for hover control
-            HovControl_SetReference(setpoints);
+            HoverControl_SetReference(setpoints);
             break;
         }
         case PROP_param_bounds_ID:

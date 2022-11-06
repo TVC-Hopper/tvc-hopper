@@ -30,7 +30,7 @@ extern void ControlsInputs_Task();
 
 extern void ControlsInputs_NotifyStart();
 
-extern void ControlsInputs_GetLidar(uint32_t *distance);
+extern void ControlsInputs_GetLidar(float *distance);
 
 extern void ControlsInputs_GetIMU(float *data);
 

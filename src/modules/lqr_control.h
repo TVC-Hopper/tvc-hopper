@@ -51,10 +51,10 @@ typedef enum hovctrl_status_t {
 typedef enum control_setpoint_t {
     SETPOINT_X = 0,
     SETPOINT_Y,
-    SETPOINT_Z,
-    SETPOINT_ROLL,
-    SETPOINT_PITCH,
-    SETPOINT_YAW
+    SETPOINT_Z
+    // SETPOINT_ROLL,
+    // SETPOINT_PITCH,
+    // SETPOINT_YAW
 };
 
 extern void HoverControl_Init();
