@@ -44,9 +44,9 @@ extern "C" {
 /* Definition of clock source of submodule 1 frequency in Hertz */
 #define PWM1_SM1_SM_CLK_SOURCE_FREQ_HZ 125000000U
 /* Definition of submodule 1 counter clock source frequency in Hertz - PWM1_SM1_SM_CLK_SOURCE_FREQ_HZ divided by prescaler */
-#define PWM1_SM1_COUNTER_CLK_SOURCE_FREQ_HZ 125000000U
+#define PWM1_SM1_COUNTER_CLK_SOURCE_FREQ_HZ 1953125U
 /* Definition of submodule 1 counter (PWM) frequency in Hertz */
-#define PWM1_SM1_COUNTER_FREQ_HZ 16001U
+#define PWM1_SM1_COUNTER_FREQ_HZ 50U
 /* Definition of submodule 1 channel A ID */
 #define PWM1_SM1_A kPWM_PwmA
 /* Definition of submodule 1 channel B ID */

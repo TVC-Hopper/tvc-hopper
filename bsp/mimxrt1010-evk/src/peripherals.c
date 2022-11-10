@@ -161,8 +161,8 @@ instance:
         - sm_id: 'SM1'
         - config:
           - clockSource: 'kPWM_BusClock'
-          - prescale: 'kPWM_Prescale_Divide_1'
-          - pwmFreq: '16 khz'
+          - prescale: 'kPWM_Prescale_Divide_64'
+          - pwmFreq: '50 Hz'
           - pairOperation: 'kPWM_Independent'
           - operationMode: 'kPWM_EdgeAligned'
           - initializationControl: 'kPWM_Initialize_LocalSync'
@@ -383,7 +383,7 @@ instance:
 /* PWM main configuration */
 pwm_config_t PWM1_SM1_config = {
   .clockSource = kPWM_BusClock,
-  .prescale = kPWM_Prescale_Divide_1,
+  .prescale = kPWM_Prescale_Divide_64,
   .pairOperation = kPWM_Independent,
   .initializationControl = kPWM_Initialize_LocalSync,
   .reloadLogic = kPWM_ReloadPwmFullCycle,
