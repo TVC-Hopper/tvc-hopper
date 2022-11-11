@@ -34,7 +34,8 @@ static void Setup_Task(void* arg) {
     HwImu_Start();
 
     while(1) {
-        vTaskSuspend(NULL);
+        HwImu_Service();
+        vTaskDelay(20);
     }
 }
 

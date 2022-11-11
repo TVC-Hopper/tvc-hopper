@@ -30,6 +30,7 @@ extern bool Bno085_Init(Bno085_t *b, Bno085InitParams_t *bip) {
     b->getTime_us = bip->getTime_us;
     b->onWrite = bip->onWrite;
     b->onRead = bip->onRead;
+    b->onDelay = bip->onDelay;
 
     b->sh2hal.open = Open;
     b->sh2hal.close = Close;
@@ -98,8 +99,13 @@ extern bool Bno085_EnableReport(Bno085_t *b, sh2_SensorId_t sensor, uint32_t int
 static int Open(sh2_Hal_t *self) {
     Bno085_t* imu = (Bno085_t*)self->instance_data;
     uint8_t soft_reset[5] = {5, 0, 1, 0, 1};
+    
+    for (uint8_t i = 0; i < 5; ++i) {
+        imu->onWrite(BNO085_I2C_ADDR, soft_reset, 5);
+        imu->onDelay(30);
+    }
 
-    imu->onWrite(BNO085_I2C_ADDR, soft_reset, 5);
+    imu->onDelay(300);
 
     return 0;
 }
@@ -144,7 +150,7 @@ static int Read(sh2_Hal_t *self, uint8_t *buffer, unsigned length, uint32_t *t_u
     }
 
 
-    return cargo_remaining == 0 ? 0 : packet_size;
+    return cargo_remaining == 0 ? packet_size : 0;
 }
 
 static int Write(sh2_Hal_t *self, uint8_t *buffer, unsigned length) {
@@ -153,11 +159,7 @@ static int Write(sh2_Hal_t *self, uint8_t *buffer, unsigned length) {
     uint32_t write_size = min(length, imu->buffer_size);
     imu->onWrite(BNO085_I2C_ADDR, buffer, write_size);
 
-    if (length - write_size == 0) {
-        return 0;
-    } else {
-        return write_size;
-    }
+    return write_size;
 }
 
 

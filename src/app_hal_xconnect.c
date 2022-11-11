@@ -85,7 +85,7 @@ extern StcpStatus_t XCCb_StcpSendPacket(void* buffer, uint16_t len, void* instan
 }
 
 extern uint8_t XCCb_I2CWrite(uint8_t address, uint8_t* data, uint16_t size) {
-//    xSemaphoreTake(i2c_mx, 0xFFFF);
+    xSemaphoreTake(i2c_mx, 0xFFFF);
     
     LPI2C1_masterTransfer.slaveAddress = address;
     LPI2C1_masterTransfer.direction = kLPI2C_Write;
@@ -96,13 +96,13 @@ extern uint8_t XCCb_I2CWrite(uint8_t address, uint8_t* data, uint16_t size) {
 
     status_t status = LPI2C_RTOS_Transfer(&LPI2C1_masterHandle, &LPI2C1_masterTransfer);
 
-//    xSemaphoreGive(i2c_mx);
+    xSemaphoreGive(i2c_mx);
 
     return status;
 }
 
 extern uint8_t XCCb_I2CRead(uint8_t address, uint8_t* data, uint16_t size) {
-//    xSemaphoreTake(i2c_mx, 0xFFFF);
+    xSemaphoreTake(i2c_mx, 0xFFFF);
 
     LPI2C1_masterTransfer.slaveAddress = address;
     LPI2C1_masterTransfer.direction = kLPI2C_Read;
@@ -113,7 +113,7 @@ extern uint8_t XCCb_I2CRead(uint8_t address, uint8_t* data, uint16_t size) {
 
     status_t status = LPI2C_RTOS_Transfer(&LPI2C1_masterHandle, &LPI2C1_masterTransfer);
 
-//    xSemaphoreGive(i2c_mx);
+    xSemaphoreGive(i2c_mx);
 
     return status;
 }

@@ -7,6 +7,8 @@ extern void HwImu_Init();
 
 extern void HwImu_Start();
 
+extern void HwImu_Service();
+
 extern void HwImu_GetReadings(float* readings);
 
 #endif

@@ -17,6 +17,7 @@ typedef struct Bno085InitParams_s {
     uint8_t (*onWrite)(uint8_t address, uint8_t *buffer, uint16_t len);
     uint8_t (*onRead)(uint8_t address, uint8_t *buffer, uint16_t len);
     uint32_t (*getTime_us)();
+    void (*onDelay)(uint32_t ms);
 } Bno085InitParams_t;
 
 
@@ -28,6 +29,7 @@ typedef struct Bno085_s {
     uint32_t (*getTime_us)();
     uint8_t (*onWrite)(uint8_t address, uint8_t *buffer, uint16_t len);
     uint8_t (*onRead)(uint8_t address, uint8_t *buffer, uint16_t len);
+    void (*onDelay)(uint32_t ms);
 } Bno085_t;
 
 extern bool Bno085_Init(Bno085_t *b, Bno085InitParams_t *bip);
