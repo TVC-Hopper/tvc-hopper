@@ -186,6 +186,11 @@ static SPP_STATUS_T GetValue(uint16_t id, void* value, void* instance_data) {
             memcpy((uint8_t*)value, &dist, sizeof(dist));
             break;
         }
+        case PROP_raw_imu_ID:
+        {
+            HwImu_GetReadings((float*)value);
+            break;
+        }
         default:
         {
             return SPP_STATUS_UNKNOWN_PROPERTY;

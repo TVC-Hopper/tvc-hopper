@@ -28,9 +28,14 @@ extern void HwImu_Init() {
 
     Bno085_Init(&imu, &ip);
 
-    Bno085_EnableReport(&imu, SH2_LINEAR_ACCELERATION, 5000);
-    Bno085_EnableReport(&imu, SH2_GYROSCOPE_CALIBRATED, 5000);
-    Bno085_EnableReport(&imu, SH2_ROTATION_VECTOR, 5000);
+}
+
+extern void HwImu_Start() {
+    Bno085_InitSensorHub(&imu);
+
+//    Bno085_EnableReport(&imu, SH2_LINEAR_ACCELERATION, 5000);
+//    Bno085_EnableReport(&imu, SH2_GYROSCOPE_CALIBRATED, 5000);
+//    Bno085_EnableReport(&imu, SH2_ROTATION_VECTOR, 5000);
 }
 
 extern void HwImu_GetReadings(float* readings) {

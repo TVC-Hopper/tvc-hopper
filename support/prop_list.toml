@@ -134,7 +134,12 @@ type = "U32"
 size = 4
 readable = true
 
-
+[[props]]
+name = "raw_imu"
+id = 51
+type = "ARR"
+size = 9
+readable = true
 
 
 

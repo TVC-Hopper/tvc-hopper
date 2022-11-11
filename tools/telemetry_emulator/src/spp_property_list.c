@@ -138,6 +138,14 @@ static const SppPropertyDefinition_t property_list[SPP_PROP_COUNT] = {
         .name        = "raw_lidar\0",
         .name_length = 10,
     },
+    {
+        .id          = PROP_raw_imu_ID,
+        .type        = SPP_PROP_T_ARR,
+        .size        = 9,
+        .flags       = {SPP_FLAG_WRITEABLE},
+        .name        = "raw_imu\0",
+        .name_length = 8,
+    },
 };
 
 

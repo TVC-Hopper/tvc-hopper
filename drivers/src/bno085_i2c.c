@@ -38,6 +38,10 @@ extern bool Bno085_Init(Bno085_t *b, Bno085InitParams_t *bip) {
     b->sh2hal.getTimeUs = GetTimeUs;
     b->sh2hal.instance_data = b;
 
+    return true;
+}
+
+extern bool Bno085_InitSensorHub(Bno085_t* b) {
     int status = sh2_open(&b->sh2hal, HalCallback, b);
     if (status != SH2_OK) {
         return false;
@@ -51,7 +55,6 @@ extern bool Bno085_Init(Bno085_t *b, Bno085InitParams_t *bip) {
     }
 
     sh2_setSensorCallback(SensorHandler, b);
-
     return true;
 }
 

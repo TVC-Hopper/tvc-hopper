@@ -3688,6 +3688,7 @@ static void prvCheckTasksWaitingTermination( void )
 {
     /** THIS FUNCTION IS CALLED FROM THE RTOS IDLE TASK **/
 
+
     #if ( INCLUDE_vTaskDelete == 1 )
         {
             TCB_t * pxTCB;

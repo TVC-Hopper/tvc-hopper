@@ -15,6 +15,7 @@ int main(int argc, char** argv) {
 
 
     if (argv[2][0] == 'e') {
+        std::cout << "Starting emulated" << std::endl;
         tc->start();
     } else {
         tc->start(argv[1], 115200);

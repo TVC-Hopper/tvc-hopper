@@ -32,6 +32,8 @@ typedef struct Bno085_s {
 
 extern bool Bno085_Init(Bno085_t *b, Bno085InitParams_t *bip);
 
+extern bool Bno085_InitSensorHub(Bno085_t* b);
+
 extern bool Bno085_EnableReport(Bno085_t *b, sh2_SensorId_t sensor, uint32_t interval_us);
 
 extern bool Bno085_GetSensorEvent(Bno085_t *b, sh2_SensorId_t sensor, sh2_SensorValue_t *value);

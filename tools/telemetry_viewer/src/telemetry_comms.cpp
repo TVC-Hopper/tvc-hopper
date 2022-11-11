@@ -305,6 +305,7 @@ StcpEngine_t* TelemetryComms::getStcp() {
 }
 
 StcpStatus_t handleStcpPacket(void* bytes, uint16_t len, void* instance_data) {
+    std::cout << "Handling packet" << std::endl;
     SppHostEngine_t* spp = TelemetryComms::getInstance()->getSpp();
     SPP_STATUS_T ret = SppHostProcessMessage(spp, (uint8_t*)bytes, len);
 
@@ -323,6 +324,7 @@ StcpStatus_t sendStcpPacket(void *bytes, uint16_t len, void* instance_data) {
        tc->getServer()->sendToClient(tc->getEmulatorSock(), (uint8_t*)bytes, len);
     } else {
         int com = tc->getComport();
+        std::cout << "sending" << std::endl;
         write_port(com, (uint8_t*)bytes, len);
     }
 

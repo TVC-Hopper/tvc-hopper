@@ -22,13 +22,21 @@
 
 #include "app_hal_xconnect.h"
 
-
-#define PRIORITY_CTL_INPUTS                 5
-#define PRIORITY_COMMAND_CONTROL_COMMS      2
-#define PRIORITY_UART_LISTENER              3
-#define PRIORITY_HOVER_CONTROL              4 // FIXME
+#define PRIORITY_STARTUP                    4
+#define PRIORITY_CTL_INPUTS                 1
+#define PRIORITY_COMMAND_CONTROL_COMMS      3
+#define PRIORITY_UART_LISTENER              5
+#define PRIORITY_HOVER_CONTROL              2 // FIXME
 
 static void CreateTasks();
+
+static void Setup_Task(void* arg) {
+    HwImu_Start();
+
+    while(1) {
+        vTaskSuspend(NULL);
+    }
+}
 
 int main(void)
 {
@@ -89,6 +97,17 @@ static void CreateTasks() {
         while (1) {}
     }
 
+    if (xTaskCreate(Setup_Task,
+                        "setup",
+                        configMINIMAL_STACK_SIZE + 128,
+                        NULL,
+                        PRIORITY_STARTUP,
+                        NULL) != pdPASS)
+    {
+        while(1) {}
+    }
+
+    /*
     if (xTaskCreate(ControlsInputs_Task,
                         "ctl_inputs",
                         configMINIMAL_STACK_SIZE + 256,
@@ -108,5 +127,6 @@ static void CreateTasks() {
     {
         while (1) {}
     }
+    */
 
 }
