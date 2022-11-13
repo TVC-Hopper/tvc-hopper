@@ -31,10 +31,6 @@ extern void HwImu_Init() {
 
 }
 
-extern void HwImu_Service() {
-    sh2_service();
-}
-
 extern void HwImu_Start() {
     Bno085_InitSensorHub(&imu);
 
@@ -44,30 +40,11 @@ extern void HwImu_Start() {
 }
 
 extern void HwImu_GetReadings(float* readings) {
-    sh2_SensorValue_t lin_a;
-    sh2_SensorValue_t gyro;
-    sh2_SensorValue_t rot_v;
+    Bno085_GetSensorEvents(&imu);
 
-    Bno085_GetSensorEvent(&imu, SH2_LINEAR_ACCELERATION, &lin_a);
-    readings[0] = lin_a.un.linearAcceleration.x; 
-    readings[1] = lin_a.un.linearAcceleration.y; 
-    readings[2] = lin_a.un.linearAcceleration.z;
-
-    for (int i = 3; i < 10; ++i) {
-        readings[i] = 0;
-    }
-    /*
-    Bno085_GetSensorEvent(&imu, SH2_GYROSCOPE_CALIBRATED, &gyro);
-    readings[3] = gyro.un.gyroscope.x; 
-    readings[4] = gyro.un.gyroscope.y; 
-    readings[5] = gyro.un.gyroscope.z; 
-    Bno085_GetSensorEvent(&imu, SH2_ROTATION_VECTOR, &rot_v);
-    readings[6] = rot_v.un.rotationVector.i; 
-    readings[7] = rot_v.un.rotationVector.j; 
-    readings[8] = rot_v.un.rotationVector.k; 
-    readings[9] = rot_v.un.rotationVector.real; 
-    */
-
+    Bno085_GetSensorValueFloat(&imu, SH2_LINEAR_ACCELERATION, 3, readings);
+    Bno085_GetSensorValueFloat(&imu, SH2_GYROSCOPE_CALIBRATED, 3, readings + 3);
+    Bno085_GetSensorValueFloat(&imu, SH2_ROTATION_VECTOR, 4, readings + 6);
 }
 
 static uint32_t GetTimestampUs() {

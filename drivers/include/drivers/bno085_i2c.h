@@ -11,6 +11,7 @@
 
 
 #define BNO085_I2C_ADDR     0x4A
+#define BNO085_READING_COUNT 3
 
 typedef struct Bno085InitParams_s {
     uint16_t buffer_size;
@@ -25,7 +26,9 @@ typedef struct Bno085_s {
     sh2_ProductIds_t product_ids; 
     uint16_t buffer_size;
     sh2_Hal_t sh2hal;
-    sh2_SensorValue_t *sensor_value;
+    uint8_t sensor_value_count;
+    sh2_SensorValue_t sensor_values[BNO085_READING_COUNT];
+    sh2_SensorId_t sensor_map[BNO085_READING_COUNT];
     uint32_t (*getTime_us)();
     uint8_t (*onWrite)(uint8_t address, uint8_t *buffer, uint16_t len);
     uint8_t (*onRead)(uint8_t address, uint8_t *buffer, uint16_t len);
@@ -38,6 +41,8 @@ extern bool Bno085_InitSensorHub(Bno085_t* b);
 
 extern bool Bno085_EnableReport(Bno085_t *b, sh2_SensorId_t sensor, uint32_t interval_us);
 
-extern bool Bno085_GetSensorEvent(Bno085_t *b, sh2_SensorId_t sensor, sh2_SensorValue_t *value);
+extern bool Bno085_GetSensorEvents(Bno085_t *b);
+
+extern bool Bno085_GetSensorValueFloat(Bno085_t *b, sh2_SensorId_t sensor, uint8_t count, float* floating);
 
 #endif

@@ -1,4 +1,4 @@
-#include "modules/controls_inputs.h"
+#include "modules/control_inputs.h"
 
 #include <string.h>
 #include <math.h>
@@ -31,7 +31,6 @@ static float Qreal = 0;
 static float norm = 0;
 
 static void ComputeQuaternions();
-static float FixedToFloat(int16_t fixedp_value, uint16_t q_point);
 static void ProcessIMU();
 static void ComputeRoll();
 static void ComputePitch();
@@ -41,7 +40,6 @@ static void SetGyro();
 extern void ControlsInputs_Init() {
     imu_data_raw_mx = xSemaphoreCreateMutex();
     imu_data_proc_mx = xSemaphoreCreateMutex();
-    // imu_data_mx = xSemaphoreCreateMutex();
     lidar_data_mx = xSemaphoreCreateMutex();
     start_capture_sem = xSemaphoreCreateBinary();
 }
@@ -64,9 +62,6 @@ extern void ControlsInputs_Task() {
         ComputeQuaternions();
 
         ProcessIMU();
-
-        // xSemaphoreTake(imu_data_mx, 0xFFFF);
-        // xSemaphoreGive(imu_data_mx);
     }
 }
 
@@ -95,10 +90,10 @@ extern void ControlsInputs_GetIMUProcessed(float *data) {
 static void ComputeQuaternions() {
     xSemaphoreTake(imu_data_raw_mx, 0xFFFF);
 
-	Qreal = FixedToFloat(imu_data_raw[IMU_RAW_IDX_QUATREAL], ROTV_QPOINT);
-    Qi = FixedToFloat(imu_data_raw[IMU_RAW_IDX_QUATI], ROTV_QPOINT);
-	Qj = FixedToFloat(imu_data_raw[IMU_RAW_IDX_QUATJ], ROTV_QPOINT);
-	Qk = FixedToFloat(imu_data_raw[IMU_RAW_IDX_QUATK], ROTV_QPOINT);
+	Qreal = imu_data_raw[IMU_RAW_IDX_QUATREAL];
+    Qi = imu_data_raw[IMU_RAW_IDX_QUATI];
+	Qj = imu_data_raw[IMU_RAW_IDX_QUATJ];
+	Qk = imu_data_raw[IMU_RAW_IDX_QUATK];
     norm = sqrt(Qreal*Qreal + Qi*Qi + Qj*Qj + Qk*Qk);
 
     Qreal /= norm;
@@ -107,11 +102,6 @@ static void ComputeQuaternions() {
     Qk /= norm;
 
     xSemaphoreGive(imu_data_raw_mx);
-}
-
-static float FixedToFloat(int16_t fixedp_value, uint16_t q_point) {
-	float floatp_value = fixedp_value * pow(2, q_point * -1);
-	return floatp_value;
 }
 
 static void ProcessIMU() {

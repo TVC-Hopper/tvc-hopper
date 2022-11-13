@@ -40,22 +40,22 @@
 #define HOVCTRL_MATH_STATUS_OK          ((uint8_t)0x00)
 #define HOVCTRL_MATH_STATUS_ERROR       ((uint8_t)0x01)
 
-typedef enum hovctrl_status_t {
-    HOVCTRL_STATUS_STATIONARY = 0,
+typedef enum hovctrl_status_e {
+    HOVCTRL_STATUS_STATIONARY,
     HOVCTRL_STATUS_TAKEOFF,
     HOVCTRL_STATUS_FLYING,
     HOVCTRL_STATUS_LANDING_CLOSE,
     HOVCTRL_STATUS_LANDING_FAR
-}; 
+} hovctrl_status_t; 
 
-typedef enum control_setpoint_t {
-    SETPOINT_X = 0,
+typedef enum control_setpoint_e {
+    SETPOINT_X,
     SETPOINT_Y,
     SETPOINT_Z
     // SETPOINT_ROLL,
     // SETPOINT_PITCH,
     // SETPOINT_YAW
-};
+} control_setpoint_t;
 
 extern void HoverControl_Init();
 
@@ -65,6 +65,6 @@ extern void HoverControl_SetReference(float* setpoints);
 
 extern void HoverControl_GetState(float* tlm);
 
-extern enum hovctrl_status_t HoverControl_GetStatus();
+extern hovctrl_status_t HoverControl_GetStatus();
 
 #endif

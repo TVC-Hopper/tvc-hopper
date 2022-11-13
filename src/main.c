@@ -13,7 +13,7 @@
 
 #include "modules/lqr_control.h"
 #include "modules/command_control_comms.h"
-#include "modules/controls_inputs.h"
+#include "modules/control_inputs.h"
 
 #include "hw/imu.h"
 #include "hw/esc.h"
@@ -34,8 +34,7 @@ static void Setup_Task(void* arg) {
     HwImu_Start();
 
     while(1) {
-        HwImu_Service();
-        vTaskDelay(20);
+        vTaskSuspend(NULL);
     }
 }
 

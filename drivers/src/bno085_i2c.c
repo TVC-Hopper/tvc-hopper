@@ -32,6 +32,9 @@ extern bool Bno085_Init(Bno085_t *b, Bno085InitParams_t *bip) {
     b->onRead = bip->onRead;
     b->onDelay = bip->onDelay;
 
+    sh2_SensorId_t id_map[3] = {SH2_LINEAR_ACCELERATION, SH2_GYROSCOPE_CALIBRATED, SH2_ROTATION_VECTOR};
+    memcpy(b->sensor_map, id_map, sizeof(id_map));
+
     b->sh2hal.open = Open;
     b->sh2hal.close = Close;
     b->sh2hal.read = Read;
@@ -59,16 +62,30 @@ extern bool Bno085_InitSensorHub(Bno085_t* b) {
     return true;
 }
 
-extern bool Bno085_GetSensorEvent(Bno085_t *b, sh2_SensorId_t sensor, sh2_SensorValue_t *value) {
-    b->sensor_value = value;
-
-    value->timestamp = 0;
+extern bool Bno085_GetSensorEvents(Bno085_t *b) {
+    b->sensor_value_count = 0;
 
     sh2_service();
 
-    if (value->timestamp == 0 && value->sensorId != SH2_GYRO_INTEGRATED_RV) {
-        // no new events
-        return false;
+    return true;
+}
+
+extern bool Bno085_GetSensorValueFloat(Bno085_t *b, sh2_SensorId_t sensor, uint8_t count, float* floating) {
+    uint8_t s_idx;
+
+    // find reading index
+    for (s_idx = 0; s_idx < BNO085_READING_COUNT; ++s_idx) {
+        if (b->sensor_values[s_idx].sensorId == sensor) {
+            break;
+        }
+    }
+
+    if (sensor == SH2_LINEAR_ACCELERATION) {
+        memcpy(floating, &b->sensor_values[s_idx].un.linearAcceleration, count * sizeof(float));
+    } else if (sensor == SH2_GYROSCOPE_CALIBRATED) {
+        memcpy(floating, &b->sensor_values[s_idx].un.gyroscope, count * sizeof(float));
+    } else if (sensor == SH2_ROTATION_VECTOR) {
+        memcpy(floating, &b->sensor_values[s_idx].un.rotationVector, count * sizeof(float));
     }
 
     return true;
@@ -98,6 +115,11 @@ extern bool Bno085_EnableReport(Bno085_t *b, sh2_SensorId_t sensor, uint32_t int
 
 static int Open(sh2_Hal_t *self) {
     Bno085_t* imu = (Bno085_t*)self->instance_data;
+    // LSB length 5
+    // MSB length 0
+    // Channel 1
+    // Seq 0
+    // Data = 0x01
     uint8_t soft_reset[5] = {5, 0, 1, 0, 1};
     
     for (uint8_t i = 0; i < 5; ++i) {
@@ -169,7 +191,6 @@ static uint32_t GetTimeUs(sh2_Hal_t *self) {
 }
 
 static void HalCallback(void *cookie, sh2_AsyncEvent_t *pEvent) {
-    Bno085_t* imu = (Bno085_t*)cookie;
     // If we see a reset, set a flag so that sensors will be reconfigured.
     if (pEvent->eventId == SH2_RESET) {
     }
@@ -179,8 +200,14 @@ static void SensorHandler(void *cookie, sh2_SensorEvent_t *event) {
     Bno085_t* imu = (Bno085_t*)cookie;
     int rc;
 
-    rc = sh2_decodeSensorEvent(imu->sensor_value, event);
-    if (rc != SH2_OK) {
-        imu->sensor_value->timestamp = 0;
+    if (event->reportId == SH2_LINEAR_ACCELERATION) {
+        rc = sh2_decodeSensorEvent(&imu->sensor_values[0], event);
+    } else if (event->reportId == SH2_GYROSCOPE_CALIBRATED) {
+        rc = sh2_decodeSensorEvent(&imu->sensor_values[1], event);
+    } else if (event->reportId == SH2_ROTATION_VECTOR) {
+        rc = sh2_decodeSensorEvent(&imu->sensor_values[2], event);
     }
 }
+
+
+

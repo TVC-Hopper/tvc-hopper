@@ -138,7 +138,7 @@ readable = true
 name = "raw_imu"
 id = 51
 type = "ARR"
-# 9 floats
+# 10 floats
 size = 40
 readable = true
 
