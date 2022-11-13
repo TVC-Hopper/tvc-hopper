@@ -1,7 +1,8 @@
 cmake_minimum_required(VERSION 3.8.1)
 project(tcp_client_server VERSION 0.0 LANGUAGES CXX)
 
-find_package (Threads)
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+find_package(Threads REQUIRED)
 
 add_library(${PROJECT_NAME}
         src/tcp_client.cpp
@@ -11,6 +12,8 @@ add_library(${PROJECT_NAME}
         src/common.cpp)
 
 option(SERVER_EXAMPLE "Build SERVER" OFF)
+
+target_link_libraries(${PROJECT_NAME} PRIVATE Threads::Threads)
 
 if(SERVER_EXAMPLE)
 
