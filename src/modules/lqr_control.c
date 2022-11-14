@@ -43,7 +43,7 @@ static void ResetControls();
 
 extern void HoverControl_Init() {
     reset_flag = true;
-    stop_flag = false;
+    stop_flag = true;
     controls_start_sem = xSemaphoreCreateBinary();
     reset_flag_mx = xSemaphoreCreateMutex();
     hover_status = HOVCTRL_STATUS_STATIONARY;
@@ -75,29 +75,30 @@ extern void HoverControl_Stop() {
 
 extern void HoverControl_Task(void* task_args) {
 
+    uint32_t xLastWakeTime = xTaskGetTickCount();
     for(;;) {
-        xSemaphoreTake(controls_start_sem, 0xFFFF);
-        uint32_t xLastWakeTime = xTaskGetTickCount();
 
-        while(1) {
-
-            xSemaphoreTake(stop_flag_mx, 0xFFFF);
-            if (stop_flag) {
-                xSemaphoreGive(stop_flag_mx);
-                xSemaphoreTake(controls_start_sem, 0xFFFF);
-                xSemaphoreTake(stop_flag_mx, 0xFFFF);
-            }
+        // set stop flag initially so loop waits for start trigger
+        // check stop flag first
+        // check reset flag next
+        xSemaphoreTake(stop_flag_mx, 0xFFFF);
+        if (stop_flag) {
             xSemaphoreGive(stop_flag_mx);
+            xSemaphoreTake(controls_start_sem, 0xFFFF);
 
-            xSemaphoreTake(reset_flag_mx, 0xFFFF);
-            if (reset_flag) {
-                ResetControls();
-            }
-            xSemaphoreGive(reset_flag);
-
-
-            ExecuteControlStep(&xLastWakeTime);
+            // get awake time
+            xLastWakeTime = xTaskGetTickCount();
+            xSemaphoreTake(stop_flag_mx, 0xFFFF);
         }
+        xSemaphoreGive(stop_flag_mx);
+
+        xSemaphoreTake(reset_flag_mx, 0xFFFF);
+        if (reset_flag) {
+            ResetControls();
+        }
+        xSemaphoreGive(reset_flag);
+
+        ExecuteControlStep(&xLastWakeTime);
     }
 }
 
