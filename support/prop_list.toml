@@ -80,15 +80,6 @@ size = 1
 writeable = true
 
 [[props]]
-# reset only control flight systems and control
-# (e.g. soft soft reset between tests without power cycling, zero out values etv.)
-name = "reset_controls"
-id = 31
-type = "BOOL"
-size = 1
-writeable = true
-
-[[props]]
 name = "servo_positions"
 id = 40
 type = "ARR"

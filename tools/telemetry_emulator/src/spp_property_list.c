@@ -91,14 +91,6 @@ static const SppPropertyDefinition_t property_list[SPP_PROP_COUNT] = {
         .name_length = 13,
     },
     {
-        .id          = PROP_reset_controls_ID,
-        .type        = SPP_PROP_T_BOOL,
-        .size        = 1,
-        .flags       = {SPP_FLAG_READABLE},
-        .name        = "reset_controls\0",
-        .name_length = 15,
-    },
-    {
         .id          = PROP_servo_positions_ID,
         .type        = SPP_PROP_T_ARR,
         .size        = 16,

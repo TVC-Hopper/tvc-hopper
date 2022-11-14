@@ -116,13 +116,6 @@ static SPP_STATUS_T SetValue(uint16_t id, void* value, void* instance_data) {
         {
             break;
         }
-        case PROP_reset_controls_ID:
-        {
-            if (*((uint8_t*) value) == 1) {
-                HoverControl_Reset();
-            }
-            break;
-        }
         case PROP_servo_positions_ID:
         {
             float* positions = (float*)value;
