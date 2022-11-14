@@ -559,7 +559,7 @@ instance:
       - debugEnable: 'true'
       - ignoreAck: 'false'
       - pinConfig: 'kLPI2C_2PinOpenDrain'
-      - baudRate_Hz: '200000'
+      - baudRate_Hz: '400000'
       - busIdleTimeout_ns: '0'
       - pinLowTimeout_ns: '0'
       - sdaGlitchFilterWidth_ns: '0'
@@ -587,7 +587,7 @@ const lpi2c_master_config_t LPI2C1_masterConfig = {
   .debugEnable = true,
   .ignoreAck = false,
   .pinConfig = kLPI2C_2PinOpenDrain,
-  .baudRate_Hz = 200000UL,
+  .baudRate_Hz = 400000UL,
   .busIdleTimeout_ns = 0UL,
   .pinLowTimeout_ns = 0UL,
   .sdaGlitchFilterWidth_ns = 0U,
