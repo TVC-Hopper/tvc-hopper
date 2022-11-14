@@ -49,7 +49,6 @@ extern void HoverControl_Init() {
 }
 
 extern void HoverControl_Start() {
-
     // if start is called, do not stop immediately
     xSemaphoreTake(stop_flag_mx, 0xFFFF);
     stop_flag = false;
@@ -62,6 +61,9 @@ extern void HoverControl_Stop() {
     xSemaphoreTake(stop_flag_mx, 0xFFFF);
     stop_flag = true;
     xSemaphoreGive(stop_flag_mx);
+
+    // need to take so that we wait again for start flag
+    xSemaphoreTake(controls_start_sem, 0);
 }
 
 extern void HoverControl_Task(void* task_args) {
@@ -75,8 +77,11 @@ extern void HoverControl_Task(void* task_args) {
         xSemaphoreTake(stop_flag_mx, 0xFFFF);
         if (stop_flag) {
             xSemaphoreGive(stop_flag_mx);
-            while(pdTRUE != xSemaphoreTake(controls_start_sem, 0xFFFF)) {}
 
+            // try to take, if can't take wait
+            while(pdTRUE != xSemaphoreTake(controls_start_sem, 0xFFFF)) {}
+            // release immediately after so that Stop can take
+            xSemaphoreGive(controls_start_sem);
             ResetControls();
             // get awake time
             xLastWakeTime = xTaskGetTickCount();
