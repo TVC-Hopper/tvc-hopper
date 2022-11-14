@@ -104,6 +104,12 @@ extern void HoverControl_Task(void* task_args) {
 
 static void ResetControls() {
     // TODO: tejal
+    error_zint = 0;
+    ref[STATE_VECTOR_SIZE] = {0};
+    curr_state[STATE_VECTOR_SIZE] = {0};
+    // reset vanes to position 0
+    actuator_inpupt_last = actuator_input_now;
+    actuator_input_now[ACTUATION_VECTOR_SIZE] = {0};
 }
 
 static void ExecuteControlStep(uint32_t* last_wake_time) {
