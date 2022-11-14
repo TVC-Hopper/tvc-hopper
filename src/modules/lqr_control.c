@@ -59,7 +59,6 @@ extern void HoverControl_Reset() {
 }
 
 extern void HoverControl_Start() {
-    xSemaphoreGive(controls_start_sem);
 
     // if start is called, do not stop immediately
     xSemaphoreTake(stop_flag_mx, 0xFFFF);
@@ -67,6 +66,8 @@ extern void HoverControl_Start() {
     xSemaphoreGive(stop_flag_mx);
 
     HoverControl_Reset();
+
+    xSemaphoreGive(controls_start_sem);
 }
 
 extern void HoverControl_Stop() {
