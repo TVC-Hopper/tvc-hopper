@@ -92,10 +92,16 @@ static SPP_STATUS_T SetValue(uint16_t id, void* value, void* instance_data) {
     switch(id) {
         case PROP_start_ID:
         {
+            if (*((uint8_t*) value) == 1) {
+                HoverControl_Start();
+            }
             break;
         }
         case PROP_stop_ID:
         {
+            if (*((uint8_t*) value) == 1) {
+                HoverControl_Stop();
+            }
             break;
         }
         case PROP_telem_cap_start_ID:
@@ -106,16 +112,15 @@ static SPP_STATUS_T SetValue(uint16_t id, void* value, void* instance_data) {
         {
             break;
         }
-        case PROP_telem_filter_en_ID:
-        {
-            break;
-        }
         case PROP_reset_system_ID:
         {
             break;
         }
         case PROP_reset_controls_ID:
         {
+            if (*((uint8_t*) value) == 1) {
+                HoverControl_Reset();
+            }
             break;
         }
         case PROP_servo_positions_ID:
@@ -130,10 +135,6 @@ static SPP_STATUS_T SetValue(uint16_t id, void* value, void* instance_data) {
             // TODO: verify this follows indexing [x, y, z]
             // only z_pos will be used for hover control
             HoverControl_SetReference(setpoints);
-            break;
-        }
-        case PROP_param_bounds_ID:
-        {
             break;
         }
         default:
@@ -170,13 +171,12 @@ static SPP_STATUS_T GetValue(uint16_t id, void* value, void* instance_data) {
         }
         case PROP_servo_positions_ID:
         {
+            float positions[4];
+            HwThrustVane_GetPositions(positions);
+            memcpy((uint8_t*)value, positions, sizeof(positions));
             break;
         }
         case PROP_target_position_ID:
-        {
-            break;
-        }
-        case PROP_param_bounds_ID:
         {
             break;
         }

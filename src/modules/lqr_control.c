@@ -1,11 +1,20 @@
 #include "modules/lqr_control.h"
 
+#include <stdint.h>
+#include <stdbool.h>
+
 #include <freertos/FreeRTOS.h>
 #include <freertos/semphr.h>
 
 #include "hw/thrust_vanes.h"
 #include "hw/esc.h"
 #include "modules/control_inputs.h"
+
+SemaphoreHandle_t controls_start_sem;
+SemaphoreHandle_t reset_flag_mx;
+SemaphoreHandle_t stop_flag_mx;
+bool reset_flag;
+bool stop_flag;
 
 hovctrl_status_t hover_status;
 static float ref[STATE_VECTOR_SIZE] = {0};
@@ -29,46 +38,104 @@ static void RateLimit_VaneActuation(float* actuator_input_last, float* actuator_
 static float Limit(float value, float min, float max);
 static void ComputeZint (float error_z);
 
+static void ExecuteControlStep(uint32_t *last_wake_time);
+static void ResetControls();
+
 extern void HoverControl_Init() {
+    reset_flag = true;
+    stop_flag = false;
+    controls_start_sem = xSemaphoreCreateBinary();
+    reset_flag_mx = xSemaphoreCreateMutex();
     hover_status = HOVCTRL_STATUS_STATIONARY;
     // reference already initialized to 0, incl roll/pitch/yaw/gyro
 }
 
+extern void HoverControl_Reset() {
+    xSemaphoreTake(reset_flag_mx, 0xFFFF);
+    reset_flag = true;
+    xSemaphoreGive(reset_flag_mx);
+}
+
+extern void HoverControl_Start() {
+    xSemaphoreGive(controls_start_sem);
+
+    // if start is called, do not stop immediately
+    xSemaphoreTake(stop_flag_mx, 0xFFFF);
+    stop_flag = false;
+    xSemaphoreGive(stop_flag_mx);
+
+    HoverControl_Reset();
+}
+
+extern void HoverControl_Stop() {
+    xSemaphoreTake(stop_flag_mx, 0xFFFF);
+    stop_flag = true;
+    xSemaphoreGive(stop_flag_mx);
+}
+
 extern void HoverControl_Task(void* task_args) {
-    uint32_t xLastWakeTime = xTaskGetTickCount();
 
-    for(;;) {                
-        ControlsInputs_GetIMUProcessed(&curr_state[STATE_IDX_ROLL]); 
-            // TODO: verify reading 6 floats [roll, pitch, yaw, gx, gy, gz]
+    for(;;) {
+        xSemaphoreTake(controls_start_sem, 0xFFFF);
+        uint32_t xLastWakeTime = xTaskGetTickCount();
 
-        ControlsInputs_GetLidar(&curr_state[STATE_IDX_Z]); 
-        curr_state[STATE_IDX_Z] /= (float)100; // convert cm to m
+        while(1) {
 
-        ControlsInputs_NotifyStart();
+            xSemaphoreTake(stop_flag_mx, 0xFFFF);
+            if (stop_flag) {
+                xSemaphoreGive(stop_flag_mx);
+                xSemaphoreTake(controls_start_sem, 0xFFFF);
+                xSemaphoreTake(stop_flag_mx, 0xFFFF);
+            }
+            xSemaphoreGive(stop_flag_mx);
 
-        float error[STATE_VECTOR_SIZE] = {0};
-        
-        ComputeError(error, ref, curr_state, STATE_VECTOR_SIZE, STATE_VECTOR_SIZE);
+            xSemaphoreTake(reset_flag_mx, 0xFFFF);
+            if (reset_flag) {
+                ResetControls();
+            }
+            xSemaphoreGive(reset_flag);
 
-        CorrectYaw(error);
 
-        HoverControl_SetStatus(error[STATE_IDX_Z]);
-        ComputeZint(error[STATE_IDX_Z]);
-        error[STATE_IDX_ZINT] = error_zint;
-
-        float actuator_input_last[ACTUATION_VECTOR_SIZE];
-        HwThrustVane_GetPositions(actuator_input_last);
-        actuator_input_last[4] = HwEsc_GetOutput();
-        
-        if (HOVCTRL_MATH_STATUS_OK == MultiplyMatrix(actuator_input_now, K_hover, error, ACTUATION_VECTOR_SIZE, STATE_VECTOR_SIZE, STATE_VECTOR_SIZE)) {
-            // RateLimit_VaneActuation(actuator_input_last, actuator_input_now, 0.3);
-            HwThrustVane_SetPositions(actuator_input_now);
-            HwEsc_SetOutput(actuator_input_now[4] * MOTOR_KRPM_TO_ESC_PERCENT); 
-                // FIXME: verify units
+            ExecuteControlStep(&xLastWakeTime);
         }
-
-        xTaskDelayUntil(&xLastWakeTime, CONTROL_LOOP_INTERVAL * portTICK_PERIOD_MS);
     }
+}
+
+static void ResetControls() {
+    // TODO: tejal
+}
+
+static void ExecuteControlStep(uint32_t* last_wake_time) {
+    ControlsInputs_GetIMUProcessed(&curr_state[STATE_IDX_ROLL]); 
+        // TODO: verify reading 6 floats [roll, pitch, yaw, gx, gy, gz]
+
+    ControlsInputs_GetLidar(&curr_state[STATE_IDX_Z]); 
+    curr_state[STATE_IDX_Z] /= (float)100; // convert cm to m
+
+    ControlsInputs_NotifyStart();
+
+    float error[STATE_VECTOR_SIZE] = {0};
+    
+    ComputeError(error, ref, curr_state, STATE_VECTOR_SIZE, STATE_VECTOR_SIZE);
+
+    CorrectYaw(error);
+
+    HoverControl_SetStatus(error[STATE_IDX_Z]);
+    ComputeZint(error[STATE_IDX_Z]);
+    error[STATE_IDX_ZINT] = error_zint;
+
+    float actuator_input_last[ACTUATION_VECTOR_SIZE];
+    HwThrustVane_GetPositions(actuator_input_last);
+    actuator_input_last[4] = HwEsc_GetOutput();
+    
+    if (HOVCTRL_MATH_STATUS_OK == MultiplyMatrix(actuator_input_now, K_hover, error, ACTUATION_VECTOR_SIZE, STATE_VECTOR_SIZE, STATE_VECTOR_SIZE)) {
+        // RateLimit_VaneActuation(actuator_input_last, actuator_input_now, 0.3);
+        HwThrustVane_SetPositions(actuator_input_now);
+        HwEsc_SetOutput(actuator_input_now[4] * MOTOR_KRPM_TO_ESC_PERCENT); 
+            // FIXME: verify units
+    }
+
+    xTaskDelayUntil(last_wake_time, CONTROL_LOOP_INTERVAL * portTICK_PERIOD_MS);
 }
 
 extern void HoverControl_SetReference(float* setpoints) {

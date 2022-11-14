@@ -30,7 +30,7 @@
 
 static void CreateTasks();
 
-static void Setup_Task(void* arg) {
+static void Setup_Task(void* task_args) {
     HwImu_Start();
 
     while(1) {
@@ -107,10 +107,10 @@ static void CreateTasks() {
         while(1) {}
     }
 
-    /*
+    
     if (xTaskCreate(ControlsInputs_Task,
                         "ctl_inputs",
-                        configMINIMAL_STACK_SIZE + 256,
+                        configMINIMAL_STACK_SIZE + 384,
                         NULL,
                         PRIORITY_CTL_INPUTS,
                         NULL) != pdPASS)
@@ -120,13 +120,12 @@ static void CreateTasks() {
 
     if(xTaskCreate(HoverControl_Task,
                         "hov_ctrl",
-                        configMINIMAL_STACK_SIZE + 256,
+                        configMINIMAL_STACK_SIZE + 384,
                         NULL,
                         PRIORITY_HOVER_CONTROL,
                         NULL) != pdPASS)
     {
         while (1) {}
     }
-    */
 
 }

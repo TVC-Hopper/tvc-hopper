@@ -83,14 +83,6 @@ static const SppPropertyDefinition_t property_list[SPP_PROP_COUNT] = {
         .name_length = 13,
     },
     {
-        .id          = PROP_telem_filter_en_ID,
-        .type        = SPP_PROP_T_BOOL,
-        .size        = 1,
-        .flags       = {SPP_FLAG_WRITEABLE},
-        .name        = "telem_filter_en\0",
-        .name_length = 16,
-    },
-    {
         .id          = PROP_reset_system_ID,
         .type        = SPP_PROP_T_BOOL,
         .size        = 1,
@@ -121,14 +113,6 @@ static const SppPropertyDefinition_t property_list[SPP_PROP_COUNT] = {
         .flags       = {SPP_FLAG_READABLE | SPP_FLAG_WRITEABLE},
         .name        = "target_position\0",
         .name_length = 16,
-    },
-    {
-        .id          = PROP_param_bounds_ID,
-        .type        = SPP_PROP_T_ARR,
-        .size        = 36,
-        .flags       = {SPP_FLAG_READABLE | SPP_FLAG_WRITEABLE},
-        .name        = "param_bounds\0",
-        .name_length = 13,
     },
     {
         .id          = PROP_raw_lidar_ID,

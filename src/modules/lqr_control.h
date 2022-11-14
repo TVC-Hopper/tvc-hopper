@@ -57,7 +57,13 @@ typedef enum control_setpoint_e {
     // SETPOINT_YAW
 } control_setpoint_t;
 
+extern void HoverControl_Reset();
+
 extern void HoverControl_Init();
+
+extern void HoverControl_Start();
+
+extern void HoverControl_Stop();
 
 extern void HoverControl_Task();
 
