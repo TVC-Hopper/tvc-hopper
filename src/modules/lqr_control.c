@@ -46,6 +46,8 @@ extern void HoverControl_Init() {
     stop_flag = true;
     controls_start_sem = xSemaphoreCreateBinary();
     reset_flag_mx = xSemaphoreCreateMutex();
+    stop_flag_mx = xSemaphoreCreateMutex();
+
     hover_status = HOVCTRL_STATUS_STATIONARY;
     // reference already initialized to 0, incl roll/pitch/yaw/gyro
 }
@@ -84,7 +86,7 @@ extern void HoverControl_Task(void* task_args) {
         xSemaphoreTake(stop_flag_mx, 0xFFFF);
         if (stop_flag) {
             xSemaphoreGive(stop_flag_mx);
-            xSemaphoreTake(controls_start_sem, 0xFFFF);
+            while(pdTRUE != xSemaphoreTake(controls_start_sem, 0xFFFF)) {}
 
             // get awake time
             xLastWakeTime = xTaskGetTickCount();
@@ -96,7 +98,7 @@ extern void HoverControl_Task(void* task_args) {
         if (reset_flag) {
             ResetControls();
         }
-        xSemaphoreGive(reset_flag);
+        xSemaphoreGive(reset_flag_mx);
 
         ExecuteControlStep(&xLastWakeTime);
     }
@@ -107,6 +109,11 @@ static void ResetControls() {
 }
 
 static void ExecuteControlStep(uint32_t* last_wake_time) {
+    // just for testing
+    xTaskDelayUntil(last_wake_time, CONTROL_LOOP_INTERVAL * portTICK_PERIOD_MS);
+    return;
+
+
     ControlsInputs_GetIMUProcessed(&curr_state[STATE_IDX_ROLL]); 
         // TODO: verify reading 6 floats [roll, pitch, yaw, gx, gy, gz]
 

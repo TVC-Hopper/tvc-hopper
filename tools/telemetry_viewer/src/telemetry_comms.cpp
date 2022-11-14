@@ -258,7 +258,9 @@ void TelemetryComms::start(const char* port, int baud) {
 }
 
 void TelemetryComms::waitForViewer() {
-    viewer_fd_ = acceptClient();
+    while(1) {
+        viewer_fd_ = acceptClient();
+    }
 }
 
 void TelemetryComms::startListener() {
