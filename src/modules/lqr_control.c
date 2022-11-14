@@ -90,7 +90,6 @@ extern void HoverControl_Task(void* task_args) {
 
             // get awake time
             xLastWakeTime = xTaskGetTickCount();
-            xSemaphoreTake(stop_flag_mx, 0xFFFF);
         }
         xSemaphoreGive(stop_flag_mx);
 
