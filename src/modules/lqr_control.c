@@ -11,9 +11,7 @@
 #include "modules/control_inputs.h"
 
 SemaphoreHandle_t controls_start_sem;
-SemaphoreHandle_t reset_flag_mx;
 SemaphoreHandle_t stop_flag_mx;
-bool reset_flag;
 bool stop_flag;
 
 hovctrl_status_t hover_status;
@@ -42,20 +40,12 @@ static void ExecuteControlStep(uint32_t *last_wake_time);
 static void ResetControls();
 
 extern void HoverControl_Init() {
-    reset_flag = true;
     stop_flag = true;
     controls_start_sem = xSemaphoreCreateBinary();
-    reset_flag_mx = xSemaphoreCreateMutex();
     stop_flag_mx = xSemaphoreCreateMutex();
 
     hover_status = HOVCTRL_STATUS_STATIONARY;
     // reference already initialized to 0, incl roll/pitch/yaw/gyro
-}
-
-extern void HoverControl_Reset() {
-    xSemaphoreTake(reset_flag_mx, 0xFFFF);
-    reset_flag = true;
-    xSemaphoreGive(reset_flag_mx);
 }
 
 extern void HoverControl_Start() {
@@ -64,8 +54,6 @@ extern void HoverControl_Start() {
     xSemaphoreTake(stop_flag_mx, 0xFFFF);
     stop_flag = false;
     xSemaphoreGive(stop_flag_mx);
-
-    HoverControl_Reset();
 
     xSemaphoreGive(controls_start_sem);
 }
@@ -89,16 +77,11 @@ extern void HoverControl_Task(void* task_args) {
             xSemaphoreGive(stop_flag_mx);
             while(pdTRUE != xSemaphoreTake(controls_start_sem, 0xFFFF)) {}
 
+            ResetControls();
             // get awake time
             xLastWakeTime = xTaskGetTickCount();
         }
         xSemaphoreGive(stop_flag_mx);
-
-        xSemaphoreTake(reset_flag_mx, 0xFFFF);
-        if (reset_flag) {
-            ResetControls();
-        }
-        xSemaphoreGive(reset_flag_mx);
 
         ExecuteControlStep(&xLastWakeTime);
     }

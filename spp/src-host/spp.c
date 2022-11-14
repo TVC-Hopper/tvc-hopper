@@ -48,18 +48,19 @@ static void SppUnpackPropDef(SppHostEngine_t *host, SppAddress_t *client, uint8_
     pd->type = prop_type;
     pd->flags.value = prop_flags;
 
-    printf("SPP: Got property %d of size %d\n", pd->id, pd->size);
 
     uint8_t name_length = len - msg_idx;
     memcpy(pd->name, message + msg_idx, name_length);
     pd->name_length = name_length;
 
+    printf("SPP: [C%d] Got property %s [%d] of size %d\n", addr_idx, pd->name, pd->id, pd->size);
     if (props_remaining == 0) {
         host->state = SPP_STATE_READY;
     }
 }
 
 void SppConnectToClient(SppHostEngine_t *host, SppAddress_t *client) {
+    SppAddClient(host, client);
     uint16_t msg_size = MESSAGE_SIZE(SPP_MSG_CONNECT_RESPONSE_SIZE, host->address_length);
     uint8_t msg[msg_size];
     uint16_t body_idx = SppFillMessageHeader(host->address_length, msg, &host->host_address, client, SPP_MSG_CONNECT_RESPONSE_ID);
@@ -145,7 +146,7 @@ static SPP_STATUS_T SppGetClientIdx(SppHostEngine_t *host, SppAddress_t* list, S
             return SPP_STATUS_OK;
         }
     }
-
+    printf("SPP: did not find client\n");
     return SPP_STATUS_NO_SUCH_CLIENT;
 }
 
@@ -214,7 +215,6 @@ SPP_STATUS_T SppHostProcessMessage(SppHostEngine_t* host, uint8_t* message, uint
         }
         host->state = SPP_STATE_CONNECTING;
         client.property_list_id = *((uint16_t*)(message + body_idx));
-        SppAddClient(host, &client);
         SppConnectToClient(host, &client);
     } else if (SPP_MSG_PROP_LIST_RESPONSE_ID == msg_id) {
         uint8_t num_props = message[body_idx++];
@@ -331,6 +331,8 @@ SPP_STATUS_T SppHostGetDefinition(SppHostEngine_t* host, SppAddress_t* client, u
             return SPP_STATUS_OK;
         }
     }
+
+    printf("SPP: did not find property definition for client [%d]\n", addr_idx);
 
     return SPP_STATUS_UNKNOWN_PROPERTY;
 }
