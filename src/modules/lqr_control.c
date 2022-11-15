@@ -10,6 +10,8 @@
 #include "hw/thrust_vanes.h"
 #include "hw/esc.h"
 #include "modules/control_inputs.h"
+#include "circbuf/cbuf.h"
+// TODO: add cbuf to track vz
 
 SemaphoreHandle_t controls_start_sem;
 SemaphoreHandle_t stop_flag_mx;
@@ -130,6 +132,7 @@ static void ExecuteControlStep(uint32_t* last_wake_time) {
     ComputeZint(error[STATE_IDX_Z]);
     error[STATE_IDX_ZINT] = error_zint;
     ComputeVZ(curr_state[STATE_IDX_Z]);
+    error[STATE_IDX_VZ] = vz;
     z_last = curr_state[STATE_IDX_Z];
 
     float actuator_input_last[ACTUATION_VECTOR_SIZE];
@@ -150,7 +153,7 @@ static void ExecuteControlStep(uint32_t* last_wake_time) {
 extern void HoverControl_SetReference(float* setpoints) {
     // force target position to be 0 or above a threshold takeoff height
     
-    if (setpoints[SETPOINT_Z] == 0) {
+    if (setpoints[SETPOINT_Z] <= 0) {
         ref[STATE_IDX_Z] = 0;
     }
     else {
@@ -264,4 +267,6 @@ static void ComputeZInt(float error_z) {
 static void ComputeVZ(float z_now) {
     // TODO: make more robust against unstable LiDAR
     vz = (z_now - z_last) / CONTROL_LOOP_INTERVAL;
+    // add linaccel z * CONTROL_LOOP_INTERVAL
+    // circ buf?
 }
