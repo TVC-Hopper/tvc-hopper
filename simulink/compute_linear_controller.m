@@ -25,17 +25,20 @@ J = [Jx 0  0  ;
      0  0  Jz];
  
 % Forces 
-Ft = Kt * wt^2;
+Ft = Kt * wt^2; % motor force
+% in testbed, the value of wt is 0 when no roll/pitch stabilization is 
+% needed, but this equation still holds but Ft is a constant in this 
+% system's inputs
 F1 = Ft * CL * a1;
 F2 = Ft * CL * a2;
 F3 = Ft * CL * a3;
 F4 = Ft * CL * a4;
-Fd = Ft * CD; 
+Fd = Ft * CD; % TODO verify that this is total drag and not per vane
 
 % Body forces
 fb = [ F2 + F4  ;
        F1 + F3  ;
-       Ft - Fd ];
+       Ft - Fd ]; % TODO determine if total drag is calculated
 
 % Body torques
 tb = [ (F1 + F3)*l            ;
@@ -134,20 +137,42 @@ x = 0; y = 0; z = 0; vx = 0; vy = 0; vz = 0; p = 0; q = 0; u = 0; wx = 0; wy = 0
 % subs(B)
 
 % All input is not zero!
-a1 = 0; a2 = 0; a3 = 0; a4 = 0; 
-wt = 20.062; % kRPM = hoverpoint
+a1 = 0; a2 = 0; a3 = 0; a4 = 0; % TODO determine if radians or degrees
+% TODO change wt according to thrust tests
+wt = 20.062; % kRPM at hoverpoint
+% in testbed, this will be some small value?
+% do we need to back calculate from control force? or just pick a value
+% that is small but large enough to generate a control force?
 
-% Drone Constants
-Kt = 0.021952;      % N / (1/s^2)
-CL = 0.008905;      % -
-CD = 0.001054;      % -
-Jx = 0.01031759;    % Kg * m^2
-Jy = 0.01031865;    % Kg * m^2
-Jz = 0.00278832;    % Kg * m^2
-m = 0.92;           % Kg
-g = 9.807;          % m/s^2
-l = 0.09471940;     % m
-r = 0.04;           % m 
+% Drone Constants ---------------------
+% TODO replace values
+
+Kt = 0.021952;      % scaling factor for wt^2 to yield thrust [N / (1/s^2)] Kf or Kt?
+    
+Aduct = 1;          % cross sectional area of exhaust [m^2]
+Afin = 0.5;         % surface area of airfoil [m^2]
+
+CLa = 0.008905;     % slope of lift coeff, same for all Joukovsky airfoils
+CL = CLa * Afin / (2 * Aduct);
+% CL = 0.008905;    % original value
+% Can we estimate CL with a linear equation for larger angles of attack?
+
+CD0 = 0.001054;     % constant bias of drag coeff, same for all Joukovsky airfoils
+CD = CD0 * Afin / (2 * Aduct); % should this be x4 for total drag? within +/- 10 deg, CD is constant
+% CD = 0.001054;    % original value
+
+Jx = 0.01031759;    % x moment of inertia [Kg * m^2]
+Jy = 0.01031865;    % y moment of inertia [Kg * m^2]
+Jz = 0.00278832;    % z moment of inertia [Kg * m^2]
+
+m = 0.92;           % mass of vehicle [Kg]
+g = 9.807;          % gravitational acceleration [m/s^2]
+
+l = 0.09471940;     % distance between COM and thrust vane joint [m]
+r = 0.04;           % distance between z-axis and middle of thrust vane [m]
+                    % Doesn't this value vary with alpha?
+
+% ---------------------
 
 % Now the A and B matrixes can be evaluted, yield the full linear model
 % around the hover point.
@@ -215,7 +240,7 @@ Q_red = Q;
 % Integral action  
 Q(9,9) = [ 1/0.15^2 ]; % z
       
-% Max actuation angle of +-10 degress
+% Max actuation angle of +-10 degrees
 R = [ 1/10^2   0       0       0       0       ; % a1
       0        1/10^2  0       0       0       ; % a2
       0        0       1/10^2  0       0       ; % a3
@@ -245,18 +270,19 @@ pzmap(sys_cl_hov);
 [p,z] = pzmap(sys_cl_hov);
 grid on
 
-Q_pos = [ 1/0.5^2  0         0        0        ;
+Q_pos = [ 1/0.5^2  0         0        0        ; % max dev of x and y is 0.5 m
           0         1/0.5^2  0        0        ;
-          0         0         1/2^2  0        ;
+          0         0         1/2^2  0        ; % max vx and vy is 1 m/s
           0         0         0        1/2^2 ];
 
 Q_hor = Q_pos;      
       
+% TODO determine what these values represent
 Q_pos(5:6,5:6) = [ 1/1^2  0
                    0        1/1^2];
      
-R_pos = [ 1/0.05^2  0;
-          0          1/0.05^2];
+R_pos = [ 1/0.05^2  0;          % max allowable actuation of 0.1 rad = 5 deg
+          0          1/0.05^2]; % roll and pitch
 
 K_pos = lqr(sys_hint, Q_pos, R_pos);
 K_hor = lqr(sys_hor, Q_hor, R_pos);
