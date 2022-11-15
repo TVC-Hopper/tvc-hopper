@@ -109,7 +109,10 @@ static void ResetControls() {
 
 static void ExecuteControlStep(uint32_t* last_wake_time) {
     // just for testing
+    ControlsInputs_NotifyStart();
     xTaskDelayUntil(last_wake_time, CONTROL_LOOP_INTERVAL * portTICK_PERIOD_MS);
+    ControlsInputs_GetIMUProcessed(&curr_state[STATE_IDX_ROLL]); 
+    ControlsInputs_GetLidar(&curr_state[STATE_IDX_Z]); 
     return;
 
 
