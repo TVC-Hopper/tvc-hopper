@@ -4,12 +4,14 @@ classdef TelemetryApp < handle
         port
         
         tp
+        pv
         
         guiFig
         btnStart
         btnPause
         btnShow
         btnStartStream
+        btnProperties
         
         btnConnect
         isConnected = false
@@ -23,7 +25,7 @@ classdef TelemetryApp < handle
             s.guiFig = uifigure('Name', 'Telemetry Control');
             
             guiW = 500;
-            guiH = 500;
+            guiH = 550;
             btnW = 200;
             btnH = 40;
             s.guiFig.Position = [500 500 guiW guiH];
@@ -44,7 +46,9 @@ classdef TelemetryApp < handle
             s.btnStartStream = uibutton(s.guiFig, 'push', 'Text', 'Start data', ...
                                 'Position', [btnL (btnB + 4*(10 + btnH)) btnW btnH], ...
                                 'ButtonPushedFcn', @(btn,event) s.startStream());
-                            
+            s.btnProperties = uibutton(s.guiFig, 'push', 'Text', 'Properties', ...
+                                'Position', [btnL (btnB + 6*(10 + btnH)) btnW btnH], ...
+                                'ButtonPushedFcn', @(btn,event) s.showProperties());        
                             
             s.btnConnect = uibutton(s.guiFig, 'state', 'Text', 'Connect', ...
                                 'Position', [btnL (btnB + 5*(10 + btnH)) btnW btnH], ...
@@ -86,6 +90,10 @@ classdef TelemetryApp < handle
 
         function stop(s, ~)
             s.tp.Stop();
+        end
+
+        function showProperties(s, ~)
+            s.pv = guiDev2(s.ip, s.port);
         end
     end
 end
