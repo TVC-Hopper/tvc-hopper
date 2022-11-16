@@ -11,7 +11,6 @@
 #include "hw/esc.h"
 #include "modules/control_inputs.h"
 #include "circbuf/cbuf.h"
-// TODO: add cbuf to track vz
 
 SemaphoreHandle_t controls_start_sem;
 SemaphoreHandle_t stop_flag_mx;
