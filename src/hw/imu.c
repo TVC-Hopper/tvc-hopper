@@ -34,15 +34,15 @@ extern void HwImu_Init() {
 extern void HwImu_Start() {
     Bno085_InitSensorHub(&imu);
 
-    Bno085_EnableReport(&imu, SH2_LINEAR_ACCELERATION, 10000);
-    Bno085_EnableReport(&imu, SH2_GYROSCOPE_CALIBRATED, 10000);
-    Bno085_EnableReport(&imu, SH2_ROTATION_VECTOR, 10000);
+    // Bno085_EnableReport(&imu, SH2_LINEAR_ACCELERATION, 5000);
+    Bno085_EnableReport(&imu, SH2_GYROSCOPE_CALIBRATED, 5000);
+    Bno085_EnableReport(&imu, SH2_ROTATION_VECTOR, 5000);
 }
 
 extern void HwImu_GetReadings(float* readings) {
     Bno085_GetSensorEvents(&imu);
 
-    Bno085_GetSensorValueFloat(&imu, SH2_LINEAR_ACCELERATION, 3, readings);
+    // Bno085_GetSensorValueFloat(&imu, SH2_LINEAR_ACCELERATION, 3, readings);
     Bno085_GetSensorValueFloat(&imu, SH2_GYROSCOPE_CALIBRATED, 3, readings + 3);
     Bno085_GetSensorValueFloat(&imu, SH2_ROTATION_VECTOR, 4, readings + 6);
 }

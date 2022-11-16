@@ -23,10 +23,10 @@
 #include "app_hal_xconnect.h"
 
 #define PRIORITY_STARTUP                    4
-#define PRIORITY_CTL_INPUTS                 1
+#define PRIORITY_CTL_INPUTS                 2
 #define PRIORITY_COMMAND_CONTROL_COMMS      3
 #define PRIORITY_UART_LISTENER              5
-#define PRIORITY_HOVER_CONTROL              2 // FIXME
+#define PRIORITY_HOVER_CONTROL              1 // FIXME
 
 static void CreateTasks();
 
