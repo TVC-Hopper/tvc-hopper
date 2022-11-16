@@ -20,23 +20,23 @@ static float curr_state[STATE_VECTOR_SIZE] = {0};
 static float actuator_input_now[ACTUATION_VECTOR_SIZE] = {0};
 static float error_zint = 0;
 
-static const float K_hover[ACTUATION_VECTOR_SIZE][STATE_VECTOR_SIZE] = {    
-    { 70.711,   0.000,      5.000,      12.161,     0.000,      5.217,      0.000,    0.000,    0.000 },
-    { 0.000,    -70.711,    -5.000,     0.000,      -12.162,    -5.217,     0.000,    0.000,    0.000 },
-    { 70.711,   0.000,      -5.000,     12.161,     0.000,      -5.217,     0.000,    0.000,    0.000 },
-    { 0.000,    -70.711,    5.000,      0.000,      -12.162,    5.217,      0.000,    0.000,    0.000 },
-    { 0.000,    0.000,      0.000,      0.000,      0.000,      0.000,      7.716,    4.140,    7.071 }
+static const float K_hover[ACTUATION_VECTOR_SIZE * STATE_VECTOR_SIZE] = {    
+    70.711,   0.000,      5.000,      12.161,     0.000,      5.217,      0.000,    0.000,    0.000,
+    0.000,    -70.711,    -5.000,     0.000,      -12.162,    -5.217,     0.000,    0.000,    0.000,
+    70.711,   0.000,      -5.000,     12.161,     0.000,      -5.217,     0.000,    0.000,    0.000,
+    0.000,    -70.711,    5.000,      0.000,      -12.162,    5.217,      0.000,    0.000,    0.000,
+    0.000,    0.000,      0.000,      0.000,      0.000,      0.000,      7.716,    4.140,    7.071
 }; // roll,     pitch,      yaw,        gx,         gy,         gz,         z,        vz,       zint
 
 static void HoverControl_SetStatus(float error_z);
-static HOVCTRL_MATH_STATUS_T MultiplyMatrix(float* Result, float** A, float* B, uint32_t A_rows, uint32_t A_cols, uint32_t B_rows);
+static HOVCTRL_MATH_STATUS_T MultiplyMatrix(float* Result, const float* A, const float* B, uint32_t A_rows, uint32_t A_cols, uint32_t B_rows);
 static HOVCTRL_MATH_STATUS_T ComputeError(float* Result, float* A, float* B, uint32_t A_size, uint32_t B_size);
 static void CorrectYaw(float* error);
 static void RateLimit_VaneActuation(float* actuator_input_last, float* actuator_input_now, float alpha);
 static float Limit(float value, float min, float max);
 static void ComputeZint (float error_z);
 
-static void ExecuteControlStep(uint32_t *last_wake_time);
+static void ExecuteControlStep(TickType_t *last_wake_time);
 static void ResetControls();
 
 extern void HoverControl_Init() {
@@ -68,7 +68,7 @@ extern void HoverControl_Stop() {
 
 extern void HoverControl_Task(void* task_args) {
 
-    uint32_t xLastWakeTime = xTaskGetTickCount();
+    TickType_t xLastWakeTime = xTaskGetTickCount();
     for(;;) {
 
         // set stop flag initially so loop waits for start trigger
@@ -84,6 +84,10 @@ extern void HoverControl_Task(void* task_args) {
             xSemaphoreGive(controls_start_sem);
             ResetControls();
             // get awake time
+            ControlsInputs_NotifyStart();
+            
+            // will be static at this point, just need to fill data before 1st read
+            vTaskDelay(5);
             xLastWakeTime = xTaskGetTickCount();
         }
         xSemaphoreGive(stop_flag_mx);
@@ -96,16 +100,8 @@ static void ResetControls() {
     // TODO: tejal
 }
 
-static void ExecuteControlStep(uint32_t* last_wake_time) {
-    // just for testing
-    ControlsInputs_NotifyStart();
-    xTaskDelayUntil(last_wake_time, CONTROL_LOOP_INTERVAL * portTICK_PERIOD_MS);
-    ControlsInputs_GetIMUProcessed(&curr_state[STATE_IDX_ROLL]); 
-    ControlsInputs_GetLidar(&curr_state[STATE_IDX_Z]); 
-    return;
-
-
-    ControlsInputs_GetIMUProcessed(&curr_state[STATE_IDX_ROLL]); 
+static void ExecuteControlStep(TickType_t* last_wake_time) {
+    ControlsInputs_GetIMU(&curr_state[STATE_IDX_ROLL]); 
         // TODO: verify reading 6 floats [roll, pitch, yaw, gx, gy, gz]
 
     ControlsInputs_GetLidar(&curr_state[STATE_IDX_Z]); 
@@ -126,9 +122,10 @@ static void ExecuteControlStep(uint32_t* last_wake_time) {
     float actuator_input_last[ACTUATION_VECTOR_SIZE];
     HwThrustVane_GetPositions(actuator_input_last);
     actuator_input_last[4] = HwEsc_GetOutput();
+
     
     if (HOVCTRL_MATH_STATUS_OK == MultiplyMatrix(actuator_input_now, K_hover, error, ACTUATION_VECTOR_SIZE, STATE_VECTOR_SIZE, STATE_VECTOR_SIZE)) {
-        // RateLimit_VaneActuation(actuator_input_last, actuator_input_now, 0.3);
+        RateLimit_VaneActuation(actuator_input_last, actuator_input_now, 0.3);
         HwThrustVane_SetPositions(actuator_input_now);
         HwEsc_SetOutput(actuator_input_now[4] * MOTOR_KRPM_TO_ESC_PERCENT); 
             // FIXME: verify units
@@ -171,7 +168,7 @@ static void HoverControl_SetStatus(float error_z) {
     }
 }
 
-static HOVCTRL_MATH_STATUS_T MultiplyMatrix(float* Result, float** A, float* B, uint32_t A_rows, uint32_t A_cols, uint32_t B_rows) {
+static HOVCTRL_MATH_STATUS_T MultiplyMatrix(float* Result, const float* A, const float* B, uint32_t A_rows, uint32_t A_cols, uint32_t B_rows) {
     if (A_cols != B_rows) {
         return HOVCTRL_MATH_STATUS_ERROR;
     } 
@@ -179,7 +176,7 @@ static HOVCTRL_MATH_STATUS_T MultiplyMatrix(float* Result, float** A, float* B, 
     for (uint32_t r = 0; r < A_rows; ++r) {
         Result[r] = 0;
         for (uint32_t i = 0; i < A_cols; ++i) {
-            Result[r] += A[r][i] * B[i];
+            Result[r] += A[r * A_cols + i] * B[r];
         }
     }
 
