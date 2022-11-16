@@ -230,8 +230,13 @@ static void CorrectYaw(float* error) {
 static void RateLimit_VaneActuation(float* last, float* now, float alpha) {
     // apply LPF to actuator inputs
     for (ACTUATOR_IDX_T i = 0; i < 4; ++i) {
-        now[i] = (now[i] * alpha) + ((1.0 - alpha) * last[i]);
+        now[i] = RateLimit(last[i], now[i], alpha);
+        // (now[i] * alpha) + ((1.0 - alpha) * last[i]);
     }
+}
+
+static float RateLimit(float last, float now, float alpha) {
+    return (now * alpha) + ((1.0 - alpha) * last);
 }
 
 static float Limit(float value, float min, float max){
@@ -269,7 +274,7 @@ static void ComputeZInt(float error_z) {
 
 static void ComputeVZ(float z_now) {
     // TODO: make more robust against unstable LiDAR
-    vz = (z_now - z_last) / CONTROL_LOOP_INTERVAL;
-    // add linaccel z * CONTROL_LOOP_INTERVAL
+    float vz_now = (z_now - z_last) / CONTROL_LOOP_INTERVAL;
+    vz = RateLimit(vz_now, vz, 0.5) ; // averages current and last
     // circ buf?
 }
