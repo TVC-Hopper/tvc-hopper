@@ -59,60 +59,7 @@
                <pin_label pin_num="74" pin_signal="GPIO_SD_02" label="GPIO_SD_02/BT_CFG[0]/J57[2]/TP34" identifier="GPIO_SD_02;PWM1_A_0"/>
             </pin_labels>
             <expansion_headers>
-               <expansion_header id="frdm_arduino" name="IMXRT Expansion Header">
-                  <connectors>
-                     <connector id="C1" name="J60">
-                        <pins>
-                           <pin id="1" external_signal_types="ground" name="GND"/>
-                           <pin id="3" external_signal_types="ground" name="GND"/>
-                           <pin id="4" external_signal_types="power_supply_3.3V" name="3.3V"/>
-                           <pin id="5" pin_num="8" pin_signal="GPIO_05"/>
-                           <pin id="6" pin_num="22" pin_signal="POR_B" name="RESET"/>
-                           <pin id="7" pin_num="6" pin_signal="GPIO_06"/>
-                           <pin id="8" external_signal_types="power_supply_3.3V" name="3.3V"/>
-                           <pin id="9" pin_num="10" pin_signal="GPIO_03"/>
-                           <pin id="10" external_signal_types="power_supply_5V" name="5V"/>
-                           <pin id="12" external_signal_types="ground" name="GND"/>
-                           <pin id="14" external_signal_types="ground" name="GND"/>
-                           <pin id="16" external_signal_types="power_supply_5V" name="5V"/>
-                        </pins>
-                     </connector>
-                     <connector id="C2" name="J57">
-                        <pins>
-                           <pin id="2" pin_num="74" pin_signal="GPIO_SD_02" name="D8"/>
-                           <pin id="6" pin_num="55" pin_signal="GPIO_AD_05" name="D10"/>
-                           <pin id="8" pin_num="56" pin_signal="GPIO_AD_04" name="D11"/>
-                           <pin id="10" pin_num="57" pin_signal="GPIO_AD_03" name="D12"/>
-                           <pin id="12" pin_num="52" pin_signal="GPIO_AD_06" name="D13"/>
-                           <pin id="14" external_signal_types="ground" name="GND"/>
-                           <pin id="16" external_signal_types="aref" name="AREF"/>
-                           <pin id="18" pin_num="12" pin_signal="GPIO_01" name="D14"/>
-                           <pin id="20" pin_num="11" pin_signal="GPIO_02" name="D15"/>
-                        </pins>
-                     </connector>
-                     <connector id="C3" name="J56">
-                        <pins>
-                           <pin id="2" pin_num="3" pin_signal="GPIO_09" name="D0"/>
-                           <pin id="4" pin_num="2" pin_signal="GPIO_10" name="D1"/>
-                           <pin id="6" pin_num="55" pin_signal="GPIO_AD_05" name="D2"/>
-                           <pin id="8" pin_num="4" pin_signal="GPIO_08" name="D3"/>
-                           <pin id="10" pin_num="4" pin_signal="GPIO_08"/>
-                           <pin id="14" pin_num="5" pin_signal="GPIO_07" name="D6"/>
-                           <pin id="16" pin_num="58" pin_signal="GPIO_AD_02" name="D7"/>
-                        </pins>
-                     </connector>
-                     <connector id="C4" name="J26">
-                        <pins>
-                           <pin id="2" pin_num="51" pin_signal="GPIO_AD_07" name="A0"/>
-                           <pin id="4" pin_num="48" pin_signal="GPIO_AD_09" name="A1"/>
-                           <pin id="6" pin_num="47" pin_signal="GPIO_AD_10" name="A2"/>
-                           <pin id="8" pin_num="43" pin_signal="GPIO_AD_14" name="A3"/>
-                           <pin id="10" pin_num="59" pin_signal="GPIO_AD_01" name="A4"/>
-                           <pin id="12" pin_num="58" pin_signal="GPIO_AD_02" name="A5"/>
-                        </pins>
-                     </connector>
-                  </connectors>
-               </expansion_header>
+               <expansion_header id="frdm_arduino" name="IMXRT Expansion Header"/>
             </expansion_headers>
             <power_domains>
                <power_domain name="NVCC_GPIO" value="3.3"/>
@@ -144,6 +91,11 @@
                      </feature>
                   </dependency>
                   <dependency resourceType="Peripheral" resourceId="LPSPI1" description="Peripheral LPSPI1 is not initialized" problem_level="1" source="Pins:BOARD_InitPins">
+                     <feature name="initialized" evaluation="equal">
+                        <data>true</data>
+                     </feature>
+                  </dependency>
+                  <dependency resourceType="Peripheral" resourceId="ADC1" description="Peripheral ADC1 is not initialized" problem_level="1" source="Pins:BOARD_InitPins">
                      <feature name="initialized" evaluation="equal">
                         <data>true</data>
                      </feature>
@@ -473,6 +425,19 @@
                      <pin_features>
                         <pin_feature name="identifier" value="LPSPI_PCS3"/>
                         <pin_feature name="direction" value="OUTPUT"/>
+                        <pin_feature name="slew_rate" value="Slow"/>
+                        <pin_feature name="software_input_on" value="Disable"/>
+                        <pin_feature name="open_drain" value="Disable"/>
+                        <pin_feature name="speed" value="MHZ_100"/>
+                        <pin_feature name="drive_strength" value="R0_4"/>
+                        <pin_feature name="pull_keeper_select" value="Keeper"/>
+                        <pin_feature name="pull_keeper_enable" value="Enable"/>
+                        <pin_feature name="pull_up_down_config" value="Pull_Down_100K_Ohm"/>
+                        <pin_feature name="hysteresis_enable" value="Disable"/>
+                     </pin_features>
+                  </pin>
+                  <pin peripheral="ADC1" signal="IN, 1" pin_num="59" pin_signal="GPIO_AD_01">
+                     <pin_features>
                         <pin_feature name="slew_rate" value="Slow"/>
                         <pin_feature name="software_input_on" value="Disable"/>
                         <pin_feature name="open_drain" value="Disable"/>
