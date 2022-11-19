@@ -5,7 +5,7 @@
 
 #include <bsp/peripherals.h>
 
-
+// PWM configuration
 #define VANE_PWM_MODE       kPWM_EdgeAligned
 #define VANE_PWM            PWM1_PERIPHERAL
 #define VANE_0_SM           PWM1_SM2
@@ -18,12 +18,14 @@
 #define VANE_2_CH           PWM1_SM3_A
 #define VANE_3_CH           PWM1_SM3_B
 
+// scaling factors
 #define MAX_PULSE_WIDTH     ((float) 2.0)
 #define MIN_PULSE_WIDTH     ((float) 1.0)
 #define MAX_ANGLE           ((float) 180.0)
 
 static void SetPosition(uint8_t idx, float position, bool setldok);
 
+// current positions
 static float servo_positions[4] = {90.0, 90.0, 90.0, 90.0};
 
 // indexed by servo id
@@ -42,6 +44,7 @@ static const pwm_channels_t vane_channels[4] = {
     VANE_3_CH,
 };
 
+// indexed by servo id
 static const pwm_module_control_t ctl_modules[4] = {
     kPWM_Control_Module_2,
     kPWM_Control_Module_2,
@@ -50,6 +53,7 @@ static const pwm_module_control_t ctl_modules[4] = {
 };
 
 extern void HwThrustVane_Init() {
+        // set fault map for each PWM output
     for (uint8_t i = 0; i < 4; ++i) {
         PWM_SetupFaultDisableMap(
                 VANE_PWM,
@@ -63,6 +67,7 @@ extern void HwThrustVane_Init() {
         );
     }
 
+    // set initial positions
     HwThrustVane_SetPositions(servo_positions);
 }
 
@@ -70,6 +75,8 @@ extern void HwThrustVane_SetPositions(float* positions) {
     for (uint8_t i = 0; i < 4; ++i) {
         SetPosition(i, positions[i], false);
     }
+
+    // synchronize change
     PWM_SetPwmLdok(VANE_PWM, kPWM_Control_Module_2 | kPWM_Control_Module_3, true);
 }
 
@@ -81,8 +88,13 @@ extern void HwThrustVane_GetPositions(float* positions) {
 
 static void SetPosition(uint8_t idx, float position, bool setldok) {
     servo_positions[idx] = position;
+
+    // convert angle to pulse width
     float pulse_width = position / MAX_ANGLE * (MAX_PULSE_WIDTH - MIN_PULSE_WIDTH) + MIN_PULSE_WIDTH;
+
+    // caluclate DC from pulse width
     uint32_t duty_cycle = (pulse_width / 20.0) * 0xFFFF;
+
     PWM_UpdatePwmDutycycleHighAccuracy(
             VANE_PWM,
             vanes[idx],
@@ -91,6 +103,7 @@ static void SetPosition(uint8_t idx, float position, bool setldok) {
             duty_cycle
     );
 
+    // only update ldok if not batching sets
     if (setldok) {
         PWM_SetPwmLdok(VANE_PWM, ctl_modules[idx], true);
     }
