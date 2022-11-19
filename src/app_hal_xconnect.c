@@ -32,12 +32,15 @@
 #define IMU_ACCEL_INTTERRUPT_GPIO 23
 #define IMU_GYRO_INTTERRUPT_GPIO 24
 
+// temporary buffers for receiving and parsing messages
 static uint8_t uart_rcv_buffer[UART_RCV_BUFFER_SIZE];
 static uint8_t uart_msg_buffer[UART_MSG_PACKET_SIZE];
 
+// uart listener needs STCP to unescape
 static StcpEngine_t* stcp;
 static lpuart_rtos_handle_t* uart_handle = &COMMS_UART_rtos_handle;
 
+// protect i2c bus
 static SemaphoreHandle_t i2c_mx;
 
 extern void AppHal_Init() {
@@ -89,6 +92,8 @@ extern uint8_t XCCb_I2CWrite(uint8_t address, uint8_t* data, uint16_t size) {
     
     LPI2C1_masterTransfer.slaveAddress = address;
     LPI2C1_masterTransfer.direction = kLPI2C_Write;
+    
+    // set subaddress size to 0 for no subaddress
     LPI2C1_masterTransfer.subaddress = 0;
     LPI2C1_masterTransfer.subaddressSize = 0;
     LPI2C1_masterTransfer.data = data;
@@ -106,6 +111,8 @@ extern uint8_t XCCb_I2CRead(uint8_t address, uint8_t* data, uint16_t size) {
 
     LPI2C1_masterTransfer.slaveAddress = address;
     LPI2C1_masterTransfer.direction = kLPI2C_Read;
+
+    // set subaddress size to 0 for no subaddress
     LPI2C1_masterTransfer.subaddress = 0;
     LPI2C1_masterTransfer.subaddressSize = 0;
     LPI2C1_masterTransfer.data = data;
@@ -169,6 +176,7 @@ extern void UartListener_Task(void* task_args) {
     uint32_t msg_rcv_idx = 0;
 
     while (true) {
+        // get bytes
         error = LPUART_RTOS_Receive(uart_handle, uart_rcv_buffer, UART_RCV_BUFFER_SIZE, &bytes_rcv_count);
 
         if (error != kStatus_Success) {
@@ -177,11 +185,16 @@ extern void UartListener_Task(void* task_args) {
 
         if (bytes_rcv_count > 0) {
             for (uint32_t i = 0; i < bytes_rcv_count; ++i) {
+                // copy bytes to buffer
                 uart_msg_buffer[msg_rcv_idx++] = uart_rcv_buffer[i];
                 if (msg_rcv_idx >= 2) {
+                    // look for footer
                     if (uart_msg_buffer[msg_rcv_idx - 2] == STCP_FOOTER
                             && uart_msg_buffer[msg_rcv_idx - 1] == STCP_FOOTER) {
+                        // handle STCP message if complete
                         StcpHandleMessage(stcp, uart_msg_buffer, msg_rcv_idx);
+
+                        // start filling buffer again
                         msg_rcv_idx = 0;
                     }
                 }
@@ -189,6 +202,7 @@ extern void UartListener_Task(void* task_args) {
         }
     }
 
+    // should not get here
     LPUART_RTOS_Deinit(uart_handle);
     vTaskSuspend(NULL);
 }

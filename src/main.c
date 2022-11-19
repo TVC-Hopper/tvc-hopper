@@ -31,6 +31,7 @@
 static void CreateTasks();
 
 static void Setup_Task(void* task_args) {
+    // depends on i2c freertos drivers, need to start freertos first
     HwImu_Start();
 
     while(1) {
@@ -45,6 +46,7 @@ int main(void)
     BOARD_InitBootClocks();
     BOARD_InitDebugConsole();
 
+    // setup crossbar for PWM
     XBARA_Init(XBARA);
     XBARA_SetSignalsConnection(XBARA, kXBARA1_InputLogicHigh, kXBARA1_OutputFlexpwm1Fault0);
     XBARA_SetSignalsConnection(XBARA, kXBARA1_InputLogicHigh, kXBARA1_OutputFlexpwm1Fault1);
@@ -54,9 +56,11 @@ int main(void)
     // this needs to be after debug console init
     // for some reason
     BOARD_InitBootPeripherals();
-    
+   
+    // connect app and hal
     AppHal_Init();
-    
+   
+    // module initialization
     ControlsInputs_Init();
     UartListener_Init();
     CommandControlComms_Init();
