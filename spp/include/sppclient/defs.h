@@ -11,12 +11,18 @@
 extern "C" {
 #endif
 
+/**
+ *  Application callbacks
+ */
 typedef struct SppClientCallbacks_s {
     SPP_STATUS_T (*Send)(uint8_t* bytes, uint16_t len, void* instance_data);
     SPP_STATUS_T (*SetValue)(uint16_t id, void* value, void* instance_data);
     SPP_STATUS_T (*GetValue)(uint16_t id, void* value, void* instance_data);
 } SppClientCallbacks_t;
 
+/**
+ *  Client engine initialization parameters
+ */
 typedef struct SppClientEngineInitParams_s {
     SppAddress_t broadcast_address;
     SppAddress_t client_address;
@@ -29,6 +35,9 @@ typedef struct SppClientEngineInitParams_s {
     void* instance_data;
 } SppClientEngineInitParams_t;
 
+/**
+ *  Client engine
+ */
 typedef struct SppClientEngine_s {
     SppAddress_t broadcast_address;
     SppAddress_t client_address;
