@@ -5,6 +5,12 @@ The project integrates well with MCUXpresso Config Tools to auto-generate low le
 Being based on standard MCUXpresso IDE projects but reorganized and built with CMake enables easy integration with MCUXpresso tools
 but also with custom tools, build needs, flashing, and testing.
 
+The repository has several major components:
+- Flight software
+- Telemetry and property server
+- MATLAB telemetry and property interface
+- Tools, tests, and support software
+
 ## Building
 
 ### Dependencies
@@ -33,25 +39,24 @@ but also with custom tools, build needs, flashing, and testing.
 
 For Windows users, it is recommended to set up WSL for this toolchain.
 
-### Programming and Debugging
+### Programming and Debugging 
 
 #### Debugging
 
-Currently, only the debug target is supported for the development board. Hopefully adding other support later.
-
 To debug, use MCUXpresso IDE to open the project located at `support/tvc_ide_build` and use the `tvc_debug` target.
-This target should be configured with the relative path to `build-debug/hopper.elf` if the project is cloned using git.
-Build the project using the regular command line interface (`make debug`) to generate `hopper.elf`.
+This target should be configured with the relative path to `build-debug-fsnor/hopper.elf` if the project is cloned using git.
+Build the project using the regular command line interface (`make flexspi_nor_debug`) to generate `hopper.elf`.
 Debug as normal using the IDE's GDB interface.
 
-This will be the normal method of debugging and testing you'll use on the System on a Board.
+A standard CMSIS-DAP probe like the MCU Link 2 can be used to debug and program the development board and flight controller via JTAG.
 
 When connecting the development board, MCUXpresso sometimes has issues connecting if the board is connected before
 the IDE is launched. For a most reproducible and consistent environment, launch the IDE first.
 
-#### Programming Flight Controller
+#### Programming the Flight Controller
 
-TBD. This may be difficult to get working.
+The flight controller uses the same JTAG/SWD interface found on the MIMXRT1011 EVK. A CMSIS-DAP probe like the MCU Link 2
+can be used to program and debug.
 
 ### Build targets
 
@@ -81,12 +86,38 @@ The build supports 3 different targets:
 
 ## Design and Architecture
 
-### SPP - Simple Property Protocol
+### Board Support Pacakges (BSPs)
+
+The BSPs are generated using the MCUXpresso Config tools. The configuration tools allows us to easily make changes
+to clock, pin, and peripheral configurations between the development board and flight controlers. The configuration
+file `*.mex` defines the BSP configuration and the configuration tool auto-generates the BSP source code.
+
+BSPs are selected in the project's root `CMakeLists.txt` file options and are linked statically to the executable.
+
+### FSLHAL
+
+The Freescale Semiconductor HAL libraries are used and statically linked to the executable.
+
+### Drivers
+
+Two drivers are provided.
+- TFLuna LiDAR
+- BNO085 IMU
+
+### Sensor Hub
+
+Sensor Hub is a library provided by CEVA to interface with the BNO085 IMU. The BNO085 driver uses this library to
+interface with the sensor fusion hub in the IMU.
+
+
+### Communication and Data Handling
+
+#### SPP - Simple Property Protocol
 
 Key-value pair protocol taken from a different project. The client (the hopper) has a property list (names, ids, types, size, etc.) that
 it can send to a host upon connection. Once connected, the host makes read and write requests to get and set property values.
 
-Its interface is simple, an initialization function, a function to parse incoming messages, and a callback used to send messages.
+Its interface is simple containing only an initialization function, a function to parse incoming messages, and a callback used to send messages.
 
 Additionally, it uses two callbacks to get and set property values. These are simple and take a property id, a byte buffer, and size.
 The callbacks use the property id to call a specific module's getter or setter for the value.
@@ -94,18 +125,14 @@ The callbacks use the property id to call a specific module's getter or setter f
 In practice, the callback to send a message simply calls the STCP write function to handle packet framing.
 
 Property list generation is handled using an automated python script. The property list is defined in a TOML file in the support directory
-and then the python script generates a pair of header and source files with the property list.
+and then the python script (`support/generate_spp_headers.py`) generates a pair of header and source files with the property list.
 
-### STCP - Simple Transport Control Protocol
+#### STCP - Simple Transport Control Protocol
 
 Packet framing protocol taken from a different project. Takes a packet, adds a header, footer, and checksum. Escapes all header/footer characters
 inside the packet body.
 
-An even simpler interface with just a function to handle incoming messages, a function to frame packets, and a callback to send messages.
-
-### Circbuf - Circular Buffer
-
-Library for a circular buffer. There's some work to be done here for making it more generic and usable but it'll work for now.
+STCP provides an even simpler interface than SPP with just a function to handle incoming messages, a function to frame packets, and a callback to send messages.
 
 ### Callbacks
 
@@ -125,18 +152,28 @@ The unit tests are focused on only testing the drivers and application code.
 
 All tests are located in `tests` directory
 
-### Telemetry Viewer
+## Telemetry and Property Management
 
-Start the server using `make start_telemetry_server mode=s`.
-Use MATLAB, switch working directory to `tools/telemetry_viewer`. Run the script to plot incoming data.
-To add new data, modify the server and the matlab script to accept and plot new values.
+A goal of this project was to create a software architecture that supports easy development and testing during the project's lifecycle.
+By exploring the needs of data and commands moving through the system, we decided to use the simple distributed key-value pair protocol SPP.
+The protocol enables data and commands to be moved throughout the system. 
 
-Unless using the telemetry emulator, the order of connections does not matter. The flight software, telemetry server, and telemetry viewer may be started in any sequence.
-Additionally, the telemetry server can be restarted without needing to restart the flight software. Same is true for the flight software.
+The telemetry and property infrastructure contains 3 major components:
+1. SPP client on the flight controller
+2. SPP host integrated with a TCP server
+3. Clients that read, write, and visualize SPP data
 
-The telemetry server operates an SPP host instance that streams data from the client (either vehicle or emulated). The MATLAB visualization/viewer client connects to the server and reads data to plot.
+### SPP host
 
-![Telemetry Viewer plotting data streams](docs/readme-assets/matlab-telemetry.png)
+The host is stateless and provides the SPP host access to all properties throguh a set of callbacks to get and set data.
+Commands can be sent via a property write. Each property has an id, name, size, read/write flags. The software in which SPP
+operates is responsible for managing the data associated with each property.
+
+### Telemetry and Property Server
+
+The server is designed to run on a Raspberry Pi. When the vehicle starts up and broadcasts it's presence, the SPP client
+transfers the property list to the host. The TCP server uses the following API to allow users to read and write any 
+property on the client.
 
 #### Server API
 
@@ -154,6 +191,20 @@ The telemetry server operates an SPP host instance that streams data from the cl
 
 ***Response***
 - Value response: `<id:2><size:1><timestamp:4><value:size>`
+
+### Telemetry Viewer
+
+Start the server using `make start_telemetry_server port=<serial port> mode=s`.
+Use MATLAB, switch working directory to `tools/telemetry_viewer`. Run the script to plot incoming data.
+To add new data, modify the server and the matlab script to accept and plot new values.
+
+Unless using the telemetry emulator, the order of connections does not matter. The flight software, telemetry server, and telemetry viewer may be started in any sequence.
+Additionally, the telemetry server can be restarted without needing to restart the flight software. Same is true for the flight software.
+
+The telemetry server operates an SPP host instance that streams data from the client (either vehicle or emulated). The MATLAB visualization/viewer client connects to the server and reads data to plot.
+
+![Telemetry Viewer plotting data streams](docs/readme-assets/matlab-telemetry.png)
+
 
 #### Data emulation
 
