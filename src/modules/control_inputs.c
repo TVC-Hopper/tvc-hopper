@@ -43,8 +43,10 @@ extern void ControlsInputs_Init() {
 
 extern void ControlsInputs_Task(void* task_args) {
     while(1) {
+        // wait for semaphore
         while(pdTRUE != xSemaphoreTake(start_capture_sem, 0xFFFF)) {};
-       
+      
+        // take lidar and IMU readings
         uint32_t temp_distance = HwLidar_GetDistance();
         
         xSemaphoreTake(lidar_data_mx, 0xFFFF);
@@ -53,8 +55,8 @@ extern void ControlsInputs_Task(void* task_args) {
 
         HwImu_GetReadings(imu_data_raw);
 
+        // process IMU data
         ComputeQuaternions();
-
         ProcessIMU();
     }
 }
