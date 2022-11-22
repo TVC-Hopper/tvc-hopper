@@ -175,16 +175,16 @@ SPP_STATUS_T SppClientProcessMessage(SppClientEngine_t* client, uint8_t* message
     if (SPP_MSG_CONNECT_RESPONSE_ID == msg_id) {
         return SppSendPropertyList(client, message, host_address);
     } else if (SPP_MSG_GET_REQUEST_ID == msg_id) {
-        // create message
+	// unpack recieved
+	uint16_t token = message[body_idx++];
+	uint16_t id = *((uint16_t*)(message + body_idx));
+
+	SppPropertyDefinition_t *pd;
+        SppGetDefinition(client, id, &pd);
+
+	// create message
         uint16_t get_resp_msg_len = SPP_MSG_HDR_SIZE(addr_len) + pd->size + SPP_MSG_GET_RESPONSE_BASE_SIZE;
         uint8_t get_resp_msg[get_resp_msg_len];
-
-        // unpack received
-        uint16_t token = message[body_idx++];
-        uint16_t id = *((uint16_t*)(message + body_idx));
-
-        SppPropertyDefinition_t *pd;
-        SppGetDefinition(client, id, &pd);
 
         // fill header
         body_idx = SppFillMessageHeader(addr_len, get_resp_msg, &client->host_address, &client->client_address, SPP_MSG_GET_RESPONSE_ID);
