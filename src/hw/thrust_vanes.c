@@ -93,6 +93,7 @@ static void SetPosition(uint8_t idx, float position, bool setldok) {
     float pulse_width = position / MAX_ANGLE * (MAX_PULSE_WIDTH - MIN_PULSE_WIDTH) + MIN_PULSE_WIDTH;
 
     // caluclate DC from pulse width
+    // 50hz -> 20ms period
     uint32_t duty_cycle = (pulse_width / 20.0) * 0xFFFF;
 
     PWM_UpdatePwmDutycycleHighAccuracy(

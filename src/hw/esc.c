@@ -11,8 +11,7 @@
 #define ESC_SM              PWM1_SM1
 #define ESC_CH              PWM1_SM1_B
 
-#define MAX_DUTY_CYCLE ((uint16_t)0xFFFF)
-#define MAX_OUTPUT     (100.0f)
+#define ESC_PWM_PERIOD      ((float) 20.0f)
 
 // current ESC output
 static float esc_output = 90.0;
@@ -21,22 +20,18 @@ extern void HwEsc_Init() {
     HwEsc_SetOutput(esc_output);
 }
 
-extern void HwEsc_SetOutput(float output) {
-
-    // apply bounds
-    if (output > MAX_OUTPUT) {
-        output = MAX_OUTPUT;
-    } else if (output < 0.0) {
-        output = 0.0;
-    }
-
+extern void HwEsc_SetOutput(float pulse_width) {
+    // TODO: switch to high accuracy and convert PW to DC
     esc_output = output;
-    PWM_UpdatePwmDutycycle(
+
+    uint32_t duty_cycle = pulse_width / ESC_PWM_PERIOD * 0xFFFF
+
+    PWM_UpdatePwmDutycycleHighAccuracy(
             ESC_PWM,
             ESC_SM,
             ESC_CH,
             ESC_PWM_MODE,
-            output
+            duty_cycle
     );
 
     // set bit to update PWM counters on next cycle (synchronization feature)

@@ -13,7 +13,7 @@ extern void HwEsc_Init();
  *
  *  @param output percent output
  */
-extern void HwEsc_SetOutput(float output);
+extern void HwEsc_SetOutput(float pulse_width);
 
 /**
  *  Get the current ESC output
