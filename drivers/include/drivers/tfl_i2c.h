@@ -7,7 +7,7 @@
 /**
  *  TFL defualt I2C address
  */
-#define TFL_DEF_ADR         ((uint8_t) 0x10)
+#define TFL_DEF_ADDR         ((uint8_t) 0x10)
 
 /**
  *  TFL defualt frame rate (100Hz) 

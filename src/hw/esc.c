@@ -11,20 +11,19 @@
 #define ESC_SM              PWM1_SM1
 #define ESC_CH              PWM1_SM1_B
 
-#define ESC_PWM_PERIOD      ((float) 20.0f)
+#define ESC_PWM_PERIOD      ((float) 20000.0)
 
 // current ESC output
-static float esc_output = 90.0;
+static float esc_output = 1000.0;
 
 extern void HwEsc_Init() {
     HwEsc_SetOutput(esc_output);
 }
 
-extern void HwEsc_SetOutput(float pulse_width) {
-    // TODO: switch to high accuracy and convert PW to DC
-    esc_output = output;
+extern void HwEsc_SetOutput(float pulse_width_us) {
+    esc_output = pulse_width_us;
 
-    uint32_t duty_cycle = pulse_width / ESC_PWM_PERIOD * 0xFFFF
+    uint32_t duty_cycle = pulse_width_us / ESC_PWM_PERIOD * 0xFFFF;
 
     PWM_UpdatePwmDutycycleHighAccuracy(
             ESC_PWM,
