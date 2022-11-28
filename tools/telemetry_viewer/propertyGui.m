@@ -125,7 +125,9 @@ classdef propertyGui < handle
                     if max < totalLength
                         max = totalLength;
                     end
+                startIdx = endIdx + 1;
                 end
+                
             end
             width = max;
         end
