@@ -1,351 +1,292 @@
-classdef propertyGui < handle
- properties
-        propList
+classdef propertyGui < baseGui
+    properties
+        propertyList
         numProps
+        
         ip
         port
         tvc
+        
         dataBuf
 
-        borderWidth = 5;
-        
-        guiFig
-        figWidth
-        figHeight
-        figTitleHeight = 40;
-
-        currYpos = 0;
-        currXpos = 0;
-
-        eltHeight = 40;
         widthInputField = 60;
-        numRows = 0;
-        numDatum = 0;
-        numChildren = 0;
-        uiEditChildren
-        uiButtonChildren
 
         buttonLabelText = ["Set Direction:", "Get/Set:"];
         buttonNames = ["Read", "Write", "Update"];
+
+        propertyNameTextPre = ["Name: ", "Type: "];
+
+        processDataButton
+        processDataButtonTxt = "Process Property Data";
+        
         pushedColor = [0.7059 0.9294 0.8745];
         unPushedColor = [0.96 0.96 0.96];
-        numButtons = 3;
         read = 1;
         write = 2;
         update = 3;
+        numButtons = 3;
+
+        tempGlob
+
         propertyStateArray
-
-        % 1: read, 2: write
-        currState
-        stateCanChange
     end
-    methods
-        function p = propertyGui(name, propList, ip, port)
-            p.propList = propList;
-            p.ip = ip;
-            p.port = port;
-            %p.tvc = TelemetryViewerClient(ip, port);
-            p.numProps = size(p.propList, 2);
-            
-%             p.computeNumEltsNumDatum();
-%             p.computeUiEditChildrenIdxs();
-%             p.computeUiButtonChildrenIdxs();
 
-            p.figWidth = p.computeFigWidth();
-            p.figHeight = p.computeFigHeight();
-            p.guiFig = uifigure('Name', name, 'Position', [100, 100, p.figWidth, p.figHeight + 40]);
+    methods
+        function obj = propertyGui(name, propertyList, ip, port)
+            obj = obj@baseGui(5, 40, name, 400, 100);
+            obj.propertyList = propertyList;
+            obj.numProps = size(obj.propertyList, 2);
             
-            p.resetYposUp();
-            p.resetXposLeft();
+            obj.ip = ip;
+            obj.port = port;
+            obj.tvc = TelemetryViewerClient(ip, port);
+            obj.makeGuiFig();
+             
+            obj.makePropertyStateArray();
             
-            p.makePropertyStateArray();
-            
-            for i = 1:p.numProps
-                p.makeTitleType(i, [0.2235 0.8902 0.7216], [0.4431 0.9608 0.8314]);
-                p.makeButtons(i);
-                p.makeUserInputFields(i);
+            for i = 1:obj.numProps
+                obj.makeTitleType(i);
+                obj.makeButtons(i);
+                obj.makeUserInputFields(i);
             end 
 
-            p.initButtonState();
+            obj.initButtonState();
         end
 
-        function moveYposDown(p, ~)
-            p.currYpos = p.currYpos - (p.borderWidth + p.eltHeight);
-        end
-
-        function moveYposUp(p, ~)
-            p.currYpos = p.currYpos + (p.borderWidth + p.eltHeight);
-        end
-
-        function resetYposUp(p, ~)
-            p.currYpos = p.figHeight - p.borderWidth;
-        end
-
-        function resetYposDown(p, ~)
-            p.currYpos = p.borderWidth;
-        end
-
-        function moveXposRight(p, moveRightAmt)
-            p.currXpos = p.currXpos + p.borderWidth + moveRightAmt;
-        end
-
-        function moveXposLeft(p, moveLeftAmt)
-            p.currXpos = p.currXpos - (p.borderWidth + moveLeftAmt);
-        end
-
-        function resetXposLeft(p, ~)
-            p.currXpos = p.borderWidth;
-        end
-
-        function resetXposRight(p, ~)
-            p.currXpos = p.figWidth - p.borderWidth;
-        end
-
-        function maxWidth = computeFigWidth(p)
-            maxWidth = max([p.computeButtonStripWidth(), p.computeMaxInputRowWidth()]);
-        end
-
-        function makePropertyStateArray(p)
-            p.propertyStateArray = propertyState.empty(p.numProps, 0);
-            for i = 1:p.numProps
-                p.propertyStateArray(i) = propertyState(p.propList(i));
-            end
-        end
-
-        function width = computeMaxInputRowWidth(p)
-            max = 0;
-            for i = 1:p.numProps
-                startIdx = 1;
-                for j = 1:size(p.propList(i).dispDims, 2) 
-                    numNamesInRow = p.propList(i).dispDims(j);
-                    endIdx = startIdx + numNamesInRow - 1;
-                    rowNames = p.propList(i).eltNames(startIdx:endIdx);
-                    sumNameLengths = sum(arrayfun(@strlength,rowNames));
-                    totalLength = sumNameLengths * 10 + numNamesInRow * p.widthInputField + (numNamesInRow * 2 + 1) * p.borderWidth;
-                    if max < totalLength
-                        max = totalLength;
-                    end
-                startIdx = endIdx + 1;
+        function width = computeFigWidth(obj)
+            names = [obj.buttonLabelText, obj.buttonNames];
+            maxButtonStripWidth = sum(arrayfun(@strlength, names)) * 10 + (size(names, 2) + 1)* obj.borderWidth;
+            maxRowLength = 0;
+            for i = 1:obj.numProps
+                propertyNameWidths(i) = sum(arrayfun(@strlength,[obj.propertyNameTextPre(1), obj.propertyList(i).name])) * 10;
+                maxNameWidth = max(arrayfun(@obj.computeWidth, obj.propertyList(i).eltNames));
+                maxEltsInRow = max(obj.propertyList(i).dispDims);
+                switch obj.propertyList(i).dispType
+                    case 'C'
+                        fieldWidths = 0;
+                        numElts = 0;
+                    case 'S'
+                        k = values(obj.propertyList(i).valToString);
+                        maxInputFieldWidth = max(arrayfun(@obj.computeWidth, k));
+                        fieldWidths = (maxNameWidth + maxInputFieldWidth) * maxEltsInRow;
+                        numElts = maxEltsInRow * 2;
+                    case 'V'
+                        fieldWidths = (maxNameWidth + obj.widthInputField) * maxEltsInRow;
+                        numElts = maxEltsInRow * 2;
+                    case 'M'
+                        fieldWidths = maxEltsInRow * max([obj.widthInputField, maxNameWidth]);
+                        numElts = maxEltsInRow;
+                    otherwise
+                        disp("ERROR IN COMPUTEFIGWIDTH")
                 end
-                
+                totalLength = fieldWidths + (numElts + 1) * obj.borderWidth;
+                if maxRowLength < totalLength
+                        maxRowLength = totalLength;
+                end
             end
-            width = max;
-        end
+            width = max([maxButtonStripWidth, maxRowLength, max(propertyNameWidths)]);
+        end 
 
-        function width = computeButtonStripWidth(p)
-            names = [p.buttonLabelText, p.buttonNames];
-            width = sum(arrayfun(@strlength, names)) * 10 + (size(names, 2) + 1)* p.borderWidth;
-        end
-
-        function numRows = computeFigHeight(p, ~)
-            numRows = sum(arrayfun(@p.computeNumRowsInProp, p.propList)) * (p.eltHeight + p.borderWidth + 1);
-        end
-
-        function numRows = computeNumRowsInProp(p, pe)
-            if pe.dispDims(1) == 0
+        function numRows = computeNumRowsInProp(obj, pe)
+            if pe.dispType == 'C'
                 numRows = 3;
+            elseif pe.dispType == 'M'
+                numRows = 4 + size(pe.dispDims,2);
             else
                 numRows = 3 + size(pe.dispDims,2);
             end
-        end
-
-        function initButtonState(p)
-            arr = flip(1:p.numChildren);
-            for i=1:p.numProps
-                p.propertyStateArray(i).initChildren(arr);
-                if p.propertyStateArray(i).property.rw == 'RW'
-                    p.propertyStateArray(i).stateCanChange = 1;
-                    p.propertyStateArray(i).currState = p.read;
-                    p.guiFig.Children(p.propertyStateArray(i).uiButtonChildren(p.read)).BackgroundColor = p.pushedColor;
-                elseif p.propertyStateArray(i).property.rw == 'R'
-                    p.propertyStateArray(i).stateCanChange = 0;
-                    p.propertyStateArray(i).currState = p.read;
-                    p.guiFig.Children(p.propertyStateArray(i).uiButtonChildren(p.read)).BackgroundColor = p.pushedColor;
-                else
-                    p.propertyStateArray(i).stateCanChange = 0;
-                    p.propertyStateArray(i).currState = p.write;
-                    p.guiFig.Children(p.propertyStateArray(i).uiButtonChildren(p.write)).BackgroundColor = p.pushedColor;
-                end
+            if pe.processData
+                numRows = numRows + 1;
             end
         end
 
-        function computeUiEditChildrenIdxs(p, ~)
-            p.uiEditChildren = flip(1:2:(2 * p.numDatum - 1));
+        function height = computeFigHeight(obj)
+            height = sum(arrayfun(@obj.computeNumRowsInProp, obj.propertyList)) * (obj.defEltHeight + obj.borderWidth + 1);
         end
 
-        function computeUiButtonChildrenIdxs(p, ~)
-            offset = 2 * p.numDatum;
-            p.uiButtonChildren = flip([offset + 1, offset + 3, offset + 4]);
-        end
-
-        function computeNumEltsNumDatum(p, ~)
-            for i = 1:size(p.propList,2)
-                p.numRows = p.numRows + 3;
-                if p.propList(i).type == 'bool'
-                    continue;
-                elseif p.propList(i).type == 'uint32' || p.propList(i).type == 'float'
-                    
-                end
+        function makePropertyStateArray(obj)
+            obj.propertyStateArray = propertyState.empty(obj.numProps, 0);
+            for i = 1:obj.numProps
+                obj.propertyStateArray(i) = propertyState(obj.propertyList(i));
             end
-%             numElts = 1;
-%             if p.propList.type == 'array'
-%                 numElts = p.propList.numBytes / 4;
-%             end
-%             p.numDatum = numElts;
-%             p.numElts = numElts + 3;
         end
 
-        function width = computeWidth(p, name)
-              width = strlength(name) * 10;
+        function makeTitleType(obj, i)
+            bgcolor1 = [0.0863    0.9608    0.8157];%[0.2235 0.8902 0.7216];
+            bgcolor2 = [0.4745    0.9294    0.8157];%[0.4431 0.9608 0.8314];
+            txtcolor = [.1, .1, .1];
+            name = append('Name: ', obj.propertyList(i).name);
+            type = append('Type: ', obj.propertyList(i).type);
+            width = obj.figWidth - 2 * obj.borderWidth;
+            obj.makeUiLabel(name, [obj.currXpos, obj.currYpos, width, obj.defEltHeight], 'center', bgcolor1, txtcolor);
+            obj.moveYposDown();
+            obj.makeUiLabel(type, [obj.currXpos, obj.currYpos, width, obj.defEltHeight], 'center', bgcolor2, txtcolor);
+            obj.moveYposDown();
         end
 
-        function makeTitleType(p, i, color1, color2)
-            name = append('Name: ', p.propList(i).name);
-            type = append('Type: ', p.propList(i).type);
-            width = p.figWidth - 2 * p.borderWidth;
-            p.makeUiLabel(name, [p.currXpos, p.currYpos, width, p.eltHeight], 'center', color1);
-            p.incrementChildCount();
-            p.moveYposDown();
-            p.makeUiLabel(type, [p.currXpos, p.currYpos, width, p.eltHeight], 'center', color2);
-            p.incrementChildCount();
-            p.moveYposDown();
-        end
+        function makeButtons(obj, i)
+            labelcolor = [0.8314    0.9882    0.9490];
+            labeltxtcolor = [.1, .1, .1];
+            fillcolor = [0.8314    0.9882    0.9490];
 
-        function p = incrementChildCount(p)
-            p.numChildren = p.numChildren + 1;
-        end
-
-        function makeButtons(p, i)
             labelText = "Set Direction:";
-            width = p.computeWidth(labelText);
-            p.makeUiLabel(labelText, [p.currXpos, p.currYpos, width, p.eltHeight], 'center', [0.9608    0.4902    0.6314]);
-            p.incrementChildCount();
-            p.moveXposRight(width);
+            width = obj.computeWidth(labelText);
+            obj.makeUiLabel(labelText, [obj.currXpos, obj.currYpos, width, obj.defEltHeight],...
+                            'center', labelcolor, labeltxtcolor);
+            obj.moveXposRight(width);
 
-            width = p.computeWidth(p.buttonNames(p.read));
-            p.makeUiButton(p.buttonNames(p.read), [p.currXpos, p.currYpos, width, p.eltHeight], p.read, i);
-            p.incrementChildCount();
-            p.propertyStateArray(i).addButtonChild(p.numChildren);
-            p.moveXposRight(width);
+            width = obj.computeWidth(obj.buttonNames(obj.write));
+            child = obj.makeUiButton(obj.buttonNames(obj.read), [obj.currXpos, obj.currYpos, width, obj.defEltHeight],...
+                                     [.96, .96, .96], [.1, .1, .1], @obj.buttonPushed, {obj.read, i});
+            obj.propertyStateArray(i).addButtonChild(child);
+            obj.moveXposRight(width);
 
-            width = p.computeWidth(p.buttonNames(p.write));
-            p.makeUiButton(p.buttonNames(p.write), [p.currXpos, p.currYpos, width, p.eltHeight], p.write, i);
-            p.incrementChildCount();
-            p.propertyStateArray(i).addButtonChild(p.numChildren);
-            p.moveXposRight(width);
+            width = obj.computeWidth(obj.buttonNames(obj.write));
+            child = obj.makeUiButton(obj.buttonNames(obj.write), [obj.currXpos, obj.currYpos, width, obj.defEltHeight],...
+                                     [.96, .96, .96], [.1, .1, .1], @obj.buttonPushed, {obj.write, i});
+            obj.propertyStateArray(i).addButtonChild(child);
+            obj.moveXposRight(width);
 
             labelText = "Get/Set:";
-            width = p.computeWidth(labelText);
-            p.makeUiLabel(labelText, [p.currXpos, p.currYpos, width, p.eltHeight], 'center', [0.9608    0.4902    0.6314]);
-            p.incrementChildCount();
-            p.moveXposRight(width);
+            width = obj.computeWidth(labelText);
+            obj.makeUiLabel(labelText, [obj.currXpos, obj.currYpos, width, obj.defEltHeight],...
+                            'center', labelcolor, labeltxtcolor);
+            obj.moveXposRight(width);
 
-            width = p.computeWidth(p.buttonNames(p.update));
-            p.makeUiButton(p.buttonNames(p.update), [p.currXpos, p.currYpos, width, p.eltHeight], p.update, i);
-            p.incrementChildCount();
-            p.propertyStateArray(i).addButtonChild(p.numChildren);
+            width = obj.computeWidth(obj.buttonNames(obj.update));
+            child = obj.makeUiButton(obj.buttonNames(obj.update), [obj.currXpos, obj.currYpos, width, obj.defEltHeight],...
+                                     [.96, .96, .96], [.1, .1, .1], @obj.buttonPushed, {obj.update, i});
+            obj.propertyStateArray(i).addButtonChild(child)
+            obj.moveXposRight(width);
             
-            fillWidth = p.figWidth - p.borderWidth -p.currXpos;
+            fillWidth = obj.figWidth - obj.borderWidth -obj.currXpos;
+            
             if fillWidth > 0
-                fillLabelPos = [p.currXpos, p.currYpos, fillWidth, p.eltHeight];
-                p.makeUiLabel("", fillLabelPos, 'center', [0.9608    0.4902    0.6314]);
-                p.incrementChildCount();
+                fillLabelPos = [obj.currXpos, obj.currYpos, fillWidth, obj.defEltHeight];
+                obj.makeUiLabel("", fillLabelPos, 'center', fillcolor, [0,0,0]);
             end
-            
-            p.resetXposLeft();
-            p.moveYposDown();
+            obj.resetXposLeft();
+            obj.moveYposDown();
         end
 
-        function makeUserInputFields(p, idx)
-            if p.propList(idx).dispDims(1) == 0
+        function initButtonState(obj)
+            for i=1:obj.numProps
+                if obj.propertyStateArray(i).property.rw == 'RW'
+                    obj.propertyStateArray(i).stateCanChange = 1;
+                    obj.propertyStateArray(i).currState = obj.read;
+                    obj.propertyStateArray(i).buttonChildren(obj.read).BackgroundColor = obj.pushedColor;
+                elseif obj.propertyStateArray(i).property.rw == 'R'
+                    obj.propertyStateArray(i).stateCanChange = 0;
+                    obj.propertyStateArray(i).currState = obj.read;
+                    obj.propertyStateArray(i).buttonChildren(obj.read).BackgroundColor = obj.pushedColor;
+                    obj.propertyStateArray(i).buttonChildren(obj.write).Enable = "off";
+                else
+                    obj.propertyStateArray(i).stateCanChange = 0;
+                    obj.propertyStateArray(i).currState = obj.write;
+                    obj.propertyStateArray(i).buttonChildren(obj.write).BackgroundColor = obj.pushedColor;
+                    obj.propertyStateArray(i).buttonChildren(obj.read).Enable = "off";
+                end
+            end
+        end
+
+        function buttonPushed(obj, args)
+            if args{1} == obj.read && obj.propertyStateArray(args{2}).stateCanChange
+                obj.propertyStateArray(args{2}).currState = obj.read;
+                obj.propertyStateArray(args{2}).buttonChildren(obj.write).BackgroundColor = obj.unPushedColor;
+                obj.propertyStateArray(args{2}).buttonChildren(obj.read).BackgroundColor = obj.pushedColor;   
+            elseif args{1} == obj.write && obj.propertyStateArray(args{2}).stateCanChange
+                obj.propertyStateArray(args{2}).currState = obj.write;
+                obj.propertyStateArray(args{2}).buttonChildren(obj.read).BackgroundColor = obj.unPushedColor;
+                obj.propertyStateArray(args{2}).buttonChildren(obj.write).BackgroundColor = obj.pushedColor;
+            elseif args{1} == obj.update
+                if obj.propertyStateArray(args{2}).currState == obj.read
+                    obj.rx(args{2});
+                else
+                    obj.tx(args{2});
+                end
+            end
+        end
+
+        function width = computeWidth(obj, name)
+              width = strlength(name) * 8;
+        end
+
+        function makeLabelStrip(obj, name)
+            obj.makeUiLabel(name, [obj.currXpos, obj.currYpos, obj.tempGlob, obj.defEltHeight],...
+                                       'center', [1 1 1], [0.1 0.1 0.1]);
+            obj.moveXposRight(obj.tempGlob);
+        end
+
+        function makeUserInputFields(obj, idx)
+            if obj.propertyList(idx).dispDims(1) == 0
                 return;
             end
             startIdx = 0;
-            widthLabel = max(arrayfun(@p.computeWidth, p.propList(idx).eltNames));
-            for i = 1:size(p.propList(idx).dispDims, 2)
-                %labelText = strcat("[", num2str(i), "]");
-                for j = 1:p.propList(idx).dispDims(i)
-                    labelText = p.propList(idx).eltNames(startIdx + j);
-                    disp(labelText)
-                    %widthLabel = p.computeWidth(labelText);
-                    p.makeUiLabel(labelText, [p.currXpos, p.currYpos, widthLabel, p.eltHeight], 'center', [0.9608    0.6706    0.8510]);
-                    p.incrementChildCount();
-                    p.moveXposRight(widthLabel);
-                    p.makeUiEditField([p.currXpos, p.currYpos, p.widthInputField, p.eltHeight]);
-                    p.moveXposRight(p.widthInputField);
-                    p.incrementChildCount();
-                    p.propertyStateArray(idx).addEditChild(p.numChildren);
+            widthLabel = max(arrayfun(@obj.computeWidth, obj.propertyList(idx).eltNames));
+            
+            if obj.propertyList(idx).dispType  == 'M'
+                obj.tempGlob = widthLabel;
+                arrayfun(@obj.makeLabelStrip, obj.propertyList(idx).eltNames);
+                obj.moveYposDown();
+                obj.resetXposLeft();
+            end
+            
+            for i = 1:size(obj.propertyList(idx).dispDims, 2)
+                for j = 1:obj.propertyList(idx).dispDims(i)
+                    fieldType = 'numeric';
+                    initVal = -inf;
+                    if obj.propertyList(idx).dispType == 'S'
+                        fieldType = 'text';
+                        initVal = "None";
+                    end
+                    if obj.propertyList(idx).dispType  ~= 'M'
+                        widthInputField = obj.widthInputField;
+                        labelText = obj.propertyList(idx).eltNames(startIdx + j);
+                        obj.makeUiLabel(labelText, [obj.currXpos, obj.currYpos, widthLabel, obj.defEltHeight],...
+                                       'center', [1 1 1], [0.1 0.1 0.1]);
+                        obj.moveXposRight(widthLabel);
+                    else
+                        widthInputField = widthLabel;
+                    end
+                    child = obj.makeUiEditField(fieldType, initVal, [.95, .95, .95], [.1, .1, .1], ...
+                                               [obj.currXpos, obj.currYpos, widthInputField, obj.defEltHeight]);
+                    obj.propertyStateArray(idx).addEditChild(child);
+                    obj.moveXposRight(widthInputField);
                 end
-                startIdx = startIdx + p.propList(idx).dispDims(i);
-                fillWidth = p.figWidth - p.borderWidth -p.currXpos;
+                startIdx = startIdx + obj.propertyList(idx).dispDims(i);
+                fillWidth = obj.figWidth - obj.borderWidth - obj.currXpos;
                 if fillWidth > 0
-                    fillLabelPos = [p.currXpos, p.currYpos, fillWidth, p.eltHeight];
-                    p.makeUiLabel("", fillLabelPos, 'center', [0.9608    0.6706    0.8510]);
-                    p.incrementChildCount();
+                    fillLabelPos = [obj.currXpos, obj.currYpos, fillWidth, obj.defEltHeight];
+                    obj.makeUiLabel("", fillLabelPos, 'center', [.96 .96 .96], [0.1 0.1 0.1]);
                 end
-                p.moveYposDown();
-                p.resetXposLeft();
+                obj.moveYposDown();
+                obj.resetXposLeft();
+            end
+            if obj.propertyStateArray(idx).property.processData
+                width = obj.computeWidth(obj.processDataButtonTxt);
+                obj.processDataButton = obj.makeUiButton(obj.processDataButtonTxt, [obj.currXpos, obj.currYpos, width, obj.defEltHeight],...
+                                     [.96, .5, .5], [1, 1, 1], obj.propertyStateArray(idx).property.processDataFunc, {obj.propertyStateArray(idx).editChildren});
             end
         end
 
-        function makeUiLabel(p, name, position, alignment, bgcolor)
-            color = [1 1 1];
-            if nargin == 5
-                color = bgcolor;
-            end
-            uilabel(p.guiFig,...
-                   'Text', name,... 
-                   'BackgroundColor',color, 'HorizontalAlignment', alignment,'FontSize',15, 'FontWeight', 'bold', 'FontColor', 'black', ...
-                   'Position', position);
-        end
-
-        function makeUiButton(p, name, position, buttonIdx, propIdx)
-            uibutton(p.guiFig, 'push', 'text', name, ...
-                    'Position', position, ...
-                    'ButtonPushedFcn', @(btn,event) p.buttonPushed(buttonIdx, propIdx));
-        end
-
-        function makeUiEditField(p,position)
-            uieditfield(p.guiFig,'numeric',...
-                       'Value', -inf,'Position', position);
-        end
-
-        function rx(p, propIdx)
-            p.tvc.RequestProperty(p.propertyStateArray(propIdx).property.id);
+        function rx(obj, propIdx)
+            obj.tvc.RequestProperty(obj.propertyStateArray(propIdx).property.id);
             pause(0.1);
-            p.tvc.RequestValue(p.propertyStateArray(propIdx).property.id);
-            [id, sz, t, val] = p.tvc.ReadValue();
-            p.dataBuf = typecast(uint8(val), 'single');
-            for i = 1:p.propertyStateArray(propIdx).property.numElts
-                p.guiFig.Children(p.guiFig.Children(p.propertyStateArray(propIdx).uiEditChildren(i))).Value = double(p.dataBuf(i));
+            obj.tvc.RequestValue(obj.propertyStateArray(propIdx).property.id);
+            [id, sz, t, val] = obj.tvc.ReadValue();
+            castType = obj.propertyStateArray(propIdx).property.type;
+            obj.dataBuf = typecast(uint8(val), castType);
+            for i = 1:obj.propertyStateArray(propIdx).property.numElts
+                obj.propertyStateArray(propIdx).editChildren(i).Value = double(obj.dataBuf(i));
             end
-
         end
 
-        function tx(p, propIdx)
-            for i = 1:p.numDatum
-                p.dataBuf(i) = single(p.guiFig.Children(p.propertyStateArray(propIdx).uiEditChildren(i)).Value);
+        function tx(obj, propIdx)
+            for i = 1:obj.propertyStateArray(propIdx).property.numElts
+                obj.dataBuf(i) = obj.propertyStateArray(propIdx).property.castFunc(obj.propertyStateArray(propIdx).editChildren(i).Value);
             end
-            txBuf = typecast(p.dataBuf, 'uint8');
-            p.tvc.SetProperty(p.propertyStateArray(propIdx).property.id, txBuf);
-        end
-
-        function buttonPushed(p, buttonIdx, propIdx)
-            if buttonIdx == p.read && p.propertyStateArray(propIdx).stateCanChange
-                p.propertyStateArray(propIdx).currState = p.read;
-                p.guiFig.Children(p.propertyStateArray(propIdx).uiButtonChildren(p.write)).BackgroundColor = p.unPushedColor;
-                p.guiFig.Children(p.propertyStateArray(propIdx).uiButtonChildren(p.read)).BackgroundColor = p.pushedColor;   
-            elseif buttonIdx == p.write && p.propertyStateArray(propIdx).stateCanChange
-                p.propertyStateArray(propIdx).currState = p.write;
-                p.guiFig.Children(p.propertyStateArray(propIdx).uiButtonChildren(p.read)).BackgroundColor = p.unPushedColor;
-                p.guiFig.Children(p.propertyStateArray(propIdx).uiButtonChildren(p.write)).BackgroundColor = p.pushedColor;
-            elseif buttonIdx == p.update
-                if p.propertyStateArray(propIdx).currState == p.read
-                    p.rx(propIdx);
-                else
-                    p.tx(propIdx);
-                end
-            end
+            txBuf = typecast(obj.dataBuf, 'uint8');
+            obj.tvc.SetProperty(obj.propertyStateArray(propIdx).property.id, txBuf);
         end
     end
 end

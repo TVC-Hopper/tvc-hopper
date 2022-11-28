@@ -51,6 +51,10 @@ classdef baseGui < handle
             obj.resetXposLeft();
         end
 
+        function setGuiFigBgColor(obj, color)
+            obj.guiFig.Color = color;
+        end
+
         function button = makeUiButton(obj, name, position, bgcolor, txtcolor, func, args)
             button = uibutton(obj.guiFig, 'push', 'text', name, ...
                              'BackgroundColor', bgcolor,...
