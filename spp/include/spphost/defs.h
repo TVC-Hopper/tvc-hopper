@@ -11,6 +11,9 @@
 extern "C" {
 #endif
 
+/**
+ *  SPP Host engine application callbacks
+ */
 typedef struct SppHostCallbacks_s {
     bool (*AreAddressesEqual)(SppAddress_t* a, SppAddress_t* b, void* instance_data);
     SPP_STATUS_T (*SendMessage)(uint8_t* msg, uint16_t len, void* instance_data);
@@ -19,6 +22,9 @@ typedef struct SppHostCallbacks_s {
     void (*OnStreamResponse)(uint32_t timestamp, SppStream_t* stream, void* instance_data);
 } SppHostCallbacks_t;
 
+/**
+ *  SPP Host engine initialization parameters
+ */
 typedef struct SppHostEngineInitParams_s {
     SppPropertyDefinition_t* defs_buffer;
     uint8_t* address_buffer;
@@ -32,6 +38,9 @@ typedef struct SppHostEngineInitParams_s {
     void* instance_data;
 } SppHostEngineInitParams_t;
 
+/**
+ *  SPP Host engine object
+ */
 typedef struct SppHostEngine_s {
     uint8_t token_count;
     uint8_t stream_count;

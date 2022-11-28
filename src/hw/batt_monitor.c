@@ -13,9 +13,11 @@ extern void BattMon_Init() {
 }
 
 extern float BattMon_GetVoltage() {
+    // take ADC reading of voltage sense pin
     ADC_SetChannelConfig(ADC1, ADC1_CH0_CONTROL_GROUP, &ADC1_channels_config[0]);
     while (0U == ADC_GetChannelStatusFlags(ADC1, ADC1_CH0_CONTROL_GROUP)) {}
     uint32_t adc_val = ADC_GetChannelConversionValue(ADC1, ADC1_CH0_CONTROL_GROUP);
 
+    // scale voltage
     return UPPER_VOLTAGE_READING * (adc_val / ADC_COUNT_MAX);
 }

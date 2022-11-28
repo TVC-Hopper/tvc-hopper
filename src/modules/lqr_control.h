@@ -1,12 +1,15 @@
 #ifndef MODULE_HOVER_CONTROL_H
 #define MODULE_HOVER_CONTROL_H
 
-#define SETPOINT_MAX_Z                  1.0 // Max altitude (meters)
-#define SETPOINT_MAX_ROLL               0.1 // Max roll (radians)
-#define SETPOINT_MAX_PITCH              0.1 // Max pitch (radians)
+#define SETPOINT_MIN_Z_NONZERO          0.2f // Min non-zero ref altitude 
+#define SETPOINT_MAX_Z                  1.0f // Max altitude (meters)
+
+#define SETPOINT_MAX_ROLL               0.1f // Max roll (radians)
+#define SETPOINT_MAX_PITCH              0.1f // Max pitch (radians)
 
 // Maps the kRPM output of the controller to % ESC actuation.
 #define MOTOR_KRPM_TO_ESC_PERCENT       72.43f // FIXME: placeholder
+#define MAX_ESC                         100.0f // TODO: verify max thrust ok
 #define CONTROL_LOOP_INTERVAL           5 // (milliseconds)
 
 // Math

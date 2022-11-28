@@ -14,12 +14,14 @@ extern bool Tfl_GetDistance(TfLidar_t *tfl, uint16_t *distance) {
 
     uint8_t* distance_bytes = (uint8_t*)distance;
 
+    // read low register
     if (!Tfl_ReadRegister(tfl, TFL_DIST_L)) {
             return false;
     } else {
         distance_bytes[0] = tfl->reply_reg;
     }
         
+    // read high register
     if (!Tfl_ReadRegister(tfl, TFL_DIST_H)) {
             return false;
     } else {
@@ -32,6 +34,8 @@ extern bool Tfl_GetDistance(TfLidar_t *tfl, uint16_t *distance) {
 
 extern bool Tfl_ReadRegister(TfLidar_t *tfl, uint8_t reg) {
     tfl->onRead(tfl->address, reg, tfl->buffer, 1);
+
+    // copy result from temporary location to a static location
     tfl->reply_reg = tfl->buffer[0];
     return true;
 }
@@ -45,12 +49,14 @@ extern bool Tfl_WriteRegister(TfLidar_t *tfl, uint8_t reg, uint8_t data) {
 extern bool Tfl_GetFrameRate(TfLidar_t *tfl, uint16_t *frame_rate) {
     uint8_t* frame_rate_bytes = (uint8_t*)frame_rate;
 
+    // set low
     if (!Tfl_ReadRegister(tfl, TFL_FPS_L)) {
             return false;
     } else {
         frame_rate_bytes[0] = tfl->reply_reg;
     }
 
+    // set high
     if (!Tfl_ReadRegister(tfl, TFL_FPS_H)) {
             return false;
     } else {

@@ -5,6 +5,7 @@
 
 #include <bsp/peripherals.h>
 
+// PWM configuration
 #define ESC_PWM_MODE        kPWM_EdgeAligned
 #define ESC_PWM             PWM1_PERIPHERAL
 #define ESC_SM              PWM1_SM1
@@ -13,6 +14,7 @@
 #define MAX_DUTY_CYCLE ((uint16_t)0xFFFF)
 #define MAX_OUTPUT     (100.0f)
 
+// current ESC output
 static float esc_output = 90.0;
 
 extern void HwEsc_Init() {
@@ -20,6 +22,8 @@ extern void HwEsc_Init() {
 }
 
 extern void HwEsc_SetOutput(float output) {
+
+    // apply bounds
     if (output > MAX_OUTPUT) {
         output = MAX_OUTPUT;
     } else if (output < 0.0) {
@@ -34,6 +38,8 @@ extern void HwEsc_SetOutput(float output) {
             ESC_PWM_MODE,
             output
     );
+
+    // set bit to update PWM counters on next cycle (synchronization feature)
     PWM_SetPwmLdok(ESC_PWM, kPWM_Control_Module_1, true);
 }
 

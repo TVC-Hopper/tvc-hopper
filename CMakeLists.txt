@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.17)
 
 project(hopper VERSION 0.0 LANGUAGES C ASM)
 
+# configure BSP options
 option(BUILD_MIMXRT1010EVK_BSP "Build MIMRX1010-EVK BSP" ON)
 option(BUILD_FLIGHTCONTROLLER_BSP "Build flight controller BSP" OFF)
 
@@ -9,6 +10,7 @@ add_compile_definitions(CPU_MIMXRT1011DAE5A)
 
 include(cmake/flags.cmake)
 
+# build all static libraries and modules
 add_subdirectory(circbuf)
 add_subdirectory(spp)
 add_subdirectory(stcp)
@@ -62,6 +64,7 @@ if(BUILD_MIMXRT1010EVK_BSP)
     )
 endif()
 
+# link
 target_link_libraries(${PROJECT_NAME}.elf PUBLIC circbuf spp_client stcp bsp fslhal drivers freertos)
 target_link_libraries(${PROJECT_NAME}.elf PRIVATE -Wl,--start-group)
 target_link_libraries(${PROJECT_NAME}.elf PRIVATE m)

@@ -1,4 +1,3 @@
-
 #include <stdint.h>
 #include <stddef.h>
 #include <stdbool.h>
@@ -221,22 +220,6 @@ static SPP_STATUS_T SetValue(uint16_t id, void* value, void* instance_data) {
             std::cout << "STOP: " << *((bool*)value) << std::endl;
             break;
         }
-        // case PROP_telem_filter_en_ID:
-        // {
-        //     prop_telem_filter_en = *((bool*)value);
-        //     std::cout << "TELEM_FILTER_EN: " << *((bool*)value) << std::endl;
-        //     break;
-        // }
-        case PROP_reset_system_ID:
-        {
-            std::cout << "RESET_SYS: " << *((bool*)value) << std::endl;
-            break;
-        }
-        // case PROP_reset_controls_ID:
-        // {
-        //     std::cout << "RESET_CONTROLS: " << *((bool*)value) << std::endl;
-        //     break;
-        // }
         case PROP_servo_positions_ID:
         {
             memcpy(prop_servo_positions, (uint8_t*)value, sizeof(prop_servo_positions));
@@ -257,16 +240,6 @@ static SPP_STATUS_T SetValue(uint16_t id, void* value, void* instance_data) {
             std::cout << std::endl;
             break;
         }
-        // case PROP_param_bounds_ID:
-        // {
-        //     memcpy(prop_param_bounds, (uint8_t*)value, sizeof(prop_param_bounds));
-        //     std::cout << "Bounds(vx,vy,vz,ax,ay,az,oy,op,or): ";
-        //     for (size_t i = 0; i < 9; ++i) {
-        //         std::cout << prop_param_bounds[i] << " ";
-        //     }
-        //     std::cout << std::endl;
-        //     break;
-        // }
         default:
         {
             return SPP_STATUS_UNKNOWN_PROPERTY;
@@ -312,11 +285,6 @@ static SPP_STATUS_T GetValue(uint16_t id, void* value, void* instance_data) {
             memcpy((uint8_t*)value, prop_target_position, sizeof(prop_target_position));
             break;
         }
-        // case PROP_param_bounds_ID:
-        // {
-        //     memcpy((uint8_t*)value, prop_param_bounds, sizeof(prop_param_bounds));
-        //     break;
-        // }
         default:
         {
             return SPP_STATUS_UNKNOWN_PROPERTY;

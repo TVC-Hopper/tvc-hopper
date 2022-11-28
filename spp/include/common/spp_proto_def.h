@@ -7,7 +7,7 @@
 #include <string.h>
 
 /**
- * Message IDs
+ *  Message IDs
  */
 
 #define SPP_MSG_HDR_SIZE(address_length)    (2 + address_length * 2)
@@ -39,7 +39,7 @@
 #define SPP_MSG_STREAM_BASE_SIZE            (8)
 
 /**
- * Property types
+ *  Property types
  */
 #define SPP_PROP_T_U16          ((uint8_t)0xE0)
 #define SPP_PROP_T_U32          ((uint8_t)0xE1)
@@ -50,7 +50,7 @@
 #define SPP_PROP_T_ARR          ((uint8_t)0xE6)
 
 /**
- * Status
+ *  Status
  */
 #define SPP_STATUS_T                    uint8_t
 #define SPP_STATUS_OK                   ((uint8_t)0x00)
@@ -68,7 +68,7 @@
 #define SPP_STATUS_UNKNOWN_PROPERTY     ((uint8_t)0x0B)
 
 /**
- * Flags
+ *  Flags
  */
 #define SPP_FLAG_READABLE           ((uint8_t)0x00)
 #define SPP_FLAG_WRITEABLE          ((uint8_t)0x01)
@@ -76,13 +76,13 @@
 #define SPP_FLAG_STREAMABLE_W       ((uint8_t)0x04)
 
 /**
- * Streams
+ *  Streams
  */
 #define SPP_STREAM_WRITE            ((uint8_t)0x10)
 #define SPP_STREAM_READ             ((uint8_t)0x20)
 
 /**
- * Protocol configuration
+ *  Protocol configuration
  */
 #define SPP_MSG_SYNC_WORD               ((uint8_t)0xCD)
 #define SPP_TOKEN_MAX_RESERVED          ((uint8_t)0xFF)
@@ -92,8 +92,14 @@
 
 #define SPP_HOST_ADDRESS_DEFAULT_IDX    0
 
+/**
+ *  Maximum number of streams
+ */
 #define SPP_STREAM_MAX_COUNT            16
 
+/**
+ *  SPP States
+ */
 #define SPP_STATE_READY                     ((uint8_t)0)
 #define SPP_STATE_CONNECTING                ((uint8_t)1)
 
@@ -108,17 +114,25 @@ extern "C" {
 
 typedef uint8_t SppState_t;
 
+/**
+ *  Address
+ */
 typedef struct SppAddress_s {
     void* address;
     uint16_t property_list_id;
 } SppAddress_t;
 
-
+/**
+ *  Value
+ */
 typedef struct SppPropertyValue_s {
     uint8_t* value;
     uint8_t size;
 } SppPropertyValue_t;
 
+/**
+ *  Property flags
+ */
 typedef union SppPropertyFlags_s {
     uint8_t value;
     struct {
@@ -129,6 +143,9 @@ typedef union SppPropertyFlags_s {
     };
 } SppPropertyFlags_t;
 
+/**
+ *  Common property definition transferred from client to host
+ */
 typedef struct SppPropertyDefinition_s {
     uint16_t id;
     uint8_t type;
@@ -139,7 +156,7 @@ typedef struct SppPropertyDefinition_s {
 } SppPropertyDefinition_t;
 
 /**
- * Describes which property to stream at what rate
+ *  Describes which property to stream at what rate
  */
 typedef struct SppStream_s {
     SppPropertyDefinition_t *def;

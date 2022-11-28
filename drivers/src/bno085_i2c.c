@@ -17,6 +17,7 @@ static uint32_t GetTimeUs(sh2_Hal_t *self);
 static void HalCallback(void* cookie, sh2_AsyncEvent_t *pEvent);
 static void SensorHandler(void* cookie, sh2_SensorEvent_t *event);
 
+// don't include all of math.h for this function
 static uint32_t min(uint32_t a, uint32_t b) {
     if (a < b) {
         return a;
@@ -65,6 +66,8 @@ extern bool Bno085_InitSensorHub(Bno085_t* b) {
 extern bool Bno085_GetSensorEvents(Bno085_t *b) {
     b->sensor_value_count = 0;
 
+    // this needs to be called periodically.
+    // polls sensor hub for new reports
     sh2_service();
 
     return true;
@@ -87,6 +90,8 @@ extern bool Bno085_GetSensorValueFloat(Bno085_t *b, sh2_SensorId_t sensor, uint8
     } else if (sensor == SH2_ROTATION_VECTOR) {
         memcpy(floating, &b->sensor_values[s_idx].un.rotationVector, count * sizeof(float));
     }
+
+    // TODO: add other report IDs
 
     return true;
 }
@@ -121,7 +126,8 @@ static int Open(sh2_Hal_t *self) {
     // Seq 0
     // Data = 0x01
     uint8_t soft_reset[5] = {5, 0, 1, 0, 1};
-    
+   
+    // attempt soft reset 5 times
     for (uint8_t i = 0; i < 5; ++i) {
         imu->onWrite(BNO085_I2C_ADDR, soft_reset, 5);
         imu->onDelay(30);
@@ -133,15 +139,21 @@ static int Open(sh2_Hal_t *self) {
 }
 
 static void Close(sh2_Hal_t *self) {
+    // do nothing
 }
 
 static int Read(sh2_Hal_t *self, uint8_t *buffer, unsigned length, uint32_t *t_us) {
     uint8_t header[4];
     
     Bno085_t* imu = (Bno085_t*)self->instance_data;
+
+    // read header
     imu->onRead(BNO085_I2C_ADDR, header, 4);
 
+    // length is 2 bytes
     uint16_t packet_size = (uint16_t)header[0] | (uint16_t)header[1] << 8;
+
+    // clear continuation byte
     packet_size &= ~0x8000;
 
     uint16_t cargo_remaining = packet_size;
@@ -150,28 +162,36 @@ static int Read(sh2_Hal_t *self, uint8_t *buffer, unsigned length, uint32_t *t_u
     uint16_t cargo_read_amount = 0;
     bool first_read = true;
 
+    // read until no more bytes are needed
     while (cargo_remaining > 0) {
         if (first_read) {
-          read_size = min(imu->buffer_size, (size_t)cargo_remaining);
+            read_size = min(imu->buffer_size, (size_t)cargo_remaining);
         } else {
-          read_size = min(imu->buffer_size, (size_t)cargo_remaining + 4);
+            read_size = min(imu->buffer_size, (size_t)cargo_remaining + 4);
         }
 
+        // header is included in every I2C read
         imu->onRead(BNO085_I2C_ADDR, i2c_buffer, read_size);
 
         if (first_read) {
-          cargo_read_amount = read_size;
-          memcpy(buffer, i2c_buffer, cargo_read_amount);
-          first_read = false;
+            // first read will contain header
+            // keep it
+            cargo_read_amount = read_size;
+            memcpy(buffer, i2c_buffer, cargo_read_amount);
+            first_read = false;
         } else {
-          cargo_read_amount = read_size - 4;
-          memcpy(buffer, i2c_buffer + 4, cargo_read_amount);
+            // don't include 4 byte header in following reads
+            // SH2 will not be able to parse the received packet
+            cargo_read_amount = read_size - 4;
+            memcpy(buffer, i2c_buffer + 4, cargo_read_amount);
         }
+
         buffer += cargo_read_amount;
         cargo_remaining -= cargo_read_amount;
     }
 
 
+    // return bytes read
     return cargo_remaining == 0 ? packet_size : 0;
 }
 
@@ -187,6 +207,8 @@ static int Write(sh2_Hal_t *self, uint8_t *buffer, unsigned length) {
 
 static uint32_t GetTimeUs(sh2_Hal_t *self) {
     Bno085_t* imu = (Bno085_t*)self->instance_data;
+    // get time in microseconds
+    // TODO: fix precision
     return imu->getTime_us() * 1000;
 }
 
@@ -207,6 +229,8 @@ static void SensorHandler(void *cookie, sh2_SensorEvent_t *event) {
     } else if (event->reportId == SH2_ROTATION_VECTOR) {
         rc = sh2_decodeSensorEvent(&imu->sensor_values[2], event);
     }
+
+    // TODO: add other report IDs
 }
 
 

@@ -3,10 +3,15 @@
 
 #include <stdint.h>
 
+/**
+ *  Initialize lidar hardware interface
+ */
 extern void HwLidar_Init();
 
 /**
- * Returns distance in cm
+ *  Read distance
+ *
+ *  @return distance in centimeters
  */
 extern uint32_t HwLidar_GetDistance();
 

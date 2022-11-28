@@ -9,11 +9,11 @@
 
 #define MAX_PAYLOAD_LENGTH 128
 
+// temporary storage for escaped sequences
 static uint8_t write_payload_buffer[MAX_PAYLOAD_LENGTH];
 static uint8_t read_payload_buffer[MAX_PAYLOAD_LENGTH];
 
-extern uint32_t
-StcpCrc32(uint8_t *buffer, uint16_t size)
+extern uint32_t StcpCrc32(uint8_t *buffer, uint16_t size)
 {
     uint32_t crc = 0xFFFFFFFF;
     uint32_t mask = 0;
@@ -35,10 +35,12 @@ extern uint8_t *StcpEscape(uint8_t *buffer, uint16_t *size)
 {
     uint16_t output_idx = 0;
     
+    // add header
     write_payload_buffer[output_idx++] = STCP_HEADER;
 
     for (uint16_t i = 0; i < *size; ++i)
     {
+        // insert extra character to escape escape, header, footer chars in contents
         if (STCP_ESCAPE == buffer[i] || STCP_FOOTER == buffer[i] || STCP_HEADER == buffer[i])
         {
             write_payload_buffer[output_idx++] = STCP_ESCAPE;
@@ -47,9 +49,11 @@ extern uint8_t *StcpEscape(uint8_t *buffer, uint16_t *size)
         write_payload_buffer[output_idx++] = buffer[i];
     }
 
+    // add footer
     write_payload_buffer[output_idx++] = STCP_FOOTER;
     write_payload_buffer[output_idx++] = STCP_FOOTER;
 
+    // update size
     *size = output_idx;
 
     return write_payload_buffer;
@@ -60,6 +64,7 @@ extern uint8_t *StcpUnEscape(uint8_t *buffer, uint16_t *size)
     uint16_t output_idx = 0;
     for (uint16_t i = 1; i < *size - 2; ++i)
     {
+        // remove escape characters
         if (STCP_ESCAPE == buffer[i])
         {
             read_payload_buffer[output_idx++] = buffer[++i];
@@ -70,6 +75,7 @@ extern uint8_t *StcpUnEscape(uint8_t *buffer, uint16_t *size)
         }
     }
 
+    // update size
     *size = output_idx;
 
     return read_payload_buffer;
@@ -78,6 +84,8 @@ extern uint8_t *StcpUnEscape(uint8_t *buffer, uint16_t *size)
 extern StcpStatus_t StcpWrite(StcpEngineHandle_t instance, uint8_t *buffer, uint16_t size)
 {
     uint8_t *escaped_buffer = StcpEscape(buffer, &size);
+
+    // send escaped message
     StcpStatus_t status = instance->callbacks.Send(escaped_buffer, size, instance->instance_data);
 
     return status;
@@ -86,6 +94,8 @@ extern StcpStatus_t StcpWrite(StcpEngineHandle_t instance, uint8_t *buffer, uint
 extern StcpStatus_t StcpHandleMessage(StcpEngineHandle_t instance, uint8_t *buffer, uint16_t size)
 {
     buffer = StcpUnEscape(buffer, &size);
+
+    // call handler for received and unescapoed message
     StcpStatus_t status = instance->callbacks.HandleMessage(buffer, size, instance->instance_data);
 
     return status;
