@@ -4,12 +4,14 @@ classdef TelemetryApp < handle
         port
         
         tp
+        pv
         
         guiFig
         btnStart
         btnPause
         btnShow
         btnStartStream
+        btnProperties
         
         btnConnect
         isConnected = false
@@ -22,32 +24,30 @@ classdef TelemetryApp < handle
             
             s.guiFig = uifigure('Name', 'Telemetry Control');
             
-            guiW = 500;
-            guiH = 500;
+            guiW = 220;
+            guiH = 6 * 10 + 5 * 40;
             btnW = 200;
             btnH = 40;
-            s.guiFig.Position = [500 500 guiW guiH];
+            s.guiFig.Position = [500 200 guiW guiH];
 
             centerW = guiW/2;
             btnL = centerW - btnW/2;
             btnB = 10;
 
             s.btnStart = uibutton(s.guiFig, 'push', 'Text', 'Start', ...
-                                'Position', [btnL (btnB + 1*(10 + btnH)) btnW btnH], ...
+                                'Position', [btnL btnB btnW btnH], ...
                                 'ButtonPushedFcn', @(btn,event) s.start());
             s.btnPause = uibutton(s.guiFig, 'push', 'Text', 'Stop', ...
-                                'Position', [btnL (btnB + 2*(10 + btnH)) btnW btnH], ...
+                                'Position', [btnL (btnB + 1*(10 + btnH)) btnW btnH], ...
                                 'ButtonPushedFcn', @(btn,event) s.stop());
             s.btnShow = uibutton(s.guiFig, 'push', 'Text', 'Show plots', ...
-                                'Position', [btnL (btnB + 3*(10 + btnH)) btnW btnH], ...
+                                'Position', [btnL (btnB + 2*(10 + btnH)) btnW btnH], ...
                                 'ButtonPushedFcn', @(btn,event) s.showPlots());
             s.btnStartStream = uibutton(s.guiFig, 'push', 'Text', 'Start data', ...
-                                'Position', [btnL (btnB + 4*(10 + btnH)) btnW btnH], ...
-                                'ButtonPushedFcn', @(btn,event) s.startStream());
-                            
-                            
+                                'Position', [btnL (btnB + 3*(10 + btnH)) btnW btnH], ...
+                                'ButtonPushedFcn', @(btn,event) s.startStream());     
             s.btnConnect = uibutton(s.guiFig, 'state', 'Text', 'Connect', ...
-                                'Position', [btnL (btnB + 5*(10 + btnH)) btnW btnH], ...
+                                'Position', [btnL (btnB + 4*(10 + btnH)) btnW btnH], ...
                                 'ValueChangedFcn', @(btn,event) s.connect());
             s.btnConnect.BackgroundColor = "red";
 

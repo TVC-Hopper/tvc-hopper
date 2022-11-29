@@ -14,7 +14,6 @@ generate_spp_headers:
 	cp src/modules/spp_property_list.c tools/telemetry_emulator/src
 	cp src/modules/spp_property_list.h tools/telemetry_emulator/src
 
-
 .PHONY: clean
 clean:
 	rm -rf build
@@ -55,7 +54,6 @@ telemetry_emulator:
 	cmake -B$(BUILD_TELEM_EMULATOR_DIR) -Stools/telemetry_emulator -GNinja
 	ninja -C$(BUILD_TELEM_EMULATOR_DIR)
 
-
 .PHONY: start_telemetry_emulator
 start_telemetry_emulator:
 	./$(BUILD_TELEM_EMULATOR_DIR)/telemetry_emulator
@@ -63,7 +61,6 @@ start_telemetry_emulator:
 .PHONY: start_telemetry_server
 start_telemetry_server:
 	./$(BUILD_TELEM_SERVER_DIR)/telemetry_server $(port) $(mode)
-
 
 .PHONY: test
 test:
