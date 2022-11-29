@@ -8,8 +8,8 @@
 // PWM configuration
 #define ESC_PWM_MODE        kPWM_EdgeAligned
 #define ESC_PWM             PWM1_PERIPHERAL
-#define ESC_SM              PWM1_SM1
-#define ESC_CH              PWM1_SM1_B
+#define ESC_SM              PWM1_SM3
+#define ESC_CH              PWM1_SM3_B
 
 #define ESC_PWM_PERIOD      ((float) 20000.0)
 
