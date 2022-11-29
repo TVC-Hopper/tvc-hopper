@@ -46,6 +46,8 @@ static void ComputeVZ(float z_now);
 static void ExecuteControlStep(TickType_t *last_wake_time);
 static void ResetControls();
 
+static float actuator_input_last[ACTUATION_VECTOR_SIZE];
+
 extern void HoverControl_Init() {
     stop_flag = true;
     controls_start_sem = xSemaphoreCreateBinary();
@@ -85,6 +87,8 @@ extern void HoverControl_Task(void* task_args) {
         if (stop_flag) {
             xSemaphoreGive(stop_flag_mx);
 
+            HwEsc_SetOutput(1000.0);
+
             // try to take, if can't take wait
             while(pdTRUE != xSemaphoreTake(controls_start_sem, 0xFFFF)) {}
             // release immediately after so that Stop can take
@@ -109,6 +113,9 @@ static void ResetControls() {
     z_last = 0;
     memset(ref, 0, STATE_VECTOR_SIZE * sizeof(float));
     memset(curr_state, 0, STATE_VECTOR_SIZE * sizeof(float));
+    ref[STATE_IDX_Z] = 5.0;
+    HwThrustVane_GetPositions(actuator_input_last);
+    actuator_input_last[4] = HwEsc_GetOutput();
 }
 
 static void ExecuteControlStep(TickType_t* last_wake_time) {
@@ -133,20 +140,25 @@ static void ExecuteControlStep(TickType_t* last_wake_time) {
     ComputeVZ(curr_state[STATE_IDX_Z]);
     error[STATE_IDX_VZ] = vz;
     z_last = curr_state[STATE_IDX_Z];
-
-    float actuator_input_last[ACTUATION_VECTOR_SIZE];
-    HwThrustVane_GetPositions(actuator_input_last);
-    actuator_input_last[4] = HwEsc_GetOutput();
-
     
     if (HOVCTRL_MATH_STATUS_OK == MultiplyMatrix(actuator_input_now, K_hover, error, ACTUATION_VECTOR_SIZE, STATE_VECTOR_SIZE, STATE_VECTOR_SIZE)) {
-        RateLimit_VaneActuation(actuator_input_last, actuator_input_now, 0.3);
+
+        // flip opposite-facing servos
+        actuator_input_now[0] *= -1;
+        actuator_input_now[3] *= -1;
+
+        for (uint8_t i = 0; i < 4; ++i) {
+            actuator_input_now[i] += 90.0;
+        }
+
+        // RateLimit_VaneActuation(actuator_input_last, actuator_input_now, 0.3);
         HwThrustVane_SetPositions(actuator_input_now);
         float esc_output = actuator_input_now[4] * MOTOR_KRPM_TO_ESC_PERCENT;
         if (esc_output > MAX_ESC) esc_output = MAX_ESC;
         HwEsc_SetOutput(esc_output); 
     }
-
+    
+    memcpy(actuator_input_last, actuator_input_now, sizeof(actuator_input_last));
     xTaskDelayUntil(last_wake_time, CONTROL_LOOP_INTERVAL * portTICK_PERIOD_MS);
 }
 
@@ -199,7 +211,7 @@ static HOVCTRL_MATH_STATUS_T MultiplyMatrix(float* Result, const float* A, const
     for (uint32_t r = 0; r < A_rows; ++r) {
         Result[r] = 0;
         for (uint32_t i = 0; i < A_cols; ++i) {
-            Result[r] += A[r * A_cols + i] * B[r];
+            Result[r] += A[r * A_cols + i] * B[i];
         }
     }
 

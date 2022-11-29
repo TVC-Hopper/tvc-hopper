@@ -122,6 +122,14 @@ static const SppPropertyDefinition_t property_list[SPP_PROP_COUNT] = {
         .name        = "raw_imu\0",
         .name_length = 8,
     },
+    {
+        .id          = PROP_imu_ID,
+        .type        = SPP_PROP_T_ARR,
+        .size        = 24,
+        .flags       = {SPP_FLAG_WRITEABLE},
+        .name        = "imu\0",
+        .name_length = 4,
+    },
 };
 
 
