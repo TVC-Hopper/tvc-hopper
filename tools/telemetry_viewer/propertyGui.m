@@ -39,7 +39,7 @@ classdef propertyGui < baseGui
             
             obj.ip = ip;
             obj.port = port;
-            obj.tvc = TelemetryViewerClient(ip, port);
+            %obj.tvc = TelemetryViewerClient(ip, port);
             obj.makeGuiFig();
              
             obj.makePropertyStateArray();
@@ -284,6 +284,9 @@ classdef propertyGui < baseGui
         function tx(obj, propIdx)
             for i = 1:obj.propertyStateArray(propIdx).property.numElts
                 obj.dataBuf(i) = obj.propertyStateArray(propIdx).property.castFunc(obj.propertyStateArray(propIdx).editChildren(i).Value);
+            end
+            if obj.propertyStateArray(propIdx).property.numElts == 0
+                obj.dataBuf(1) = 1;
             end
             txBuf = typecast(obj.dataBuf, 'uint8');
             obj.tvc.SetProperty(obj.propertyStateArray(propIdx).property.id, txBuf);
