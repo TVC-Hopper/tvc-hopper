@@ -10,7 +10,7 @@ BUILD_TELEM_EMULATOR_DIR=build-telem-em
 
 .PHONY:
 generate_spp_headers:
-	python tools/generate_spp_lists.py support/prop_list.toml src/modules/spp_property_list tools/telemetry_viewer/include/telemetry/spp_property_list
+	python3 tools/generate_spp_lists.py support/prop_list.toml src/modules/spp_property_list tools/telemetry_viewer/include/telemetry/spp_property_list
 	cp src/modules/spp_property_list.c tools/telemetry_emulator/src
 	cp src/modules/spp_property_list.h tools/telemetry_emulator/src
 

@@ -11,12 +11,12 @@
 #define VANE_0_SM           PWM1_SM2
 #define VANE_1_SM           PWM1_SM2
 #define VANE_2_SM           PWM1_SM3
-#define VANE_3_SM           PWM1_SM3
+#define VANE_3_SM           PWM1_SM1
 
 #define VANE_0_CH           PWM1_SM2_A
 #define VANE_1_CH           PWM1_SM2_B
 #define VANE_2_CH           PWM1_SM3_A
-#define VANE_3_CH           PWM1_SM3_B
+#define VANE_3_CH           PWM1_SM1_B
 
 // scaling factors
 #define MAX_PULSE_WIDTH     ((float) 2.0)
