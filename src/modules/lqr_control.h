@@ -8,8 +8,8 @@
 #define SETPOINT_MAX_PITCH              0.1f // Max pitch (radians)
 
 // Maps the kRPM output of the controller to % ESC actuation.
-#define MOTOR_KRPM_TO_ESC_PERCENT       72.43f // FIXME: placeholder
-#define MAX_ESC                         1000.0f // TODO: verify max thrust ok
+//#define MOTOR_KRPM_TO_ESC_PERCENT       72.43f // FIXME: placeholder
+#define MAX_ESC                         2000.0f 
 #define CONTROL_LOOP_INTERVAL           5 // (milliseconds)
 
 // Math

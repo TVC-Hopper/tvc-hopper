@@ -25,11 +25,11 @@ static float vz = 0;
 static float z_last = 0;
 
 static const float K_hover[ACTUATION_VECTOR_SIZE * STATE_VECTOR_SIZE] = {    
-    70.711,   0.000,      5.000,      12.161,     0.000,      5.217,      0.000,    0.000,    0.000,
-    0.000,    -70.711,    -5.000,     0.000,      -12.162,    -5.217,     0.000,    0.000,    0.000,
-    70.711,   0.000,      -5.000,     12.161,     0.000,      -5.217,     0.000,    0.000,    0.000,
-    0.000,    -70.711,    5.000,      0.000,      -12.162,    5.217,      0.000,    0.000,    0.000,
-    0.000,    0.000,      0.000,      0.000,      0.000,      0.000,      7.716,    4.140,    7.071
+   70.7107,   -0.0000,    5.0000,    8.5803,   -0.0000,    3.5687,   -0.0000,   -0.0000,   -0.0000,
+   -0.0000,  -70.7107,   -5.0000,   -0.0000,   -9.6246,   -3.5687,    0.0000,    0.0000,    0.0000,
+   70.7107,    0.0000,   -5.0000,    8.5803,    0.0000,   -3.5687,    0.0000,    0.0000,    0.0000,
+   -0.0000,  -70.7107,    5.0000,   -0.0000,   -9.6246,    3.5687,   -0.0000,   -0.0000,   -0.0000,
+    0.0000,    0.0000,    0.0000,    0.0000,    0.0000,    0.0000,    4.4624,    1.1935,    6.6667
 }; // roll,     pitch,      yaw,        gx,         gy,         gz,         z,        vz,       zint
 
 static void HoverControl_SetStatus(float error_z);
@@ -86,7 +86,8 @@ extern void HoverControl_Task(void* task_args) {
         xSemaphoreTake(stop_flag_mx, 0xFFFF);
         if (stop_flag) {
             xSemaphoreGive(stop_flag_mx);
-
+            
+            // stop ESC
             HwEsc_SetOutput(1000.0);
 
             // try to take, if can't take wait
@@ -120,20 +121,22 @@ static void ResetControls() {
 
 static void ExecuteControlStep(TickType_t* last_wake_time) {
     ControlsInputs_GetIMU(&curr_state[STATE_IDX_ROLL]); 
-        // TODO: verify reading 6 floats [roll, pitch, yaw, gx, gy, gz]
-
     ControlsInputs_GetLidar(&curr_state[STATE_IDX_Z]); 
-    curr_state[STATE_IDX_Z] /= (float)100; // convert cm to m
+    
+    // convert lidar measurement from cm to m
+    curr_state[STATE_IDX_Z] /= (float)100.0f;
 
+    // start next reading
     ControlsInputs_NotifyStart();
 
     float error[STATE_VECTOR_SIZE] = {0};
-    
     ComputeError(error, ref, curr_state, STATE_VECTOR_SIZE, STATE_VECTOR_SIZE);
-
     CorrectYaw(error);
 
+    // determine flying mode based on altitude
     HoverControl_SetStatus(error[STATE_IDX_Z]);
+
+    // get z error and z velocity
     AdjustZError(error);
     ComputeZInt(error[STATE_IDX_Z]);
     error[STATE_IDX_ZINT] = error_zint;
@@ -147,13 +150,16 @@ static void ExecuteControlStep(TickType_t* last_wake_time) {
         actuator_input_now[0] *= -1;
         actuator_input_now[3] *= -1;
 
+        // servos are oriented 90 degrees off 0
         for (uint8_t i = 0; i < 4; ++i) {
             actuator_input_now[i] += 90.0;
         }
 
         // RateLimit_VaneActuation(actuator_input_last, actuator_input_now, 0.3);
         HwThrustVane_SetPositions(actuator_input_now);
-        float esc_output = actuator_input_now[4] * MOTOR_KRPM_TO_ESC_PERCENT;
+        
+        //esc output should be between after matrix multiplication 0 and 1
+        float esc_output = actuator_input_now[4] / .001 + 1000;
         if (esc_output > MAX_ESC) esc_output = MAX_ESC;
         HwEsc_SetOutput(esc_output); 
     }

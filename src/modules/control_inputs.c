@@ -50,7 +50,7 @@ extern void ControlsInputs_Task(void* task_args) {
         uint32_t temp_distance = HwLidar_GetDistance();
         
         xSemaphoreTake(lidar_data_mx, 0xFFFF);
-        lidar_distance = 500.0;
+        lidar_distance = temp_distance;
         xSemaphoreGive(lidar_data_mx);
 
         HwImu_GetReadings(imu_data_raw);
