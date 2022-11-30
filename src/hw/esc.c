@@ -34,7 +34,7 @@ extern void HwEsc_SetOutput(float pulse_width_us) {
     );
 
     // set bit to update PWM counters on next cycle (synchronization feature)
-    PWM_SetPwmLdok(ESC_PWM, kPWM_Control_Module_1, true);
+    PWM_SetPwmLdok(ESC_PWM, kPWM_Control_Module_2, true);
 }
 
 

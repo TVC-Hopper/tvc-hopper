@@ -15,6 +15,7 @@
 #include "app_hal_xconnect.h"
 
 #include "modules/lqr_control.h"
+#include "modules/control_inputs.h"
 
 #include "hw/imu.h"
 #include "hw/batt_monitor.h"
@@ -185,6 +186,11 @@ static SPP_STATUS_T GetValue(uint16_t id, void* value, void* instance_data) {
             HwImu_GetReadings(data);
             memcpy((uint8_t*)value, data, sizeof(data));
             break;
+        }
+        case PROP_imu_ID:
+        {
+            // roll pitch yaw, x, y, z
+            ControlsInputs_GetIMU(value);
         }
         default:
         {

@@ -30,27 +30,32 @@ static float servo_positions[4] = {90.0, 90.0, 90.0, 90.0};
 
 // indexed by servo id
 static const pwm_submodule_t vanes[4] = {
+    VANE_3_SM,
     VANE_0_SM,
     VANE_1_SM,
     VANE_2_SM,
-    VANE_3_SM,
 };
 
 // indexed by servo id
 static const pwm_channels_t vane_channels[4] = {
+    VANE_3_CH,
     VANE_0_CH,
     VANE_1_CH,
     VANE_2_CH,
-    VANE_3_CH,
 };
 
 // indexed by servo id
 static const pwm_module_control_t ctl_modules[4] = {
+    kPWM_Control_Module_1,
     kPWM_Control_Module_2,
     kPWM_Control_Module_2,
-    kPWM_Control_Module_3,
     kPWM_Control_Module_3,
 };
+
+static const pwm_module_control_t all_ctl_modules = ctl_modules[0]
+                                                    | ctl_modules[1]
+                                                    | ctl_modules[2]
+                                                    | ctl_modules[3];
 
 extern void HwThrustVane_Init() {
         // set fault map for each PWM output
@@ -77,7 +82,7 @@ extern void HwThrustVane_SetPositions(float* positions) {
     }
 
     // synchronize change
-    PWM_SetPwmLdok(VANE_PWM, kPWM_Control_Module_2 | kPWM_Control_Module_3, true);
+    PWM_SetPwmLdok(VANE_PWM, all_ctl_modules, true);
 }
 
 

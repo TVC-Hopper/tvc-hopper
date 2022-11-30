@@ -17,6 +17,7 @@
 #define PROP_target_position_ID ((uint16_t) 41)
 #define PROP_raw_lidar_ID ((uint16_t) 50)
 #define PROP_raw_imu_ID ((uint16_t) 51)
+#define PROP_imu_ID ((uint16_t) 52)
 
 
 #endif

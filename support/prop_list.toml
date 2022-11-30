@@ -114,6 +114,14 @@ type = "ARR"
 size = 40
 readable = true
 
+[[props]]
+name = "imu"
+id = 52
+type = "ARR"
+# 6 floats
+size = 24
+readable = true
+
 
 
 

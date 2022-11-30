@@ -24,7 +24,7 @@ static uint32_t lidar_distance = 0;
 // gyro <- x, y, z (q=9)
 // yaw, pitch, roll (quaternions) <- i, j, k, real (q=14)
 static float imu_data_raw[10]= {0};
-static float imu_data_proc[9] = {0};
+static float imu_data_proc[6] = {0};
 
 static float Qi = 0;
 static float Qj = 0;
@@ -50,7 +50,7 @@ extern void ControlsInputs_Task(void* task_args) {
         uint32_t temp_distance = HwLidar_GetDistance();
         
         xSemaphoreTake(lidar_data_mx, 0xFFFF);
-        lidar_distance = temp_distance;
+        lidar_distance = 500.0;
         xSemaphoreGive(lidar_data_mx);
 
         HwImu_GetReadings(imu_data_raw);
@@ -118,11 +118,20 @@ static void ProcessIMU() {
 
 
     xSemaphoreTake(imu_data_proc_mx, 0xFFFF);
-	imu_data_proc[IMU_PROC_IDX_ROLL] = roll;
-	imu_data_proc[IMU_PROC_IDX_PITCH] = pitch;
-    imu_data_proc[IMU_PROC_IDX_YAW] = yaw;
 
-    memcpy(&imu_data_proc[IMU_PROC_IDX_GYRO], &imu_data_raw[IMU_RAW_IDX_GYRO], 3 * sizeof(float));
+
+
+
+
+    // make corrections for different imu orientation here
+	imu_data_proc[IMU_PROC_IDX_ROLL] = -pitch;
+	imu_data_proc[IMU_PROC_IDX_PITCH] = roll - 1.55;
+    imu_data_proc[IMU_PROC_IDX_YAW] = yaw - 0.65;
+
+    // gyro is x, y, z
+    imu_data_proc[IMU_PROC_IDX_GYRO + 0] = imu_data_raw[IMU_RAW_IDX_GYRO + 2];
+    imu_data_proc[IMU_PROC_IDX_GYRO + 1] = imu_data_raw[IMU_RAW_IDX_GYRO + 0];
+    imu_data_proc[IMU_PROC_IDX_GYRO + 2] = imu_data_raw[IMU_RAW_IDX_GYRO + 1];
 
     xSemaphoreGive(imu_data_proc_mx);
 
