@@ -241,6 +241,8 @@ pipe_ret_t TcpServer::sendToAllClients(const uint8_t * msg, size_t size) {
  * Return true if message was sent successfully
  */
 pipe_ret_t TcpServer::sendToClient(const Client & client, const uint8_t * msg, size_t size){
+    print(client->getIp());
+    
     try{
         client.send(msg, size);
     } catch (const std::runtime_error &error) {

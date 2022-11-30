@@ -61,7 +61,8 @@ int main() {
 
     // configure and register observer
     client_observer_t observer;
-	observer.wantedIP = "127.0.0.1";
+	//observer.wantedIP = "127.0.0.1";
+	observer.wantedIP = "169.254.47.57";
 	observer.incomingPacketHandler = onIncomingMsg;
 	observer.disconnectionHandler = onDisconnection;
 	tcp.subscribe(observer);
@@ -69,7 +70,8 @@ int main() {
 	// connect client to an open server
 	bool connected = false;
     while (!connected) {
-        pipe_ret_t connectRet = tcp.connectTo("127.0.0.1", 65123);
+        //pipe_ret_t connectRet = tcp.connectTo("127.0.0.1", 65123);
+        pipe_ret_t connectRet = tcp.connectTo("169.254.47.57", 65123);
         connected = connectRet.isSuccessful();
         if (connected) {
             std::cout << "Client connected successfully\n";
