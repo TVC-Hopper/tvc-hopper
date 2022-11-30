@@ -189,6 +189,10 @@ extern void HoverControl_GetState(float* tlm) {
     }
 }
 
+extern void HoverControl_GetThrottlePercent(float* throttle) {
+    memcpy(throttle, actuator_input_now + 4, sizeof(float));
+};
+
 extern hovctrl_status_t HoverControl_GetStatus() {
     return hover_status;
 }
