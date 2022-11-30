@@ -25,11 +25,11 @@ static float vz = 0;
 static float z_last = 0;
 
 static const float K_hover[ACTUATION_VECTOR_SIZE * STATE_VECTOR_SIZE] = {    
-    70.711,   0.000,      5.000,      12.161,     0.000,      5.217,      0.000,    0.000,    0.000,
-    0.000,    -70.711,    -5.000,     0.000,      -12.162,    -5.217,     0.000,    0.000,    0.000,
-    70.711,   0.000,      -5.000,     12.161,     0.000,      -5.217,     0.000,    0.000,    0.000,
-    0.000,    -70.711,    5.000,      0.000,      -12.162,    5.217,      0.000,    0.000,    0.000,
-    0.000,    0.000,      0.000,      0.000,      0.000,      0.000,      7.716,    4.140,    7.071
+   70.7107,   -0.0000,    5.0000,    8.5803,   -0.0000,    3.5687,   -0.0000,   -0.0000,   -0.0000,
+   -0.0000,  -70.7107,   -5.0000,   -0.0000,   -9.6246,   -3.5687,    0.0000,    0.0000,    0.0000,
+   70.7107,    0.0000,   -5.0000,    8.5803,    0.0000,   -3.5687,    0.0000,    0.0000,    0.0000,
+   -0.0000,  -70.7107,    5.0000,   -0.0000,   -9.6246,    3.5687,   -0.0000,   -0.0000,   -0.0000,
+    0.0000,    0.0000,    0.0000,    0.0000,    0.0000,    0.0000,    4.4624,    1.1935,    6.6667
 }; // roll,     pitch,      yaw,        gx,         gy,         gz,         z,        vz,       zint
 
 static void HoverControl_SetStatus(float error_z);
@@ -153,7 +153,9 @@ static void ExecuteControlStep(TickType_t* last_wake_time) {
 
         // RateLimit_VaneActuation(actuator_input_last, actuator_input_now, 0.3);
         HwThrustVane_SetPositions(actuator_input_now);
-        float esc_output = actuator_input_now[4] * MOTOR_KRPM_TO_ESC_PERCENT;
+        
+        //esc output should be between after matrix multiplication 0 and 1
+        float esc_output = actuator_input_now[4] / .001 + 1000;
         if (esc_output > MAX_ESC) esc_output = MAX_ESC;
         HwEsc_SetOutput(esc_output); 
     }
