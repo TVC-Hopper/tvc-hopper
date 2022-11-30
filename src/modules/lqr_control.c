@@ -86,7 +86,8 @@ extern void HoverControl_Task(void* task_args) {
         xSemaphoreTake(stop_flag_mx, 0xFFFF);
         if (stop_flag) {
             xSemaphoreGive(stop_flag_mx);
-
+            
+            // stop ESC
             HwEsc_SetOutput(1000.0);
 
             // try to take, if can't take wait
@@ -120,20 +121,22 @@ static void ResetControls() {
 
 static void ExecuteControlStep(TickType_t* last_wake_time) {
     ControlsInputs_GetIMU(&curr_state[STATE_IDX_ROLL]); 
-        // TODO: verify reading 6 floats [roll, pitch, yaw, gx, gy, gz]
-
     ControlsInputs_GetLidar(&curr_state[STATE_IDX_Z]); 
-    curr_state[STATE_IDX_Z] /= (float)100; // convert cm to m
+    
+    // convert lidar measurement from cm to m
+    curr_state[STATE_IDX_Z] /= (float)100.0f;
 
+    // start next reading
     ControlsInputs_NotifyStart();
 
     float error[STATE_VECTOR_SIZE] = {0};
-    
     ComputeError(error, ref, curr_state, STATE_VECTOR_SIZE, STATE_VECTOR_SIZE);
-
     CorrectYaw(error);
 
+    // determine flying mode based on altitude
     HoverControl_SetStatus(error[STATE_IDX_Z]);
+
+    // get z error and z velocity
     AdjustZError(error);
     ComputeZInt(error[STATE_IDX_Z]);
     error[STATE_IDX_ZINT] = error_zint;
@@ -147,6 +150,7 @@ static void ExecuteControlStep(TickType_t* last_wake_time) {
         actuator_input_now[0] *= -1;
         actuator_input_now[3] *= -1;
 
+        // servos are oriented 90 degrees off 0
         for (uint8_t i = 0; i < 4; ++i) {
             actuator_input_now[i] += 90.0;
         }
