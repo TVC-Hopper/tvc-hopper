@@ -159,8 +159,12 @@ static void ExecuteControlStep(TickType_t* last_wake_time) {
         HwThrustVane_SetPositions(actuator_input_now);
         
         //esc output should be between after matrix multiplication 0 and 1
-        float esc_output = actuator_input_now[4] / .001 + 1000;
-        if (esc_output > MAX_ESC) esc_output = MAX_ESC;
+        float esc_output = actuator_input_now[4] / 0.001 + 1000.0;
+
+        if (esc_output > MAX_ESC) {
+            esc_output = MAX_ESC;
+        }
+
         HwEsc_SetOutput(esc_output); 
     }
     
