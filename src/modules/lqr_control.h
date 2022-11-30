@@ -72,6 +72,8 @@ extern void HoverControl_SetReference(float* setpoints);
 
 extern void HoverControl_GetState(float* tlm);
 
+extern void HoverControl_GetThrottlePercent(float* throttle);
+
 extern hovctrl_status_t HoverControl_GetStatus();
 
 #endif

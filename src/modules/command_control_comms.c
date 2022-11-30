@@ -133,7 +133,9 @@ static SPP_STATUS_T SetValue(uint16_t id, void* value, void* instance_data) {
         }
         case PROP_esc_pwm_ID:
         {
-            float* pulse_width = 
+            float* pulse_width = (float*)value;
+            if (*pulse_width > 2000) while(true) {};
+            HwEsc_SetOutput(*pulse_width);
         }
         default:
         {
@@ -176,6 +178,7 @@ static SPP_STATUS_T GetValue(uint16_t id, void* value, void* instance_data) {
         }
         case PROP_target_position_ID:
         {
+            
             break;
         }
         case PROP_raw_lidar_ID:
@@ -198,7 +201,7 @@ static SPP_STATUS_T GetValue(uint16_t id, void* value, void* instance_data) {
         }
         case PROP_esc_pwm_ID:
         {
-
+            HoverControl_GetThrottlePercent(value);
         }
         default:
         {
