@@ -39,7 +39,7 @@ classdef propertyGui < baseGui
             
             obj.ip = ip;
             obj.port = port;
-            obj.tvc = TelemetryViewerClient(ip, port);
+            %obj.tvc = TelemetryViewerClient(ip, port);
             obj.makeGuiFig();
              
             obj.makePropertyStateArray();
