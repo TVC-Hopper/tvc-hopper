@@ -47,6 +47,7 @@ classdef baseGui < handle
             obj.figWidth = obj.computeFigWidth();
             obj.guiFig = uifigure('Name', obj.baseFigName,...
                                   'Position', [obj.fromBLdist, obj.fromBRdist, obj.figWidth, obj.figHeight]);
+            obj.guiFig.Scrollable = 'on';
             obj.resetYposUp();
             obj.resetXposLeft();
         end
