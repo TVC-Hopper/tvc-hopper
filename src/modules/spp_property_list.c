@@ -130,6 +130,14 @@ static const SppPropertyDefinition_t property_list[SPP_PROP_COUNT] = {
         .name        = "imu\0",
         .name_length = 4,
     },
+    {
+        .id          = PROP_esc_pwm_ID,
+        .type        = SPP_PROP_T_FLOAT,
+        .size        = 4,
+        .flags       = {SPP_FLAG_READABLE | SPP_FLAG_WRITEABLE},
+        .name        = "esc_pwm\0",
+        .name_length = 8,
+    },
 };
 
 

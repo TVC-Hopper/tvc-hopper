@@ -122,7 +122,13 @@ type = "ARR"
 size = 24
 readable = true
 
-
+[[props]]
+name = "esc_pwm"
+id = 53
+type = "FLOAT"
+size = 1
+readable = true
+writeable = true
 
 
 
