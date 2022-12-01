@@ -184,6 +184,7 @@ static void ExecuteControlStep(TickType_t* last_wake_time) {
         float esc_output = actuator_input_now[4] / .001 + 1000;
         if (esc_output > MAX_ESC) esc_output = MAX_ESC;
         HwEsc_SetOutput(esc_output); 
+        // TODO: Rate limit esc output?
     }
     
     memcpy(actuator_input_last, actuator_input_now, sizeof(actuator_input_last));
@@ -304,7 +305,7 @@ static void AdjustZError(float* error) {
             error[STATE_IDX_Z] *= LANDING_SPEED_FACTOR_FAR;
             break; 
         case HOVCTRL_STATUS_TAKEOFF:
-            // TODO: increase error for initial esc thrust boost?
+            // TODO: decrease error for gradual esc thrust boost?
             break; 
         default: 
             break;
