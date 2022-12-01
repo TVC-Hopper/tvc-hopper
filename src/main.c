@@ -133,8 +133,8 @@ static void CreateTasks() {
         while (1) {}
     }
 
-/*
-    if(xTaskCreate(HoverControl_AutoLanding_Task,
+
+    if(xTaskCreate(HoverControlAutoLanding_Task,
                         "auto_landing",
                         configMINIMAL_STACK_SIZE + 384,
                         NULL,
@@ -143,6 +143,6 @@ static void CreateTasks() {
     {
         while (1) {}
     }
-*/
+    
 
 }

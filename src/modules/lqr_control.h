@@ -70,7 +70,7 @@ extern void HoverControl_Start();
 
 extern void HoverControl_Stop();
 
-extern void HoverControl_AutoLanding_Task();
+extern void HoverControlAutoLanding_Task();
 
 extern void HoverControl_Task();
 

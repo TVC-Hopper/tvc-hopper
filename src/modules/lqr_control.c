@@ -10,6 +10,7 @@
 #include "hw/hw.h"
 #include "hw/thrust_vanes.h"
 #include "hw/esc.h"
+#include "hw/batt_monitor.h"
 #include "modules/control_inputs.h"
 #include "circbuf/cbuf.h"
 
@@ -25,7 +26,7 @@ static float error_zint = 0;
 static float vz = 0;
 static float z_last = 0;
 
-TickType_t xLastTakeoffTime = 0; // for flight time monitoring
+TickType_t last_takeoff_time = 0; // for flight time monitoring
 
 static const float K_hover[ACTUATION_VECTOR_SIZE * STATE_VECTOR_SIZE] = {    
    70.7107,   -0.0000,    5.0000,    8.5803,   -0.0000,    3.5687,   -0.0000,   -0.0000,   -0.0000,
@@ -80,8 +81,8 @@ extern void HoverControl_Stop() {
     xSemaphoreTake(controls_start_sem, 0);
 }
 
-/*
-extern void HoverControl_AutoLanding_Task(void* task_args) {
+
+extern void HoverControlAutoLanding_Task(void* task_args) {
 
     TickType_t xLastWakeTime = xTaskGetTickCount();
     for(;;) {
@@ -89,16 +90,16 @@ extern void HoverControl_AutoLanding_Task(void* task_args) {
         float setpoints[3] = {0};
         
         float v = BattMon_GetVoltage();
-        if (v < LOW_BATTERY || (xLastWakeTime - xLastTakeoffTime) * portTICK_PERIOD_MS > MAX_FLIGHT_TIME) {
+        if (v < LOW_BATTERY || (xLastWakeTime - last_takeoff_time) * portTICK_PERIOD_MS > MAX_FLIGHT_TIME) {
             HoverControl_SetReference(setpoints);
         }
         // monitor battery voltage, land if under threshold
-        // monitor flight time (w ref to time at takeoff), land if over threshold
+        // monitor flight time (w ref to last time it was stationary), land if over threshold
 
-        vTaskDelayUntil(1000); // check every second?
+        vTaskDelay(1000); // check every second?
     }
 }
-*/
+
 
 extern void HoverControl_Task(void* task_args) {
 
@@ -236,7 +237,9 @@ extern hovctrl_status_t HoverControl_GetStatus() {
 
 static void HoverControl_SetStatus(float error_z) {
     if (ref[STATE_IDX_Z] == 0) {
-        if (error_z > -0.01) { // 1 cm above ground
+        last_takeoff_time = xTaskGetTickCount(); // set last takeoff time
+        if (error_z > -1.0 * (lidar_zero*0.01 + 0.01)) { // changed from > -0.01 = 1 cm above ground
+            // if distance from ground is anywhere between (lidar_zero + margin) and 0, consider landed
             hover_status = HOVCTRL_STATUS_STATIONARY;
         }
         else if (error_z > -1.0 * SETPOINT_MIN_Z_NONZERO) { // 20 cm above ground
@@ -248,7 +251,6 @@ static void HoverControl_SetStatus(float error_z) {
     }
     else if (curr_state[STATE_IDX_Z] < SETPOINT_MIN_Z_NONZERO) {
         hover_status = HOVCTRL_STATUS_TAKEOFF;
-        xLastTakeoffTime = xTaskGetTickCount(); // set last takeoff time
     }
     else {
         hover_status = HOVCTRL_STATUS_FLYING;
