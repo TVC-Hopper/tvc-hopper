@@ -130,6 +130,13 @@ size = 1
 readable = true
 writeable = true
 
+[[props]]
+name = "k_matrix"
+id = 54
+type = "ARR"
+size = 180
+writeable = true
+
 
 
 

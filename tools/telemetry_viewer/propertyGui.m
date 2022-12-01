@@ -32,14 +32,15 @@ classdef propertyGui < baseGui
     end
 
     methods
-        function obj = propertyGui(name, propertyList, ip, port)
+        function obj = propertyGui(name, propertyList, tvc)
             obj = obj@baseGui(5, 40, name, 400, 100);
             obj.propertyList = propertyList;
             obj.numProps = size(obj.propertyList, 2);
             
-            obj.ip = ip;
-            obj.port = port;
-            obj.tvc = TelemetryViewerClient(ip, port);
+%             obj.ip = ip;
+%             obj.port = port;
+            %obj.tvc = TelemetryViewerClient(ip, port);
+            obj.tvc = tvc;
             obj.makeGuiFig();
              
             obj.makePropertyStateArray();

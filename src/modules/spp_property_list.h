@@ -14,7 +14,7 @@
 #include <sppclient/defs.h>
 #include <sppclient/api.h>
 
-#define SPP_PROP_COUNT 16
+#define SPP_PROP_COUNT 17
 
 #define PROP_start_ID ((uint16_t) 0)
 #define PROP_stop_ID ((uint16_t) 1)
@@ -32,6 +32,7 @@
 #define PROP_raw_imu_ID ((uint16_t) 51)
 #define PROP_imu_ID ((uint16_t) 52)
 #define PROP_esc_pwm_ID ((uint16_t) 53)
+#define PROP_k_matrix_ID ((uint16_t) 54)
 
 
 const SppPropertyDefinition_t* SppGetPropertyList();

@@ -136,6 +136,13 @@ static SPP_STATUS_T SetValue(uint16_t id, void* value, void* instance_data) {
         {
             float* pulse_width = (float*)value;
             HwEsc_SetOutput(*pulse_width, true);
+            break;
+        }
+        case PROP_k_matrix_ID:
+        {
+            float* new_K = (float*)value;
+            HoverControl_WriteK(new_K);
+            break;
         }
         default:
         {
