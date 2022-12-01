@@ -3,6 +3,7 @@
 
 #define SETPOINT_MIN_Z_NONZERO          0.2f // Min non-zero ref altitude 
 #define SETPOINT_MAX_Z                  1.0f // Max altitude (meters)
+#define MAX_ZINT                        5.0f // FIXME: placeholder
 
 #define SETPOINT_MAX_ROLL               0.1f // Max roll (radians)
 #define SETPOINT_MAX_PITCH              0.1f // Max pitch (radians)
@@ -20,6 +21,9 @@
 
 #define LANDING_SPEED_FACTOR_CLOSE      1.2f
 #define LANDING_SPEED_FACTOR_FAR        0.2f
+
+#define LOW_BATTERY                     1.0f // FIXME: placeholder
+#define MAX_FLIGHT_TIME                 20000.0f // FIXME: placeholder 20 sec 
 
 #define STATE_IDX_T                     uint16_t
 #define STATE_IDX_ROLL                  ((uint16_t)0x00)
@@ -65,6 +69,8 @@ extern void HoverControl_Init();
 extern void HoverControl_Start();
 
 extern void HoverControl_Stop();
+
+extern void HoverControl_AutoLanding_Task();
 
 extern void HoverControl_Task();
 

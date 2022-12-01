@@ -27,6 +27,7 @@
 #define PRIORITY_COMMAND_CONTROL_COMMS      3
 #define PRIORITY_UART_LISTENER              5
 #define PRIORITY_HOVER_CONTROL              1 // FIXME
+#define PRIORITY_AUTO_LAND                  4 // FIXME: between comms and startup?
 
 static void CreateTasks();
 
@@ -131,5 +132,17 @@ static void CreateTasks() {
     {
         while (1) {}
     }
+
+/*
+    if(xTaskCreate(HoverControl_AutoLanding_Task,
+                        "auto_landing",
+                        configMINIMAL_STACK_SIZE + 384,
+                        NULL,
+                        PRIORITY_HOVER_CONTROL,
+                        NULL) != pdPASS)
+    {
+        while (1) {}
+    }
+*/
 
 }

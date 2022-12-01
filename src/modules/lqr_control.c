@@ -24,6 +24,8 @@ static float error_zint = 0;
 static float vz = 0;
 static float z_last = 0;
 
+TickType_t xLastTakeoffTime = 0; // for flight time monitoring
+
 static const float K_hover[ACTUATION_VECTOR_SIZE * STATE_VECTOR_SIZE] = {    
    70.7107,   -0.0000,    5.0000,    8.5803,   -0.0000,    3.5687,   -0.0000,   -0.0000,   -0.0000,
    -0.0000,  -70.7107,   -5.0000,   -0.0000,   -9.6246,   -3.5687,    0.0000,    0.0000,    0.0000,
@@ -74,6 +76,26 @@ extern void HoverControl_Stop() {
     // need to take so that we wait again for start flag
     xSemaphoreTake(controls_start_sem, 0);
 }
+
+/*
+extern void HoverControl_AutoLanding_Task(void* task_args) {
+
+    TickType_t xLastWakeTime = xTaskGetTickCount();
+    for(;;) {
+
+        float setpoints[3] = {0};
+        
+        float v = BattMon_GetVoltage();
+        if (v < LOW_BATTERY || (xLastWakeTime - xLastTakeoffTime) * portTICK_PERIOD_MS > MAX_FLIGHT_TIME) {
+            HoverControl_SetReference(setpoints);
+        }
+        // monitor battery voltage, land if under threshold
+        // monitor flight time (w ref to time at takeoff), land if over threshold
+
+        vTaskDelayUntil(1000); // check every second?
+    }
+}
+*/
 
 extern void HoverControl_Task(void* task_args) {
 
@@ -170,6 +192,7 @@ static void ExecuteControlStep(TickType_t* last_wake_time) {
 
 extern void HoverControl_SetReference(float* setpoints) {
     // force target position to be 0 or above a threshold takeoff height
+    // TODO: reset integral if ref z is 0? reset integral when setpoint is reached??
     
     if (setpoints[SETPOINT_Z] <= 0) {
         ref[STATE_IDX_Z] = 0;
@@ -207,6 +230,7 @@ static void HoverControl_SetStatus(float error_z) {
     }
     else if (curr_state[STATE_IDX_Z] < SETPOINT_MIN_Z_NONZERO) {
         hover_status = HOVCTRL_STATUS_TAKEOFF;
+        xLastTakeoffTime = xTaskGetTickCount(); // set last takeoff time
     }
     else {
         hover_status = HOVCTRL_STATUS_FLYING;
@@ -289,6 +313,8 @@ static void AdjustZError(float* error) {
 
 static void ComputeZInt(float error_z) {
     error_zint += error_z * CONTROL_LOOP_INTERVAL;
+    error_zint = Limit(error_zint, 0, MAX_ZINT);
+    // TODO: set integral upper limit for anti windup
 }
 
 static void ComputeVZ(float z_now) {
