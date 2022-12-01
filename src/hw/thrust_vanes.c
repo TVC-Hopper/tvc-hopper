@@ -27,6 +27,7 @@ static void SetPosition(uint8_t idx, float position, bool setldok);
 
 // current positions
 static float servo_positions[4] = {90.0, 90.0, 90.0, 90.0};
+static float servo_offsets[4] = {0.000, -0.5, 12.600, -3.600};
 
 // indexed by servo id
 static const pwm_submodule_t vanes[4] = {
@@ -76,6 +77,12 @@ extern void HwThrustVane_Init() {
     HwThrustVane_SetPositions(servo_positions);
 }
 
+extern void HwThrustVane_SetPositionsControlBatch(float* positions) {
+    for (uint8_t i = 0; i < 4; ++i) {
+        SetPosition(i, positions[i], false);
+    }
+}
+
 extern void HwThrustVane_SetPositions(float* positions) {
     for (uint8_t i = 0; i < 4; ++i) {
         SetPosition(i, positions[i], false);
@@ -93,6 +100,9 @@ extern void HwThrustVane_GetPositions(float* positions) {
 
 static void SetPosition(uint8_t idx, float position, bool setldok) {
     servo_positions[idx] = position;
+
+    position += servo_offsets[idx];
+
 
     // convert angle to pulse width
     float pulse_width = position / MAX_ANGLE * (MAX_PULSE_WIDTH - MIN_PULSE_WIDTH) + MIN_PULSE_WIDTH;

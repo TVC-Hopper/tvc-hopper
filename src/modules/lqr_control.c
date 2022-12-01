@@ -7,6 +7,7 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/semphr.h>
 
+#include "hw/hw.h"
 #include "hw/thrust_vanes.h"
 #include "hw/esc.h"
 #include "modules/control_inputs.h"
@@ -49,6 +50,8 @@ static void ExecuteControlStep(TickType_t *last_wake_time);
 static void ResetControls();
 
 static float actuator_input_last[ACTUATION_VECTOR_SIZE];
+
+static float lidar_zero = 0.0;
 
 extern void HoverControl_Init() {
     stop_flag = true;
@@ -108,9 +111,11 @@ extern void HoverControl_Task(void* task_args) {
         xSemaphoreTake(stop_flag_mx, 0xFFFF);
         if (stop_flag) {
             xSemaphoreGive(stop_flag_mx);
-            
-            // stop ESC
-            HwEsc_SetOutput(1000.0);
+
+            vTaskDelay(100);
+            HwEsc_SetOutputControlBatch(1000.0);
+            vTaskDelay(100);
+            Hw_UpdatePwm(); 
 
             // try to take, if can't take wait
             while(pdTRUE != xSemaphoreTake(controls_start_sem, 0xFFFF)) {}
@@ -122,6 +127,7 @@ extern void HoverControl_Task(void* task_args) {
             
             // will be static at this point, just need to fill data before 1st read
             vTaskDelay(5);
+            ControlsInputs_GetLidar(&lidar_zero); 
             xLastWakeTime = xTaskGetTickCount();
         }
         xSemaphoreGive(stop_flag_mx);
@@ -136,14 +142,16 @@ static void ResetControls() {
     z_last = 0;
     memset(ref, 0, STATE_VECTOR_SIZE * sizeof(float));
     memset(curr_state, 0, STATE_VECTOR_SIZE * sizeof(float));
-    ref[STATE_IDX_Z] = 5.0;
     HwThrustVane_GetPositions(actuator_input_last);
     actuator_input_last[4] = HwEsc_GetOutput();
 }
 
 static void ExecuteControlStep(TickType_t* last_wake_time) {
     ControlsInputs_GetIMU(&curr_state[STATE_IDX_ROLL]); 
-    ControlsInputs_GetLidar(&curr_state[STATE_IDX_Z]); 
+    ControlsInputs_GetLidar(&curr_state[STATE_IDX_Z]);
+    
+    // zero out lidar (before cm conversion!)
+    curr_state[STATE_IDX_Z] -= lidar_zero;
     
     // convert lidar measurement from cm to m
     curr_state[STATE_IDX_Z] /= (float)100.0f;
@@ -178,15 +186,24 @@ static void ExecuteControlStep(TickType_t* last_wake_time) {
         }
 
         // RateLimit_VaneActuation(actuator_input_last, actuator_input_now, 0.3);
-        HwThrustVane_SetPositions(actuator_input_now);
+        HwThrustVane_SetPositionsControlBatch(actuator_input_now);
         
         //esc output should be between after matrix multiplication 0 and 1
-        float esc_output = actuator_input_now[4] / .001 + 1000;
-        if (esc_output > MAX_ESC) esc_output = MAX_ESC;
-        HwEsc_SetOutput(esc_output); 
+        float esc_output = actuator_input_now[4] / 0.001 + 1000.0;
+
+        if (esc_output > MAX_ESC) {
+            esc_output = MAX_ESC;
+        } else if (esc_output < 1000.0) {
+            esc_output = 1000.0;
+        }
+
+        HwEsc_SetOutputControlBatch(esc_output);
+        Hw_UpdatePwm(); 
         // TODO: Rate limit esc output?
     }
     
+
+
     memcpy(actuator_input_last, actuator_input_now, sizeof(actuator_input_last));
     xTaskDelayUntil(last_wake_time, CONTROL_LOOP_INTERVAL * portTICK_PERIOD_MS);
 }
@@ -210,7 +227,7 @@ extern void HoverControl_GetState(float* tlm) {
 }
 
 extern void HoverControl_GetThrottlePercent(float* throttle) {
-    memcpy(throttle, actuator_input_now + 4, sizeof(float));
+    *throttle = actuator_input_now[4];
 };
 
 extern hovctrl_status_t HoverControl_GetStatus() {

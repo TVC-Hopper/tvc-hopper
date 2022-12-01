@@ -17,10 +17,28 @@
 static float esc_output = 1000.0;
 
 extern void HwEsc_Init() {
-    HwEsc_SetOutput(esc_output);
+    PWM_SetupFaultDisableMap(
+            ESC_PWM,
+            ESC_SM,
+            ESC_CH,
+            kPWM_faultchannel_0,
+            kPWM_FaultDisable_0
+            | kPWM_FaultDisable_1
+            | kPWM_FaultDisable_2
+            | kPWM_FaultDisable_3
+    );
+
+    HwEsc_SetOutput(esc_output, true);
 }
 
-extern void HwEsc_SetOutput(float pulse_width_us) {
+extern void HwEsc_SetOutputControlBatch(float pulse_width_us) {
+    HwEsc_SetOutput(pulse_width_us, false);
+}
+
+extern void HwEsc_SetOutput(float pulse_width_us, bool setldok) {
+
+    // TODO: check bounds
+    
     esc_output = pulse_width_us;
 
     uint32_t duty_cycle = pulse_width_us / ESC_PWM_PERIOD * 0xFFFF;
@@ -33,8 +51,10 @@ extern void HwEsc_SetOutput(float pulse_width_us) {
             duty_cycle
     );
 
-    // set bit to update PWM counters on next cycle (synchronization feature)
-    PWM_SetPwmLdok(ESC_PWM, kPWM_Control_Module_2, true);
+    if (setldok) {
+        // set bit to update PWM counters on next cycle (synchronization feature)
+        PWM_SetPwmLdok(ESC_PWM, kPWM_Control_Module_3, true);
+    }
 }
 
 
