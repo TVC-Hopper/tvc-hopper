@@ -19,6 +19,7 @@
 #define PROP_raw_imu_ID ((uint16_t) 51)
 #define PROP_imu_ID ((uint16_t) 52)
 #define PROP_esc_pwm_ID ((uint16_t) 53)
+#define PROP_k_matrix_ID ((uint16_t) 54)
 
 
 #endif

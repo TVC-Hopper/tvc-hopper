@@ -33,6 +33,10 @@ static const float K_hover[ACTUATION_VECTOR_SIZE * STATE_VECTOR_SIZE] = {
     0.0000,    0.0000,    0.0000,    0.0000,    0.0000,    0.0000,    4.4624,    1.1935,    6.6667
 }; // roll,     pitch,      yaw,        gx,         gy,         gz,         z,        vz,       zint
 
+extern void HoverControl_WriteK(float* new_K);
+extern void HoverControl_WriteK(float* new_K){
+    memcpy(K_hover, new_K, sizeof(K_hover));
+}
 static void HoverControl_SetStatus(float error_z);
 static HOVCTRL_MATH_STATUS_T MultiplyMatrix(float* Result, const float* A, const float* B, uint32_t A_rows, uint32_t A_cols, uint32_t B_rows);
 static HOVCTRL_MATH_STATUS_T ComputeError(float* Result, float* A, float* B, uint32_t A_size, uint32_t B_size);

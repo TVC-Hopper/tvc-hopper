@@ -4,12 +4,11 @@ classdef propertyLaunchGui < baseGui
 
         numButtons
         maxButtonWidth
-        ip
-        port
+        tvc
     end
 
     methods
-        function obj = propertyLaunchGui(ip, port)
+        function obj = propertyLaunchGui(tvc)
             obj = obj@baseGui(20, 40, "Show Property Groups", 100, 100);
             
             obj.propertyList = propertyList();
@@ -18,8 +17,9 @@ classdef propertyLaunchGui < baseGui
             obj.computeMaxButtonWidth();
             obj.makeGuiFig();
 
-            obj.ip = ip;
-            obj.port = port;
+%             obj.ip = ip;
+%             obj.port = port;
+            obj.tvc = tvc;
             obj.makeButtons();
         end
 
@@ -63,7 +63,7 @@ classdef propertyLaunchGui < baseGui
                 end
            end
 
-           propertyGui(obj.propertyList.groups{args{1},1}, props, obj.ip, obj.port);
+           propertyGui(obj.propertyList.groups{args{1},1}, props, obj.tvc);
            
            for i = 1:20
                 color(1, 2:3) = color(1, 2:3) + [.025, .025];

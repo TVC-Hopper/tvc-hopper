@@ -39,8 +39,8 @@ classdef TelemetryPlotter < handle
     end
     
     methods
-        function s = TelemetryPlotter(ip, port)
-            s.tv = TelemetryViewerClient(ip, port);
+        function s = TelemetryPlotter(tvc)
+            s.tv = tvc;
             s.xRange_ms = s.xRange_s * 1000;
             s.tickBase = (0:s.dTick:s.xRange_ms);
         end

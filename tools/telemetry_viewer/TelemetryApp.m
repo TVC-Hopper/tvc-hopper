@@ -18,14 +18,15 @@ classdef TelemetryApp < handle
 
     end
     methods
-        function s = TelemetryApp(ip, port)
-            s.ip = ip;
-            s.port = port;
-            
+        function s = TelemetryApp(tvc)
+%             s.ip = ip;
+%             s.port = port;
+%             s.tp = tvc;
+            s.tp = TelemetryPlotter(tvc);
             s.guiFig = uifigure('Name', 'Telemetry Control');
             
             guiW = 220;
-            guiH = 6 * 10 + 5 * 40;
+            guiH = 5 * 10 + 4 * 40;
             btnW = 200;
             btnH = 40;
             s.guiFig.Position = [500 200 guiW guiH];
@@ -46,9 +47,9 @@ classdef TelemetryApp < handle
             s.btnStartStream = uibutton(s.guiFig, 'push', 'Text', 'Start data', ...
                                 'Position', [btnL (btnB + 3*(10 + btnH)) btnW btnH], ...
                                 'ButtonPushedFcn', @(btn,event) s.startStream());     
-            s.btnConnect = uibutton(s.guiFig, 'state', 'Text', 'Connect', ...
-                                'Position', [btnL (btnB + 4*(10 + btnH)) btnW btnH], ...
-                                'ValueChangedFcn', @(btn,event) s.connect());
+%             s.btnConnect = uibutton(s.guiFig, 'state', 'Text', 'Connect', ...
+%                                 'Position', [btnL (btnB + 4*(10 + btnH)) btnW btnH], ...
+%                                 'ValueChangedFcn', @(btn,event) s.connect());
             s.btnConnect.BackgroundColor = "red";
 
         end

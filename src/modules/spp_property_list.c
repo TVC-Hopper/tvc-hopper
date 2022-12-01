@@ -138,6 +138,14 @@ static const SppPropertyDefinition_t property_list[SPP_PROP_COUNT] = {
         .name        = "esc_pwm\0",
         .name_length = 8,
     },
+    {
+        .id          = PROP_k_matrix_ID,
+        .type        = SPP_PROP_T_ARR,
+        .size        = 180,
+        .flags       = {SPP_FLAG_READABLE},
+        .name        = "k_matrix\0",
+        .name_length = 9,
+    },
 };
 
 
