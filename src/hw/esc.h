@@ -2,6 +2,7 @@
 #define HW_ESC_H
 
 #include <stdint.h>
+#include <stdbool.h>
 
 /**
  *  Initialize ESC hardware interface
@@ -13,7 +14,7 @@ extern void HwEsc_Init();
  *
  *  @param pulse_width_us output pulse width
  */
-extern void HwEsc_SetOutput(float pulse_width_us);
+extern void HwEsc_SetOutput(float pulse_width_us, bool setldok);
 
 /**
  *  Get the current ESC output
@@ -21,5 +22,7 @@ extern void HwEsc_SetOutput(float pulse_width_us);
  *  @return current ESC output
  */
 extern float HwEsc_GetOutput();
+
+extern void HwEsc_SetOutputControlBatch(float pulse_width_us);
 
 #endif

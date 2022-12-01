@@ -18,6 +18,7 @@
 #include "modules/control_inputs.h"
 
 #include "hw/imu.h"
+#include "hw/esc.h"
 #include "hw/batt_monitor.h"
 #include "hw/lidar.h"
 #include "hw/thrust_vanes.h"
@@ -134,8 +135,7 @@ static SPP_STATUS_T SetValue(uint16_t id, void* value, void* instance_data) {
         case PROP_esc_pwm_ID:
         {
             float* pulse_width = (float*)value;
-            if (*pulse_width > 2000) while(true) {};
-            HwEsc_SetOutput(*pulse_width);
+            HwEsc_SetOutput(*pulse_width, true);
         }
         default:
         {

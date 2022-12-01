@@ -77,6 +77,12 @@ extern void HwThrustVane_Init() {
     HwThrustVane_SetPositions(servo_positions);
 }
 
+extern void HwThrustVane_SetPositionsControlBatch(float* positions) {
+    for (uint8_t i = 0; i < 4; ++i) {
+        SetPosition(i, positions[i], false);
+    }
+}
+
 extern void HwThrustVane_SetPositions(float* positions) {
     for (uint8_t i = 0; i < 4; ++i) {
         SetPosition(i, positions[i], false);

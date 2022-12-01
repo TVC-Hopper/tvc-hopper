@@ -33,6 +33,7 @@ add_executable(${PROJECT_NAME}.elf
     src/modules/control_inputs.c
     src/modules/lqr_control.c
 
+    src/hw/hw.c
     src/hw/imu.c
     src/hw/thrust_vanes.c
     src/hw/lidar.c

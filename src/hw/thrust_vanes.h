@@ -22,6 +22,8 @@ extern void HwThrustVane_SetPositions(float* positions);
  */
 extern void HwThrustVane_GetPositions(float* positions);
 
+extern void HwThrustVane_SetPositionsControlBatch(float* positions);
+
 /**
  *  Set single thrust vane position
  *
