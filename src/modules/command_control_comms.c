@@ -140,10 +140,31 @@ static SPP_STATUS_T SetValue(uint16_t id, void* value, void* instance_data) {
         }
         case PROP_k_matrix_ID:
         {
+            //TODO: FIX
             float* new_K = (float*)value;
             HoverControl_WriteK(new_K);
             break;
         }
+        case PROP_z_lim_spinup_ID:
+        {
+            //TODO
+            break;
+        }
+        case PROP_z_lim_normal_ID:
+        {
+            //TODO
+            break;
+        }
+        case PROP_max_zint_ID:
+        {
+            //TODO
+            break;
+        }
+        case PROP_max_esc_out_ID:
+        {
+            //TODO
+            break;
+        }        
         default:
         {
             return SPP_STATUS_UNKNOWN_PROPERTY;

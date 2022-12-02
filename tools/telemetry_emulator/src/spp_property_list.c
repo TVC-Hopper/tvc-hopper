@@ -146,6 +146,38 @@ static const SppPropertyDefinition_t property_list[SPP_PROP_COUNT] = {
         .name        = "k_matrix\0",
         .name_length = 9,
     },
+    {
+        .id          = PROP_z_lim_spinup_ID,
+        .type        = SPP_PROP_T_FLOAT,
+        .size        = 4,
+        .flags       = {SPP_FLAG_READABLE | SPP_FLAG_WRITEABLE},
+        .name        = "z_lim_spinup\0",
+        .name_length = 13,
+    },
+    {
+        .id          = PROP_z_lim_normal_ID,
+        .type        = SPP_PROP_T_FLOAT,
+        .size        = 4,
+        .flags       = {SPP_FLAG_READABLE | SPP_FLAG_WRITEABLE},
+        .name        = "z_lim_normal\0",
+        .name_length = 13,
+    },
+    {
+        .id          = PROP_max_zint_ID,
+        .type        = SPP_PROP_T_FLOAT,
+        .size        = 4,
+        .flags       = {SPP_FLAG_READABLE | SPP_FLAG_WRITEABLE},
+        .name        = "max_zint\0",
+        .name_length = 9,
+    },
+    {
+        .id          = PROP_max_esc_out_ID,
+        .type        = SPP_PROP_T_FLOAT,
+        .size        = 4,
+        .flags       = {SPP_FLAG_READABLE | SPP_FLAG_WRITEABLE},
+        .name        = "max_esc_out\0",
+        .name_length = 12,
+    },
 };
 
 

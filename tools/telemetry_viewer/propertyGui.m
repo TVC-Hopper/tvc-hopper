@@ -14,7 +14,7 @@ classdef propertyGui < baseGui
         buttonLabelText = ["Set Direction:", "Get/Set:"];
         buttonNames = ["Read", "Write", "Update"];
 
-        propertyNameTextPre = ["Name: ", "Type: "];
+        propertyNameTextPre = ["", "Type: "];
 
         processDataButton
         processDataButtonTxt = "Process Property Data";
@@ -116,7 +116,7 @@ classdef propertyGui < baseGui
             bgcolor1 = [0.0863    0.9608    0.8157];%[0.2235 0.8902 0.7216];
             bgcolor2 = [0.4745    0.9294    0.8157];%[0.4431 0.9608 0.8314];
             txtcolor = [.1, .1, .1];
-            name = append('Name: ', obj.propertyList(i).name);
+            name = append('', obj.propertyList(i).name);
             type = append('Type: ', obj.propertyList(i).type);
             width = obj.figWidth - 2 * obj.borderWidth;
             obj.makeUiLabel(name, [obj.currXpos, obj.currYpos, width, obj.defEltHeight], 'center', bgcolor1, txtcolor);
@@ -130,7 +130,7 @@ classdef propertyGui < baseGui
             labeltxtcolor = [.1, .1, .1];
             fillcolor = [0.8314    0.9882    0.9490];
 
-            labelText = "Set Direction:";
+            labelText = "";
             width = obj.computeWidth(labelText);
             obj.makeUiLabel(labelText, [obj.currXpos, obj.currYpos, width, obj.defEltHeight],...
                             'center', labelcolor, labeltxtcolor);
@@ -148,7 +148,7 @@ classdef propertyGui < baseGui
             obj.propertyStateArray(i).addButtonChild(child);
             obj.moveXposRight(width);
 
-            labelText = "Get/Set:";
+            labelText = " ";
             width = obj.computeWidth(labelText);
             obj.makeUiLabel(labelText, [obj.currXpos, obj.currYpos, width, obj.defEltHeight],...
                             'center', labelcolor, labeltxtcolor);
@@ -156,7 +156,7 @@ classdef propertyGui < baseGui
 
             width = obj.computeWidth(obj.buttonNames(obj.update));
             child = obj.makeUiButton(obj.buttonNames(obj.update), [obj.currXpos, obj.currYpos, width, obj.defEltHeight],...
-                                     [.96, .96, .96], [.1, .1, .1], @obj.buttonPushed, {obj.update, i});
+                                     [.96, .5, .5], [1, 1, 1], @obj.buttonPushed, {obj.update, i});
             obj.propertyStateArray(i).addButtonChild(child)
             obj.moveXposRight(width);
             

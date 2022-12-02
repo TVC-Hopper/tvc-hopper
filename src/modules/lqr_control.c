@@ -59,6 +59,12 @@ static float actuator_input_last[ACTUATION_VECTOR_SIZE];
 static float lidar_zero = 0.0;
 static float esc_rate_limit = ESC_RATE_LIMIT_SPINUP;
 
+/*temporary, for my reference, macros must be replaced with variables in control loop*/
+static float esc_rate_limit_spinup = ESC_RATE_LIMIT_SPINUP;
+static float esc_rate_limit_normal = ESC_RATE_LIMIT_NORMAL;
+static float max_z_int = MAX_ZINT;
+static float esc_max_output = MAX_ESC;
+
 extern void HoverControl_Init() {
     stop_flag = true;
     controls_start_sem = xSemaphoreCreateBinary();

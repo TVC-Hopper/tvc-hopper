@@ -20,6 +20,10 @@
 #define PROP_imu_ID ((uint16_t) 52)
 #define PROP_esc_pwm_ID ((uint16_t) 53)
 #define PROP_k_matrix_ID ((uint16_t) 54)
+#define PROP_z_lim_spinup_ID ((uint16_t) 55)
+#define PROP_z_lim_normal_ID ((uint16_t) 56)
+#define PROP_max_zint_ID ((uint16_t) 57)
+#define PROP_max_esc_out_ID ((uint16_t) 58)
 
 
 #endif
