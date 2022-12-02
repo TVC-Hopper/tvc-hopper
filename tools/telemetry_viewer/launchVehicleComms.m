@@ -16,7 +16,7 @@ classdef launchVehicleComms < baseGui
             obj = obj@baseGui(10, 40, "Vehicle Comms", 100, 100);
 %             obj.ip = ip;
 %             obj.port = port;
-            %obj.tvc = TelemetryViewerClient(ip, port);
+            obj.tvc = TelemetryViewerClient(ip, port);
             obj.makeGuiFig();
             idxs = 1:2;
             arrayfun(@obj.makeVertButtonStrip, idxs);
