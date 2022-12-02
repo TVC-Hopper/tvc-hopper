@@ -37,7 +37,7 @@ static const SppPropertyDefinition_t property_list[SPP_PROP_COUNT] = {
     {
         .id          = PROP_telem_data_ID,
         .type        = SPP_PROP_T_ARR,
-        .size        = 52,
+        .size        = 32,
         .flags       = {SPP_FLAG_WRITEABLE},
         .name        = "telem_data\0",
         .name_length = 11,

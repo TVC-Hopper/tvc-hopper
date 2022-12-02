@@ -1,27 +1,23 @@
 classdef TelemetryPlotter < handle
     properties
         tv;
-        posAxLimY = [-60 60];
-        velAxLimY = [-10 10];
-        accelAxLimY = [-20 20];
-        attitudeAxLimY = [-180 180];
-        altAxLimY = [-1 10];
-        battVoltLimY = [0 25];
+        imuRPYAxLimY = [-5 5];
+        imuGyroAxLimY = [-5 5];
+        lidarAxLimY = [-180 180];
+        escAxLimY = [900 2100];
         xRange_s = 20;
 
-        telemetryStream_period_ms = 20;
-        battVoltStream_period_ms = 500;
+        stream_period_ms = 20;
         tickUpdateInterval = 20;
         dTick = 4000;
         
-        telemetryPropId = 10;
-        battVoltPropId = 18;
+        telemetryId = 10;
         
         xRange_ms;
         tickBase;
         updateCounter = 0;
         
-        batt_t0
+%         batt_t0
         telem_t0
         
         tim
@@ -30,12 +26,10 @@ classdef TelemetryPlotter < handle
         hfig
         f
         ax
-        hp
-        hv
-        ha
-        hatt
-        halt
-        hb
+        himu
+        hgyro
+        hlidar
+        hesc
     end
     
     methods
@@ -46,67 +40,47 @@ classdef TelemetryPlotter < handle
         end
         
         function StartDataStream(s)
-            s.tv.StartStream(s.telemetryPropId, s.telemetryStream_period_ms);
-            s.tv.StartStream(s.battVoltPropId, s.battVoltStream_period_ms);
+            s.tv.StartStream(s.telemetryId, s.stream_period_ms);
         end
         
         function s = ConfigurePlots(s)
             s.f = figure;
             s.f.Position = [100 100 1200 1200];
-            subplotCount = 6;
+            subplotCount = 4;
 
-            % position (x,y,z)
+            % imu (r,p,y)
             s.ax(1) = subplot(subplotCount,1,1);
-            s.hp = [animatedline('Color', 'r', 'LineWidth', 1) ...
+            s.himu = [animatedline('Color', 'r', 'LineWidth', 1) ...
                     animatedline('Color', 'g', 'LineWidth', 1) ...
                     animatedline('Color', 'b', 'LineWidth', 1) ...
                   ];
-            ylabel('position');
-            legend('x', 'y', 'z','AutoUpdate','off');
-            set(s.ax(1), 'ylim', s.posAxLimY);
+            ylabel('rpy');
+            legend('roll', 'pitch', 'yaw','AutoUpdate','off');
+            set(s.ax(1), 'ylim', s.imuRPYAxLimY);
 
-            % velocity (x,y,z)
+            % imu gyro (x,y,z)
             s.ax(2) = subplot(subplotCount,1,2);
-            s.hv = [animatedline('Color', 'r', 'LineWidth', 1) ...
+            s.hgyro = [animatedline('Color', 'r', 'LineWidth', 1) ...
                     animatedline('Color', 'g', 'LineWidth', 1) ...
                     animatedline('Color', 'b', 'LineWidth', 1) ...
                   ];
-            ylabel('velocity');
+            ylabel('gyro');
             legend('x', 'y', 'z','AutoUpdate','off');
-            set(s.ax(2), 'ylim', s.velAxLimY);
+            set(s.ax(2), 'ylim', s.imuGyroAxLimY);
 
-            % acceleration (x,y,z)
+            % lidar
             s.ax(3) = subplot(subplotCount,1,3);
-            s.ha = [animatedline('Color', 'r', 'LineWidth', 1) ...
-                    animatedline('Color', 'g', 'LineWidth', 1) ...
-                    animatedline('Color', 'b', 'LineWidth', 1) ...
-                  ];
-            ylabel('acceleration');
-            legend('x', 'y', 'z','AutoUpdate','off');
-            set(s.ax(3), 'ylim', s.accelAxLimY);
+            s.hlidar = [animatedline('Color', 'r', 'LineWidth', 1)];
+            ylabel('altitude (lidar)');
+            legend('altitude','AutoUpdate','off');
+            set(s.ax(3), 'ylim', s.lidarAxLimY);
 
-            % attitude (x,y,z)
+            % esc
             s.ax(4) = subplot(subplotCount,1,4);
-            s.hatt = [animatedline('Color', 'r', 'LineWidth', 1) ...
-                    animatedline('Color', 'g', 'LineWidth', 1) ...
-                    animatedline('Color', 'b', 'LineWidth', 1) ...
-                  ];
-            ylabel('attitude');
-            legend('yaw', 'pitch', 'roll','AutoUpdate','off'); 
-            set(s.ax(4), 'ylim', s.attitudeAxLimY);
-
-            % altitiude (x,y,z)
-            s.ax(5) = subplot(subplotCount,1,5);
-            s.halt = [animatedline('Color', 'r', 'LineWidth', 1)];
-            ylabel('altitude');
-            set(s.ax(5), 'ylim', s.altAxLimY);
-
-
-            % battery voltage (x,y,z)
-            s.ax(6) = subplot(subplotCount,1,6);
-            s.hb = [animatedline('Color', 'r', 'LineWidth', 1)];
-            ylabel('voltage');
-            set(s.ax(6), 'ylim', s.battVoltLimY);
+            s.hesc = [animatedline('Color', 'r', 'LineWidth', 1)];
+            ylabel('esc pulse width');
+            legend('pw (us)','AutoUpdate','off'); 
+            set(s.ax(4), 'ylim', s.escAxLimY);
 
             set(s.f,'defaultLegendAutoUpdate','off');
             s.hfig = axes(s.f, 'visible', 'off');
@@ -135,44 +109,32 @@ classdef TelemetryPlotter < handle
         end
         
         function Clear(s)
-            for h = s.hp
+            for h = s.himu
                 clearpoints(h);
             end
             
-            for h = s.hv
+            for h = s.hgyro
                 clearpoints(h);
             end
             
-            for h = s.ha
+            for h = s.hlidar
                 clearpoints(h);
             end
             
-            for h = s.halt
-                clearpoints(h);
-            end
-            
-            for h = s.hatt
-                clearpoints(h);
-            end
-            
-            for h = s.hb
+            for h = s.hesc
                 clearpoints(h);
             end
         end
         
         function Plot(s)
             s.telem_t0 = 0;
-            s.batt_t0 = 0;
             
             s.tim = timer('Period', 0.02, 'ExecutionMode', 'fixedRate');
             s.tim.TimerFcn = @(~, ~)s.PlotIteration;
                         
             for i = 1:5
-                s.tv.RequestValue(s.telemetryPropId);
+                s.tv.RequestValue(s.telemetryId);
                 [~, ~, s.telem_t0, ~] = s.tv.ReadValue();
-
-                s.tv.RequestValue(s.battVoltPropId);
-                [~, ~, s.batt_t0, ~] = s.tv.ReadValue();
                 pause(0.1);
             end
             
@@ -182,52 +144,35 @@ classdef TelemetryPlotter < handle
         end
         
         function PlotIteration(s)
-            s.tv.RequestValue(s.telemetryPropId);
+            s.tv.RequestValue(s.telemetryId);
             [~, ~, telem_tstamp, telem_value] = s.tv.ReadValue();
-            [p, v, a, att, alt] = unpackTelemetry(telem_value);
-
-            s.tv.RequestValue(s.battVoltPropId);
-            [~, ~, batt_tstamp, batt_value] = s.tv.ReadValue();
+            [imu, gyro, lidar, esc] = unpackTelemetry(telem_value);
 
             t_tstamp = 0;
-            b_tstamp = 0;
+
 
             if ~isempty(telem_value)
                 t = double(telem_tstamp - s.telem_t0);
                 t_tstamp = t;
 
-                % position
-                addpoints(s.hp(1), t, p(1));
-                addpoints(s.hp(2), t, p(2));
-                addpoints(s.hp(3), t, p(3));
+                % imu
+                addpoints(s.himu(1), t, imu(1));
+                addpoints(s.himu(2), t, imu(2));
+                addpoints(s.himu(3), t, imu(3));
 
-                % velocity
-                addpoints(s.hv(1), t, v(1));
-                addpoints(s.hv(2), t, v(2));
-                addpoints(s.hv(3), t, v(3));
+                % gyro
+                addpoints(s.hgyro(1), t, gyro(1));
+                addpoints(s.hgyro(2), t, gyro(2));
+                addpoints(s.hgyro(3), t, gyro(3));
 
-                % acceleration
-                addpoints(s.ha(1), t, a(1));
-                addpoints(s.ha(2), t, a(2));
-                addpoints(s.ha(3), t, a(3));
+                % lidar
+                addpoints(s.hlidar(1), t, lidar);
 
-                % attitude
-                addpoints(s.hatt(1), t, att(1));
-                addpoints(s.hatt(2), t, att(2));
-                addpoints(s.hatt(3), t, att(3));
-
-                % altitude
-                addpoints(s.halt(1), t, alt(1));
+                % esc
+                addpoints(s.hesc(1), t, esc);
             end
 
-            if ~isempty(batt_value)
-                t = double(batt_tstamp - s.batt_t0);
-                b_tstamp = t;
-                voltage = double(typecast(uint8(batt_value), 'single'));
-                addpoints(s.hb(1), t, voltage);
-            end
-
-            t = max([b_tstamp t_tstamp]);
+            t = t_tstamp;
             lowerBound = max([0 (t - s.xRange_ms)]);
             upperBound = max([s.xRange_ms (t + s.xRange_ms)]);
             set(s.ax, 'xlim', [lowerBound upperBound]);

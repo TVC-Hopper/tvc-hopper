@@ -97,28 +97,21 @@ int main() {
         i += 0.0015;
 
         std::lock_guard<std::mutex> lg(telem_mx);
-        // position
-        prop_telem[0] = (5 * sin(i*2)) - 2;
-        prop_telem[1] = (6 * sin(i*2)) + 4;
-        prop_telem[2] = (7 * sin(i*3)) + 2;
+        // imu
+        prop_telem[0] = (sin(i*2)) - 2;
+        prop_telem[1] = (sin(i*2)) + 4;
+        prop_telem[2] = (sin(i*3)) + 2;
 
-        // velocity
+        // gyro
         prop_telem[3] = (int)(counter / 100) % 5;
         prop_telem[4] = (int)(counter / 200) % 3 + 2;
         prop_telem[5] = (int)(counter / 400) % 10 - 5;
 
-        // acceleration
+        // lidar
         prop_telem[6] = (8 * sin(i)) + 5;
-        prop_telem[7] = (5 * sin(i)) + 7;
-        prop_telem[8] = (2 * sin(i)) + 10;
 
-        // attitude
+        // esc
         prop_telem[9] = (10 * sin(i - 1.0)) - 15;
-        prop_telem[10] = (5 * sin(i + 2.1)) + 100;
-        prop_telem[11] = (20 * sin(i + 1.5)) + 50;
-
-        // altitude
-        prop_telem[12] = (5 * sin(i + 1.0)) + 5;
 
         prop_battery_v -= 0.000001;
         counter++;

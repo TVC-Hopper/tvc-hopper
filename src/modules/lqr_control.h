@@ -1,16 +1,16 @@
 #ifndef MODULE_HOVER_CONTROL_H
 #define MODULE_HOVER_CONTROL_H
 
-#define SETPOINT_MIN_Z_NONZERO          0.2f // Min non-zero ref altitude 
+#define SETPOINT_MIN_Z_NONZERO          0.07f // Min non-zero ref altitude 
 #define SETPOINT_MAX_Z                  1.0f // Max altitude (meters)
-#define MAX_ZINT                        5.0f // FIXME: placeholder
+#define MAX_ZINT                        0.3f // FIXME: placeholder
 
 #define SETPOINT_MAX_ROLL               0.1f // Max roll (radians)
 #define SETPOINT_MAX_PITCH              0.1f // Max pitch (radians)
 
 // Maps the kRPM output of the controller to % ESC actuation.
 //#define MOTOR_KRPM_TO_ESC_PERCENT       72.43f // FIXME: placeholder
-#define MAX_ESC                         2000.0f 
+#define MAX_ESC                         1800.0f 
 #define CONTROL_LOOP_INTERVAL           5 // (milliseconds)
 
 // Math
@@ -81,5 +81,7 @@ extern void HoverControl_GetState(float* tlm);
 extern void HoverControl_GetThrottlePercent(float* throttle);
 
 extern hovctrl_status_t HoverControl_GetStatus();
+
+extern void HoverControl_WriteK(float* new_K);
 
 #endif

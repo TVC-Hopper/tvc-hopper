@@ -137,7 +137,7 @@ x = 0; y = 0; z = 0; vx = 0; vy = 0; vz = 0; p = 0; q = 0; u = 0; wx = 0; wy = 0
 % All input is not zero!
 a1 = 0; a2 = 0; a3 = 0; a4 = 0; 
 %wt = 20.062; % kRPM = hoverpoint
-wt = .3837;
+wt = 0.5354;
 
 % Drone Constants
 Kt1 = 18.4626;      % N / (1/s^2)

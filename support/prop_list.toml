@@ -22,12 +22,10 @@ name = "telem_data"
 id = 10
 type = "ARR"
 # float(4)
-# p(x,y,z) [12]
-# v(x,y,z) [12]
-# a(x,y,z) [12]
-# o(r,p,y) [12]
-# alt [4]
-size = 52
+# imu(r, p, y, gx, gy, gz) [24]
+# lidar [4]
+# esc [4]
+size = 32
 readable = true
 
 [[props]]

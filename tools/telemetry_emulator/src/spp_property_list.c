@@ -37,7 +37,7 @@ static const SppPropertyDefinition_t property_list[SPP_PROP_COUNT] = {
     {
         .id          = PROP_telem_data_ID,
         .type        = SPP_PROP_T_ARR,
-        .size        = 52,
+        .size        = 32,
         .flags       = {SPP_FLAG_WRITEABLE},
         .name        = "telem_data\0",
         .name_length = 11,
@@ -137,6 +137,14 @@ static const SppPropertyDefinition_t property_list[SPP_PROP_COUNT] = {
         .flags       = {SPP_FLAG_READABLE | SPP_FLAG_WRITEABLE},
         .name        = "esc_pwm\0",
         .name_length = 8,
+    },
+    {
+        .id          = PROP_k_matrix_ID,
+        .type        = SPP_PROP_T_ARR,
+        .size        = 180,
+        .flags       = {SPP_FLAG_READABLE},
+        .name        = "k_matrix\0",
+        .name_length = 9,
     },
 };
 

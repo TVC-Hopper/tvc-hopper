@@ -14,6 +14,10 @@
 #include "modules/control_inputs.h"
 #include "circbuf/cbuf.h"
 
+#define ESC_RATE_LIMIT_SPINUP (0.005f)
+#define ESC_RATE_LIMIT_NORMAL (0.01f)
+
+
 SemaphoreHandle_t controls_start_sem;
 SemaphoreHandle_t stop_flag_mx;
 bool stop_flag;
@@ -28,18 +32,14 @@ static float z_last = 0;
 
 TickType_t last_takeoff_time = 0; // for flight time monitoring
 
-static const float K_hover[ACTUATION_VECTOR_SIZE * STATE_VECTOR_SIZE] = {    
-   70.7107,   -0.0000,    5.0000,    8.5803,   -0.0000,    3.5687,   -0.0000,   -0.0000,   -0.0000,
-   -0.0000,  -70.7107,   -5.0000,   -0.0000,   -9.6246,   -3.5687,    0.0000,    0.0000,    0.0000,
-   70.7107,    0.0000,   -5.0000,    8.5803,    0.0000,   -3.5687,    0.0000,    0.0000,    0.0000,
-   -0.0000,  -70.7107,    5.0000,   -0.0000,   -9.6246,    3.5687,   -0.0000,   -0.0000,   -0.0000,
-    0.0000,    0.0000,    0.0000,    0.0000,    0.0000,    0.0000,    4.4624,    1.1935,    6.6667
+static float K_hover[ACTUATION_VECTOR_SIZE * STATE_VECTOR_SIZE] = {
+   70.7107,   -0.0000,    5.0000,    8.0781,   -0.0000,    3.2309,   -0.0000,   -0.0000,   -0.0000,
+   -0.0000,  -70.7107,   -5.0000,    0.0000,   -8.8054,   -3.2309,    0.0000,   -0.0000,    0.0000,
+   70.7107,    0.0000,   -5.0000,    8.0781,    0.0000,   -3.2309,    0.0000,    0.0000,    0.0000,
+    0.0000,  -70.7107,    5.0000,    0.0000,   -8.8054,    3.2309,    0.0000,   -0.0000,    0.0000,
+   -0.0000,    0.0000,   -0.0000,    0.0000,    0.0000,   -0.0000,    4.4207,    1.1657,    6.6667,
 }; // roll,     pitch,      yaw,        gx,         gy,         gz,         z,        vz,       zint
 
-extern void HoverControl_WriteK(float* new_K);
-extern void HoverControl_WriteK(float* new_K){
-    memcpy(K_hover, new_K, sizeof(K_hover));
-}
 static void HoverControl_SetStatus(float error_z);
 static HOVCTRL_MATH_STATUS_T MultiplyMatrix(float* Result, const float* A, const float* B, uint32_t A_rows, uint32_t A_cols, uint32_t B_rows);
 static HOVCTRL_MATH_STATUS_T ComputeError(float* Result, float* A, float* B, uint32_t A_size, uint32_t B_size);
@@ -57,6 +57,7 @@ static void ResetControls();
 static float actuator_input_last[ACTUATION_VECTOR_SIZE];
 
 static float lidar_zero = 0.0;
+static float esc_rate_limit = ESC_RATE_LIMIT_SPINUP;
 
 extern void HoverControl_Init() {
     stop_flag = true;
@@ -90,6 +91,7 @@ extern void HoverControlAutoLanding_Task(void* task_args) {
 
     TickType_t xLastWakeTime = xTaskGetTickCount();
     for(;;) {
+        vTaskSuspend(NULL);
 
         float setpoints[3] = {0};
         
@@ -194,6 +196,11 @@ static void ExecuteControlStep(TickType_t* last_wake_time) {
         HwThrustVane_SetPositionsControlBatch(actuator_input_now);
         
         //esc output should be between after matrix multiplication 0 and 1
+        if (hover_status != HOVCTRL_STATUS_FLYING) {
+            esc_rate_limit = ESC_RATE_LIMIT_NORMAL;
+        }
+
+        RateLimit(actuator_input_last[4], actuator_input_now[4], esc_rate_limit);
         float esc_output = actuator_input_now[4] / 0.001 + 1000.0;
 
         if (esc_output > MAX_ESC) {
@@ -337,13 +344,18 @@ static void AdjustZError(float* error) {
 
 static void ComputeZInt(float error_z) {
     error_zint += error_z * CONTROL_LOOP_INTERVAL;
-    error_zint = Limit(error_zint, 0, MAX_ZINT);
+    error_zint = Limit(error_zint, -MAX_ZINT, MAX_ZINT);
     // TODO: set integral upper limit for anti windup
 }
 
 static void ComputeVZ(float z_now) {
     // TODO: make more robust against unstable LiDAR
-    float vz_now = (z_now - z_last) / CONTROL_LOOP_INTERVAL;
+    float vz_now = (z_now - z_last) / ((float)CONTROL_LOOP_INTERVAL);
     vz = RateLimit(vz_now, vz, 0.5) ; // averages current and last
     // circ buf?
+}
+
+
+extern void HoverControl_WriteK(float* new_K){
+    memcpy(K_hover, new_K, sizeof(K_hover));
 }

@@ -220,36 +220,16 @@ static SPP_STATUS_T GetValue(uint16_t id, void* value, void* instance_data) {
 }
 
 static void GetTelemetry(uint8_t* value) {
-    float placeholder = 0.0;
-    uint8_t idx = 0;
     float* value_f = (float*)value;
-    if (is_telemetry_filtered) {
-        // TODO
-    } else {
-        // TODO
-        // pos
-        value_f[idx++] = placeholder;
-        value_f[idx++] = placeholder;
-        value_f[idx++] = placeholder;
 
-        // vel
-        value_f[idx++] = placeholder;
-        value_f[idx++] = placeholder;
-        value_f[idx++] = placeholder;
+    ControlsInputs_GetIMU(value_f);
+    value_f += 6;
 
-        // accel
-        value_f[idx++] = placeholder;
-        value_f[idx++] = placeholder;
-        value_f[idx++] = placeholder;
+    value[7] = 0.0;
+//    ControlsInputs_GetLidar(value_f);
+//    value_f += 1;
 
-        // att
-        value_f[idx++] = placeholder;
-        value_f[idx++] = placeholder;
-        value_f[idx++] = placeholder;
-
-        // alt
-        value_f[idx++] = placeholder;
-    }
+    HwEsc_GetOutput(&value_f[8]);
 }
 
 static StcpStatus_t HandleStcpPacket(void* buffer, uint16_t length, void* instance_data) {
