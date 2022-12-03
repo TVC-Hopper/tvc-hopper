@@ -3,7 +3,7 @@
 
 #define SETPOINT_MIN_Z_NONZERO          0.07f // Min non-zero ref altitude 
 #define SETPOINT_MAX_Z                  1.0f // Max altitude (meters)
-#define MAX_ZINT                        0.3f // FIXME: placeholder
+#define MAX_ZINT                        1.2f // FIXME: placeholder
 
 #define SETPOINT_MIN_ROLL               0.1f // Min roll (radians)
 #define SETPOINT_MIN_PITCH              0.1f // Min pitch (radians)
@@ -87,5 +87,13 @@ extern void HoverControl_GetThrottlePercent(float* throttle);
 extern hovctrl_status_t HoverControl_GetStatus();
 
 extern void HoverControl_WriteK(float* new_K);
+
+extern void HoverControl_SetSpinupESCRateLimit(float limit);
+
+extern void HoverControl_SetNormalESCRateLimit(float limit);
+
+extern void HoverControl_SetMaxZInt(float i_max);
+
+extern void HoverControl_SetESCMaxOutput(float output);
 
 #endif

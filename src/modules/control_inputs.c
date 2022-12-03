@@ -119,14 +119,10 @@ static void ProcessIMU() {
 
     xSemaphoreTake(imu_data_proc_mx, 0xFFFF);
 
-
-
-
-
     // make corrections for different imu orientation here
 	imu_data_proc[IMU_PROC_IDX_ROLL] = -pitch;
-	imu_data_proc[IMU_PROC_IDX_PITCH] = roll - 1.55;
-    imu_data_proc[IMU_PROC_IDX_YAW] = yaw + 1.32;
+	imu_data_proc[IMU_PROC_IDX_PITCH] = roll;
+    imu_data_proc[IMU_PROC_IDX_YAW] = yaw;
 
     // gyro is x, y, z
     imu_data_proc[IMU_PROC_IDX_GYRO + 0] = imu_data_raw[IMU_RAW_IDX_GYRO + 2];
