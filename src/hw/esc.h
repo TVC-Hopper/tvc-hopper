@@ -23,6 +23,8 @@ extern void HwEsc_SetOutput(float pulse_width_us, bool setldok);
  */
 extern float HwEsc_GetOutput();
 
+extern void HwEsc_SetMax(float pw);
+
 extern void HwEsc_SetOutputControlBatch(float pulse_width_us);
 
 #endif

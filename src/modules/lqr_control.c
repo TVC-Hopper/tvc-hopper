@@ -163,12 +163,15 @@ static void ResetControls() {
 }
 
 static void ExecuteControlStep(TickType_t* last_wake_time) {
+    float error[STATE_VECTOR_SIZE] = {0};
+
     ControlsInputs_GetIMU(&curr_state[STATE_IDX_ROLL]); 
     ControlsInputs_GetLidar(&curr_state[STATE_IDX_Z]);
     
     // zero out lidar (before cm conversion!)
     curr_state[STATE_IDX_Z] -= lidar_zero;
     
+    // zero out IMU
     for (uint8_t i = 0; i < 6; ++i) {
         curr_state[i] -= imu_zero[i];
     }
@@ -179,24 +182,24 @@ static void ExecuteControlStep(TickType_t* last_wake_time) {
     // start next reading
     ControlsInputs_NotifyStart();
 
-    float error[STATE_VECTOR_SIZE] = {0};
     ComputeError(error, ref, curr_state, STATE_VECTOR_SIZE, STATE_VECTOR_SIZE);
     CorrectYaw(error);
 
     // determine flying mode based on altitude
     HoverControl_SetStatus(error[STATE_IDX_Z]);
 
-    // get z error and z velocity
+    // adjust for state (landing/takeoff) 
     AdjustZError(error);
 
     if (actuator_input_last[4] < esc_max_output) {
         ComputeZInt(error[STATE_IDX_Z]);
     }
 
-    error[STATE_IDX_ZINT] = error_zint;
     ComputeVZ(curr_state[STATE_IDX_Z]);
+
+    error[STATE_IDX_ZINT] = error_zint;
     error[STATE_IDX_VZ] = vz;
-    z_last = curr_state[STATE_IDX_Z];
+
     
     if (HOVCTRL_MATH_STATUS_OK == MultiplyMatrix(actuator_input_now, K_hover, error, ACTUATION_VECTOR_SIZE, STATE_VECTOR_SIZE, STATE_VECTOR_SIZE)) {
 
@@ -221,19 +224,13 @@ static void ExecuteControlStep(TickType_t* last_wake_time) {
         actuator_input_now[4] = RateLimit(actuator_input_last[4], actuator_input_now[4], esc_rate_limit);
         float esc_output = actuator_input_now[4] / 0.001 + 1000.0;
 
-        // TODO: this is redundant?
-        if (esc_output > esc_max_output) {
-            esc_output = esc_max_output;
-        } else if (esc_output < 1000.0) {
-            esc_output = 1000.0;
-        }
-
         HwEsc_SetOutputControlBatch(esc_output);
         Hw_UpdatePwm(); 
     }
     
 
 
+    z_last = curr_state[STATE_IDX_Z];
     memcpy(actuator_input_last, actuator_input_now, sizeof(actuator_input_last));
     xTaskDelayUntil(last_wake_time, CONTROL_LOOP_INTERVAL * portTICK_PERIOD_MS);
 }

@@ -13,8 +13,14 @@
 
 #define ESC_PWM_PERIOD      ((float) 20000.0)
 
+#define ESC_MAX             ((float) 2000.0)
+#define ESC_MIN             ((float) 1000.0)
+
 // current ESC output
 static float esc_output = 1000.0;
+
+static float esc_max = ESC_MAX;
+static float esc_min = ESC_MIN;
 
 extern void HwEsc_Init() {
     PWM_SetupFaultDisableMap(
@@ -35,10 +41,18 @@ extern void HwEsc_SetOutputControlBatch(float pulse_width_us) {
     HwEsc_SetOutput(pulse_width_us, false);
 }
 
+extern void HwEsc_SetMax(float pw) {
+    esc_max = pw;
+}
+
 extern void HwEsc_SetOutput(float pulse_width_us, bool setldok) {
 
-    // TODO: check bounds
-    
+    if (pulse_width_us > esc_max) {
+        pulse_width_us = esc_max;
+    } else if (pulse_width_us < esc_min) {
+        pulse_width_us = esc_min;
+    }
+
     esc_output = pulse_width_us;
 
     uint32_t duty_cycle = pulse_width_us / ESC_PWM_PERIOD * 0xFFFF;

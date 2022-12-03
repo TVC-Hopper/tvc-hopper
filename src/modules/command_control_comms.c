@@ -95,6 +95,7 @@ static SPP_STATUS_T SetValue(uint16_t id, void* value, void* instance_data) {
         case PROP_start_ID:
         {
             if (*((uint8_t*) value) == 1) {
+                HwEsc_SetMax(2000.0);
                 HoverControl_Start();
             }
             break;
@@ -102,6 +103,7 @@ static SPP_STATUS_T SetValue(uint16_t id, void* value, void* instance_data) {
         case PROP_stop_ID:
         {
             if (*((uint8_t*) value) == 1) {
+                HwEsc_SetMax(1000.0);
                 HoverControl_Stop();
             }
             break;
