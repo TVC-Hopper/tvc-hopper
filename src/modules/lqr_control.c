@@ -157,7 +157,7 @@ static void ResetControls() {
     memset(curr_state, 0, STATE_VECTOR_SIZE * sizeof(float));
     HwThrustVane_GetPositions(actuator_input_last);
     actuator_input_last[4] = HwEsc_GetOutput();
-}
+} // TODO: zero lidar, roll, pitch, yaw
 
 static void ExecuteControlStep(TickType_t* last_wake_time) {
     ControlsInputs_GetIMU(&curr_state[STATE_IDX_ROLL]); 
@@ -223,12 +223,15 @@ static void ExecuteControlStep(TickType_t* last_wake_time) {
 
 
     memcpy(actuator_input_last, actuator_input_now, sizeof(actuator_input_last));
-    xTaskDelayUntil(last_wake_time, CONTROL_LOOP_INTERVAL * portTICK_PERIOD_MS);
+    xTaskDelayUntil(last_wake_time, CONTROL_LOOP_INTERVAL * portTICK_PERIOD_MS); // FIXME: divide not multiply
 }
 
 extern void HoverControl_SetReference(float* setpoints) {
     // force target position to be 0 or above a threshold takeoff height
     // TODO: reset integral if ref z is 0? reset integral when setpoint is reached??
+
+    ref[STATE_IDX_ROLL] = Limit(setpoints[SETPOINT_ROLL], SETPOINT_MIN_ROLL, SETPOINT_MAX_ROLL);
+    ref[STATE_IDX_PITCH] = Limit(setpoints[SETPOINT_PITCH], SETPOINT_MIN_ROLL, SETPOINT_MAX_PITCH);
     
     if (setpoints[SETPOINT_Z] <= 0) {
         ref[STATE_IDX_Z] = 0;

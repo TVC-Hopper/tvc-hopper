@@ -5,6 +5,8 @@
 #define SETPOINT_MAX_Z                  1.0f // Max altitude (meters)
 #define MAX_ZINT                        0.3f // FIXME: placeholder
 
+#define SETPOINT_MIN_ROLL               0.1f // Min roll (radians)
+#define SETPOINT_MIN_PITCH              0.1f // Min pitch (radians)
 #define SETPOINT_MAX_ROLL               0.1f // Max roll (radians)
 #define SETPOINT_MAX_PITCH              0.1f // Max pitch (radians)
 
@@ -56,8 +58,10 @@ typedef enum hovctrl_status_e {
 } hovctrl_status_t; 
 
 typedef enum control_setpoint_e {
-    SETPOINT_X,
-    SETPOINT_Y,
+    SETPOINT_ROLL,
+    SETPOINT_PITCH,
+    // SETPOINT_X,
+    // SETPOINT_Y,
     SETPOINT_Z
     // SETPOINT_ROLL,
     // SETPOINT_PITCH,
