@@ -13,7 +13,7 @@
 // Maps the kRPM output of the controller to % ESC actuation.
 //#define MOTOR_KRPM_TO_ESC_PERCENT       72.43f // FIXME: placeholder
 #define MAX_ESC                         1800.0f 
-#define CONTROL_LOOP_INTERVAL           5 // (milliseconds)
+#define CONTROL_LOOP_INTERVAL           5.0f // (milliseconds)
 
 // Math
 #define PI                              3.142857f

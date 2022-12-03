@@ -191,7 +191,7 @@ static void ExecuteControlStep(TickType_t* last_wake_time) {
     // adjust for state (landing/takeoff) 
     AdjustZError(error);
 
-    if (actuator_input_last[4] < esc_max_output) {
+    if (actuator_input_last[4] < esc_max_output) { // FIXME: or if error is negative?
         ComputeZInt(error[STATE_IDX_Z]);
     }
 
@@ -361,14 +361,14 @@ static void AdjustZError(float* error) {
 }
 
 static void ComputeZInt(float error_z) {
-    error_zint += error_z * CONTROL_LOOP_INTERVAL;
+    error_zint += error_z * (CONTROL_LOOP_INTERVAL / 1000.0);
     error_zint = Limit(error_zint, 0, max_z_int);
     // TODO: set integral upper limit for anti windup
 }
 
 static void ComputeVZ(float z_now) {
     // TODO: make more robust against unstable LiDAR
-    float vz_now = (z_now - z_last) / ((float)CONTROL_LOOP_INTERVAL);
+    float vz_now = (z_now - z_last) / (CONTROL_LOOP_INTERVAL / 1000.0);
     vz = RateLimit(vz_now, vz, 0.5) ; // averages current and last
     // circ buf?
 }
