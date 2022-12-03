@@ -135,7 +135,7 @@ function ss_rep = getStateSpaceRep()
     
     % All input is not zero!
     a1 = 0; a2 = 0; a3 = 0; a4 = 0; 
-    wt = .3837;
+    wt = .5430;
     
     % Drone Constants
     Kt1 = 18.4626;      % N / (1/s^2)
@@ -145,7 +145,7 @@ function ss_rep = getStateSpaceRep()
     Jx = 0.0041;    % Kg * m^2
     Jy = 0.0074;    % Kg * m^2
     Jz = 0.0065;    % Kg * m^2
-    m = 1.548;
+    m = 1.578;
     g = 9.807;          % m/s^2
     l = 0.0627;     % m
     r = 0.0128;           % m 

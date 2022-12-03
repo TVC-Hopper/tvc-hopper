@@ -33,11 +33,11 @@ static float z_last = 0;
 TickType_t last_takeoff_time = 0; // for flight time monitoring
 
 static float K_hover[ACTUATION_VECTOR_SIZE * STATE_VECTOR_SIZE] = {
-   70.7107,   -0.0000,    5.0000,    8.0781,   -0.0000,    3.2309,   -0.0000,   -0.0000,   -0.0000,
-   -0.0000,  -70.7107,   -5.0000,    0.0000,   -8.8054,   -3.2309,    0.0000,   -0.0000,    0.0000,
-   70.7107,    0.0000,   -5.0000,    8.0781,    0.0000,   -3.2309,    0.0000,    0.0000,    0.0000,
-    0.0000,  -70.7107,    5.0000,    0.0000,   -8.8054,    3.2309,    0.0000,   -0.0000,    0.0000,
-   -0.0000,    0.0000,   -0.0000,    0.0000,    0.0000,   -0.0000,    4.4207,    1.1657,    6.6667,
+  70.7107,   0.0000,   5.0000,   8.0603,   0.0000,   3.2187,   0.0000,   0.0000,   0.0000,
+   0.0000, -70.7107,  -5.0000,   0.0000,  -8.7759,  -3.2187,   0.0000,   0.0000,   0.0000,
+  70.7107,   0.0000,  -5.0000,   8.0603,   0.0000,  -3.2187,   0.0000,   0.0000,   0.0000,
+   0.0000, -70.7107,   5.0000,   0.0000,  -8.7759,   3.2187,   0.0000,   0.0000,   0.0000,
+   0.0000,   0.0000,   0.0000,   0.0000,   0.0000,   0.0000,   0.4275,   0.1978,   0.4216,
 }; // roll,     pitch,      yaw,        gx,         gy,         gz,         z,        vz,       zint
 
 static void HoverControl_SetStatus(float error_z);
@@ -57,13 +57,15 @@ static void ResetControls();
 static float actuator_input_last[ACTUATION_VECTOR_SIZE];
 
 static float lidar_zero = 0.0;
-static float esc_rate_limit = ESC_RATE_LIMIT_SPINUP;
+static float imu_zero[6] = {0.0};
 
-/*temporary, for my reference, macros must be replaced with variables in control loop*/
 static float esc_rate_limit_spinup = ESC_RATE_LIMIT_SPINUP;
 static float esc_rate_limit_normal = ESC_RATE_LIMIT_NORMAL;
 static float max_z_int = MAX_ZINT;
 static float esc_max_output = MAX_ESC;
+
+static float esc_rate_limit = ESC_RATE_LIMIT_SPINUP;
+
 
 extern void HoverControl_Init() {
     stop_flag = true;
@@ -140,7 +142,8 @@ extern void HoverControl_Task(void* task_args) {
             
             // will be static at this point, just need to fill data before 1st read
             vTaskDelay(5);
-            ControlsInputs_GetLidar(&lidar_zero); 
+            ControlsInputs_GetLidar(&lidar_zero);
+            ControlsInputs_GetIMU(imu_zero);
             xLastWakeTime = xTaskGetTickCount();
         }
         xSemaphoreGive(stop_flag_mx);
@@ -156,7 +159,7 @@ static void ResetControls() {
     memset(ref, 0, STATE_VECTOR_SIZE * sizeof(float));
     memset(curr_state, 0, STATE_VECTOR_SIZE * sizeof(float));
     HwThrustVane_GetPositions(actuator_input_last);
-    actuator_input_last[4] = HwEsc_GetOutput();
+    actuator_input_last[4] = 0.0;
 }
 
 static void ExecuteControlStep(TickType_t* last_wake_time) {
@@ -165,6 +168,10 @@ static void ExecuteControlStep(TickType_t* last_wake_time) {
     
     // zero out lidar (before cm conversion!)
     curr_state[STATE_IDX_Z] -= lidar_zero;
+    
+    for (uint8_t i = 0; i < 6; ++i) {
+        curr_state[i] -= imu_zero[i];
+    }
     
     // convert lidar measurement from cm to m
     curr_state[STATE_IDX_Z] /= (float)100.0f;
@@ -181,7 +188,11 @@ static void ExecuteControlStep(TickType_t* last_wake_time) {
 
     // get z error and z velocity
     AdjustZError(error);
-    ComputeZInt(error[STATE_IDX_Z]);
+
+    if (actuator_input_last[4] < esc_max_output) {
+        ComputeZInt(error[STATE_IDX_Z]);
+    }
+
     error[STATE_IDX_ZINT] = error_zint;
     ComputeVZ(curr_state[STATE_IDX_Z]);
     error[STATE_IDX_VZ] = vz;
@@ -203,21 +214,22 @@ static void ExecuteControlStep(TickType_t* last_wake_time) {
         
         //esc output should be between after matrix multiplication 0 and 1
         if (hover_status != HOVCTRL_STATUS_FLYING) {
-            esc_rate_limit = ESC_RATE_LIMIT_NORMAL;
+            esc_rate_limit = esc_rate_limit_normal;
         }
-
-        RateLimit(actuator_input_last[4], actuator_input_now[4], esc_rate_limit);
+        
+        actuator_input_now[4] = Limit(actuator_input_now[4], 0.0, 1.0);
+        actuator_input_now[4] = RateLimit(actuator_input_last[4], actuator_input_now[4], esc_rate_limit);
         float esc_output = actuator_input_now[4] / 0.001 + 1000.0;
 
-        if (esc_output > MAX_ESC) {
-            esc_output = MAX_ESC;
+        // TODO: this is redundant?
+        if (esc_output > esc_max_output) {
+            esc_output = esc_max_output;
         } else if (esc_output < 1000.0) {
             esc_output = 1000.0;
         }
 
         HwEsc_SetOutputControlBatch(esc_output);
         Hw_UpdatePwm(); 
-        // TODO: Rate limit esc output?
     }
     
 
@@ -350,7 +362,7 @@ static void AdjustZError(float* error) {
 
 static void ComputeZInt(float error_z) {
     error_zint += error_z * CONTROL_LOOP_INTERVAL;
-    error_zint = Limit(error_zint, -MAX_ZINT, MAX_ZINT);
+    error_zint = Limit(error_zint, 0, max_z_int);
     // TODO: set integral upper limit for anti windup
 }
 
@@ -364,4 +376,20 @@ static void ComputeVZ(float z_now) {
 
 extern void HoverControl_WriteK(float* new_K){
     memcpy(K_hover, new_K, sizeof(K_hover));
+}
+
+extern void HoverControl_SetSpinupESCRateLimit(float limit) {
+    esc_rate_limit_spinup = limit;
+}
+
+extern void HoverControl_SetNormalESCRateLimit(float limit) {
+    esc_rate_limit_normal = limit;
+}
+
+extern void HoverControl_SetMaxZInt(float i_max) {
+    max_z_int = i_max;
+}
+
+extern void HoverControl_SetESCMaxOutput(float output)  {
+    esc_max_output = output;
 }

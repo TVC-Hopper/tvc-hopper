@@ -1,5 +1,6 @@
 clc
 clear
+
 syms x y z vx vy vz p q u wx wy wz      % States
 syms Ft F1 F2 F3 F4 Fd a1 a2 a3 a4 wt    % Inputs 
 syms Kt1 Kt2 CL CD CF m Jx Jy Jz r l g       % Constants
@@ -137,7 +138,7 @@ x = 0; y = 0; z = 0; vx = 0; vy = 0; vz = 0; p = 0; q = 0; u = 0; wx = 0; wy = 0
 % All input is not zero!
 a1 = 0; a2 = 0; a3 = 0; a4 = 0; 
 %wt = 20.062; % kRPM = hoverpoint
-wt = 0.5354;
+wt = .5430;
 
 % Drone Constants
 Kt1 = 18.4626;      % N / (1/s^2)
@@ -153,7 +154,7 @@ Jx = 0.0041;    % Kg * m^2
 Jy = 0.0074;    % Kg * m^2
 Jz = 0.0065;    % Kg * m^2
 %m = 0.92;           % Kg
-m = 1.548;
+m = 1.578
 g = 9.807;          % m/s^2
 % l = 0.09471940;     % m
 % r = 0.04;           % m 
@@ -232,7 +233,7 @@ R = [ 1/10^2   0       0       0       0       ; % a1
       0        1/10^2  0       0       0       ; % a2
       0        0       1/10^2  0       0       ; % a3
       0        0       0       1/10^2  0       ; % a4
-      0        0       0       0       1/1^2  ]; % wt
+      0        0       0       0       250  ]; % wt
   
 % Compute "optimal" controller
 K_hov = lqr(sys_int, Q, R);
@@ -275,12 +276,12 @@ K_pos = lqr(sys_hint, Q_pos, R_pos);
 K_hor = lqr(sys_hor, Q_hor, R_pos);
 
 
-sys_cl_pos = feedback( sys_hor*K_hor, eye(4));
+% sys_cl_pos = feedback( sys_hor*K_hor, eye(4));
 
-figure(2)
-pzmap(sys_cl_pos);
-[p2,z2] = pzmap(sys_cl_pos)
-grid on
+% figure(2)
+% pzmap(sys_cl_pos);
+% [p2,z2] = pzmap(sys_cl_pos)
+% grid on
 % sys_total = series( sys_cl_pos, sys_cl_pos )
 
 % matrix_to_cpp( K_pos )
@@ -293,6 +294,7 @@ grid on
 % Ad = M(1:12, 1:12);
 % Bd = M(1:12, 13:17);
 
+matrix_to_cpp(K_hov)
 
 %% Functions 
 

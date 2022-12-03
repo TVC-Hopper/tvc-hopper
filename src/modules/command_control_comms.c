@@ -147,22 +147,22 @@ static SPP_STATUS_T SetValue(uint16_t id, void* value, void* instance_data) {
         }
         case PROP_z_lim_spinup_ID:
         {
-            //TODO
+            HoverControl_SetSpinupESCRateLimit(*((float*)value));
             break;
         }
         case PROP_z_lim_normal_ID:
         {
-            //TODO
+            HoverControl_SetNormalESCRateLimit(*((float*)value));
             break;
         }
         case PROP_max_zint_ID:
         {
-            //TODO
+            HoverControl_SetMaxZInt(*((float*)value));
             break;
         }
         case PROP_max_esc_out_ID:
         {
-            //TODO
+            HoverControl_SetESCMaxOutput(*((float*)value));
             break;
         }        
         default:
@@ -226,10 +226,12 @@ static SPP_STATUS_T GetValue(uint16_t id, void* value, void* instance_data) {
         {
             // roll pitch yaw, x, y, z
             ControlsInputs_GetIMU(value);
+            break;
         }
         case PROP_esc_pwm_ID:
         {
             HoverControl_GetThrottlePercent(value);
+            break;
         }
         default:
         {

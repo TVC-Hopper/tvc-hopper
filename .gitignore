@@ -13,3 +13,10 @@ support/tvc_ide_build/.mcuxpressoide_packages_support/
 support/tvc_ide_build/.metadata/
 support/tvc_ide_build/Debug/
 support/tvc_ide_build/tvc_ide_build.mex
+
+*.l
+
+tools/Matlab/slprj/*
+tools/Matlab/slprj
+*.slxc
+tools/Matlab/Updated Simulation (with our physical parameters)/slprj

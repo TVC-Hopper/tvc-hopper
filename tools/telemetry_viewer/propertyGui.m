@@ -284,14 +284,16 @@ classdef propertyGui < baseGui
 
         function tx(obj, propIdx)
             for i = 1:obj.propertyStateArray(propIdx).property.numElts
-                obj.dataBuf(i) = obj.propertyStateArray(propIdx).property.castFunc(obj.propertyStateArray(propIdx).editChildren(i).Value);
+                txBuf_raw(i) = obj.propertyStateArray(propIdx).property.castFunc(obj.propertyStateArray(propIdx).editChildren(i).Value);
             end
             
             if obj.propertyStateArray(propIdx).property.numElts == 0
                 txBuf = uint8(1);
             else
-                txBuf = typecast(obj.dataBuf, 'uint8');
+                txBuf = typecast(txBuf_raw, 'uint8');
             end
+            
+            disp(txBuf);
             
             
             obj.tvc.SetProperty(obj.propertyStateArray(propIdx).property.id, txBuf);
