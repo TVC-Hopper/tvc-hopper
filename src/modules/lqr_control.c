@@ -14,8 +14,8 @@
 #include "modules/control_inputs.h"
 #include "circbuf/cbuf.h"
 
-#define ESC_RATE_LIMIT_SPINUP (0.005f)
-#define ESC_RATE_LIMIT_NORMAL (0.01f)
+#define ESC_RATE_LIMIT_SPINUP (1.0f)
+#define ESC_RATE_LIMIT_NORMAL (1.0f)
 
 
 SemaphoreHandle_t controls_start_sem;
