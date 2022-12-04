@@ -1,5 +1,6 @@
 build
 build-*
+tools/slprj
 .vscode
 *.bak
 .DS_Store

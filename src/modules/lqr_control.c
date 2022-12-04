@@ -17,6 +17,8 @@
 #define ESC_RATE_LIMIT_SPINUP (1.0f)
 #define ESC_RATE_LIMIT_NORMAL (1.0f)
 
+#define INT_ABOVE_SP_SCALE (0.4f)
+
 
 SemaphoreHandle_t controls_start_sem;
 SemaphoreHandle_t stop_flag_mx;
@@ -33,11 +35,11 @@ static float z_last = 0;
 TickType_t last_takeoff_time = 0; // for flight time monitoring
 
 static float K_hover[ACTUATION_VECTOR_SIZE * STATE_VECTOR_SIZE] = {
-  70.7107,   0.0000,   5.0000,   8.0603,   0.0000,   3.2187,   0.0000,   0.0000,   0.0000,
-   0.0000, -70.7107,  -5.0000,   0.0000,  -8.7759,  -3.2187,   0.0000,   0.0000,   0.0000,
-  70.7107,   0.0000,  -5.0000,   8.0603,   0.0000,  -3.2187,   0.0000,   0.0000,   0.0000,
-   0.0000, -70.7107,   5.0000,   0.0000,  -8.7759,   3.2187,   0.0000,   0.0000,   0.0000,
-   0.0000,   0.0000,   0.0000,   0.0000,   0.0000,   0.0000,   0.4275,   0.1978,   0.4216,
+70.7107,   0.0000,  50.0000,   8.2475,   0.0000,  50.7874,   0.0000,   0.0000,   0.0000,
+   0.0000, -70.7107, -50.0000,   0.0000,  -9.0844, -50.7874,   0.0000,   0.0000,   0.0000,
+  70.7107,   0.0000, -50.0000,   8.2475,   0.0000, -50.7874,   0.0000,   0.0000,   0.0000,
+   0.0000, -70.7107,  50.0000,   0.0000,  -9.0844,  50.7874,   0.0000,   0.0000,   0.0000,
+   0.0000,   0.0000,   0.0000,   0.0000,   0.0000,   0.0000,   0.1244,   0.1192,   0.0632,
 }; // roll,     pitch,      yaw,        gx,         gy,         gz,         z,        vz,       zint
 
 static void HoverControl_SetStatus(float error_z);
@@ -361,7 +363,11 @@ static void AdjustZError(float* error) {
 }
 
 static void ComputeZInt(float error_z) {
-    error_zint += error_z * (CONTROL_LOOP_INTERVAL / 1000.0);
+    if (error_z < 0) {
+        error_zint += error_z * (CONTROL_LOOP_INTERVAL / 1000.0) * INT_ABOVE_SP_SCALE;
+    } else {
+        error_zint += error_z * (CONTROL_LOOP_INTERVAL / 1000.0);
+    }
     error_zint = Limit(error_zint, 0, max_z_int);
     // TODO: set integral upper limit for anti windup
 }

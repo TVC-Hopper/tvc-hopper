@@ -3,7 +3,7 @@
 
 #define SETPOINT_MIN_Z_NONZERO          0.07f // Min non-zero ref altitude 
 #define SETPOINT_MAX_Z                  1.0f // Max altitude (meters)
-#define MAX_ZINT                        1.2f // FIXME: placeholder
+#define MAX_ZINT                        100.0f // FIXME: placeholder
 
 #define SETPOINT_MIN_ROLL               0.1f // Min roll (radians)
 #define SETPOINT_MIN_PITCH              0.1f // Min pitch (radians)
