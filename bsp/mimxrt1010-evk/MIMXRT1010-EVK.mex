@@ -148,6 +148,11 @@
                         <data>true</data>
                      </feature>
                   </dependency>
+                  <dependency resourceType="Peripheral" resourceId="ADC1" description="Peripheral ADC1 is not initialized" problem_level="1" source="Pins:BOARD_InitPins">
+                     <feature name="initialized" evaluation="equal">
+                        <data>true</data>
+                     </feature>
+                  </dependency>
                   <dependency resourceType="SWComponent" resourceId="platform.drivers.common" description="Pins initialization requires the COMMON Driver in the project." problem_level="2" source="Pins:BOARD_InitPins">
                      <feature name="enabled" evaluation="equal" configuration="core0">
                         <data>true</data>
@@ -473,6 +478,19 @@
                      <pin_features>
                         <pin_feature name="identifier" value="LPSPI_PCS3"/>
                         <pin_feature name="direction" value="OUTPUT"/>
+                        <pin_feature name="slew_rate" value="Slow"/>
+                        <pin_feature name="software_input_on" value="Disable"/>
+                        <pin_feature name="open_drain" value="Disable"/>
+                        <pin_feature name="speed" value="MHZ_100"/>
+                        <pin_feature name="drive_strength" value="R0_4"/>
+                        <pin_feature name="pull_keeper_select" value="Keeper"/>
+                        <pin_feature name="pull_keeper_enable" value="Enable"/>
+                        <pin_feature name="pull_up_down_config" value="Pull_Down_100K_Ohm"/>
+                        <pin_feature name="hysteresis_enable" value="Disable"/>
+                     </pin_features>
+                  </pin>
+                  <pin peripheral="ADC1" signal="IN, 1" pin_num="59" pin_signal="GPIO_AD_01">
+                     <pin_features>
                         <pin_feature name="slew_rate" value="Slow"/>
                         <pin_feature name="software_input_on" value="Disable"/>
                         <pin_feature name="open_drain" value="Disable"/>
@@ -1609,7 +1627,7 @@
                         <struct name="clockConfig">
                            <setting name="clockSource" value="kADC_ClockSourceAD"/>
                            <setting name="clockSourceFreq" value="custom:10 MHz"/>
-                           <setting name="clockDriver" value="kADC_ClockDriver2"/>
+                           <setting name="clockDriver" value="kADC_ClockDriver1"/>
                            <setting name="samplePeriodMode" value="kADC_SamplePeriodShort2Clocks"/>
                            <setting name="enableAsynchronousClockOutput" value="true"/>
                         </struct>

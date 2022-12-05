@@ -162,7 +162,7 @@ instance:
         - config:
           - clockSource: 'kPWM_BusClock'
           - prescale: 'kPWM_Prescale_Divide_64'
-          - pwmFreq: '50 Hz'
+          - pwmFreq: '200 Hz'
           - pairOperation: 'kPWM_Independent'
           - operationMode: 'kPWM_EdgeAligned'
           - initializationControl: 'kPWM_Initialize_LocalSync'
@@ -215,7 +215,7 @@ instance:
         - config:
           - clockSource: 'kPWM_BusClock'
           - prescale: 'kPWM_Prescale_Divide_64'
-          - pwmFreq: '50 Hz'
+          - pwmFreq: '200 Hz'
           - pairOperation: 'kPWM_Independent'
           - operationMode: 'kPWM_EdgeAligned'
           - initializationControl: 'kPWM_Initialize_LocalSync'
@@ -278,7 +278,7 @@ instance:
         - config:
           - clockSource: 'kPWM_BusClock'
           - prescale: 'kPWM_Prescale_Divide_64'
-          - pwmFreq: '50 Hz'
+          - pwmFreq: '200 Hz'
           - pairOperation: 'kPWM_Independent'
           - operationMode: 'kPWM_EdgeAligned'
           - initializationControl: 'kPWM_Initialize_LocalSync'

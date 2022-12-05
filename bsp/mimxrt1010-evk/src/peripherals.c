@@ -791,7 +791,7 @@ instance:
     - clockConfig:
       - clockSource: 'kADC_ClockSourceAD'
       - clockSourceFreq: 'custom:10 MHz'
-      - clockDriver: 'kADC_ClockDriver2'
+      - clockDriver: 'kADC_ClockDriver1'
       - samplePeriodMode: 'kADC_SamplePeriodShort2Clocks'
       - enableAsynchronousClockOutput: 'true'
     - conversionConfig:
@@ -837,7 +837,7 @@ const adc_config_t ADC1_config = {
   .referenceVoltageSource = kADC_ReferenceVoltageSourceAlt0,
   .samplePeriodMode = kADC_SamplePeriodShort2Clocks,
   .clockSource = kADC_ClockSourceAD,
-  .clockDriver = kADC_ClockDriver2,
+  .clockDriver = kADC_ClockDriver1,
   .resolution = kADC_Resolution12Bit
 };
 const adc_channel_config_t ADC1_channels_config[1] = {
