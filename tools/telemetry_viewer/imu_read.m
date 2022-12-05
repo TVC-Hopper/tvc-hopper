@@ -38,7 +38,7 @@ while 1
 %     disp(fval);
 
     
-    axis([max(i-500, 0) max(500 + i, i) -5 5])
+    axis([max(i-500, 0) max(500 + i, i) -5.1 5.1])
     
     % first line
     addpoints(r,i,double(imu_val_f(1)));
