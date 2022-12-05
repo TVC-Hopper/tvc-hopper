@@ -3,7 +3,7 @@ clear
 
 syms x y z vx vy vz p q u wx wy wz      % States
 syms Ft F1 F2 F3 F4 Fd a1 a2 a3 a4 wt    % Inputs 
-syms Kt1 Kt2 CL CD CF m Jx Jy Jz r l g       % Constants
+syms Kt1 Kt2 CL CD CF m Jx Jy Jz Jyz Jxz Jxy r l g       % Constants
 
 %% Definitions
 % Transformation matrix from body angular velocity to Tait-Bryan rates
@@ -19,11 +19,16 @@ R = [cos(q)*cos(u), sin(p)*sin(q)*cos(u)-cos(p)*sin(u), cos(p)*sin(q)*cos(u)+sin
      -sin(q),       sin(p)*cos(q),                      cos(p)*cos(q)                     ];
  
 
-% Matrix of mass inertia
-J = [Jx 0  0  ;
-     0  Jy 0  ;
-     0  0  Jz];
+% Matrix of mass inertia CAD
+J = [Jx Jxy  Jxz ;
+     0   Jy  Jyz ;
+     0    0   Jz];
  
+% Matrix of mass inertia MEASURED
+% J = [Jx   0  0 ;
+%      0   Jy  0 ;
+%      0    0 Jz];
+
 % Forces 
 %Ft = Kt * wt^2;
 Ft = Kt1*wt^2 + Kt2*wt;
@@ -147,12 +152,21 @@ Kt2 = 18.4714;
 % CD = 0.001054;      % -
 CL = .1081 * .00201552 / (2 * .0065698);
 CD = .0145 * .00201552 / (2 * .0065698);
+
 % Jx = 0.01031759;    % Kg * m^2
 % Jy = 0.01031865;    % Kg * m^2
 % Jz = 0.00278832;    % Kg * m^2
-Jx = 0.0041;    % Kg * m^2
-Jy = 0.0074;    % Kg * m^2
-Jz = 0.0065;    % Kg * m^2
+% measured
+% Jx = 0.0041;    % Kg * m^2
+% Jy = 0.0074;    % Kg * m^2
+% Jz = 0.0065;    % Kg * m^2
+% %from CAD
+Jx = .0048;
+Jy = .0079;
+Jz = .0072;
+Jyz = 4.3018e-05;
+Jxz = 2.1655e-05;
+Jxy = 2.1655e-05;
 %m = 0.92;           % Kg
 m = 1.578;
 g = 9.807;          % m/s^2
@@ -214,26 +228,37 @@ sys_hint = ss(A_hint, B_hint, C_hint, D_hint);
 
 % Bryson's Rule. 
 % Max angle of 0.3 radians. Maximum angular rate of 5 rad/second
-Q = [ 1/0.1^2     0        0        0      0      0      0        0    ;  % Roll
-      0        1/0.1^2     0        0      0      0      0        0    ;  % Pitch
-      0        0        1/1^2    0      0      0      0        0       ;  % Yaw
-      0        0        0        1/1^2  0      0      0        0       ;  % omega_x
-      0        0        0        0      1/1^2  0      0        0       ;  % omega_y
-      0        0        0        0      0      1/2^2  0        0       ;  % omega_z
-      0        0        0        0      0      0      .1    0       ;  % z
-      0        0        0        0      0      0      0        1/1^2  ]; % v_z
+% Q = [ 1/0.1^2     0        0        0      0      0      0        0       ;  % Roll
+%       0        1/0.1^2     0        0      0      0      0        0       ;  % Pitch
+%       0        0           1/1^2    0      0      0      0        0       ;  % Yaw
+%       0        0           0        1/1^2  0      0      0        0       ;  % omega_x
+%       0        0           0        0      1/1^2  0      0        0       ;  % omega_y
+%       0        0           0        0      0      1/2^2  0        0       ;  % omega_z
+%       0        0           0        0      0      0      .1       0       ;  % z
+%       0        0           0        0      0      0      0        1/1^2  ]; % v_z
+
+Q = [ 1        0           0        0      0      0      0        0       ;  % Roll
+      0        1           0        0      0      0      0        0       ;  % Pitch
+      0        0        .001        0      0      0      0        0       ;  % Yaw
+      0        0           0     .001      0      0      0        0       ;  % omega_x
+      0        0           0        0   .001      0      0        0       ;  % omega_y
+      0        0           0        0      0    100      0        0       ;  % omega_z
+      0        0           0        0      0      0      .1       0       ;  % z
+      0        0           0        0      0      0      0     .001      ];  % v_z
+
 
 Q_red = Q;  
   
 % Integral action  
-Q(9,9) = [ 1/0.15^2 ]; % z
+% Q(9,9) = [ 1/0.15^2 ]; % z
+Q(9,9) = [ .01 ]; % z
       
 % Max actuation angle of +-10 degress
 R = [ 1/10^2   0       0       0       0       ; % a1
       0        1/10^2  0       0       0       ; % a2
       0        0       1/10^2  0       0       ; % a3
       0        0       0       1/10^2  0       ; % a4
-      0        0       0       0       250  ]; % wt
+      0        0       0       0       1  ]; % wt
   
 % Compute "optimal" controller
 K_hov = lqr(sys_int, Q, R);
@@ -261,8 +286,8 @@ grid on
 
 Q_pos = [ 1/0.5^2  0         0        0        ;
           0         1/0.5^2  0        0        ;
-          0         0         1/2^2  0        ;
-          0         0         0        1/2^2 ];
+          0         0        1/2^2    0        ;
+          0         0        0        1/2^2 ];
 
 Q_hor = Q_pos;      
       
@@ -284,7 +309,7 @@ pzmap(sys_cl_pos);
 grid on
 % sys_total = series( sys_cl_pos, sys_cl_pos )
 
-% matrix_to_cpp( K_pos )
+matrix_to_cpp( K_hov )
 
 %% Symbolic Discretization
 

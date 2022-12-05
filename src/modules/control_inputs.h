@@ -2,7 +2,7 @@
 #define MODULE_CONTROLS_INPUTS_H
 
 #include <stdint.h>
-
+#define PI                              3.142857f
 /**
  *  IMU report indices
  */

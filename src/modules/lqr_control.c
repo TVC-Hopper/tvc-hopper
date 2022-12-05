@@ -27,7 +27,10 @@ bool stop_flag;
 hovctrl_status_t hover_status;
 static float ref[STATE_VECTOR_SIZE] = {0};
 static float curr_state[STATE_VECTOR_SIZE] = {0};
+static float prev_state[STATE_VECTOR_SIZE] = {0};
+
 static float actuator_input_now[ACTUATION_VECTOR_SIZE] = {0};
+static float actuator_input_last[ACTUATION_VECTOR_SIZE] = {0};
 static float error_zint = 0;
 static float vz = 0;
 static float z_last = 0;
@@ -35,12 +38,12 @@ static float z_last = 0;
 TickType_t last_takeoff_time = 0; // for flight time monitoring
 
 static float K_hover[ACTUATION_VECTOR_SIZE * STATE_VECTOR_SIZE] = {
-70.7107,   0.0000,  50.0000,   8.2475,   0.0000,  50.7874,   0.0000,   0.0000,   0.0000,
-   0.0000, -70.7107, -50.0000,   0.0000,  -9.0844, -50.7874,   0.0000,   0.0000,   0.0000,
-  70.7107,   0.0000, -50.0000,   8.2475,   0.0000, -50.7874,   0.0000,   0.0000,   0.0000,
-   0.0000, -70.7107,  50.0000,   0.0000,  -9.0844,  50.7874,   0.0000,   0.0000,   0.0000,
-   0.0000,   0.0000,   0.0000,   0.0000,   0.0000,   0.0000,   0.1244,   0.1192,   0.0632,
-}; // roll,     pitch,      yaw,        gx,         gy,         gz,         z,        vz,       zint
+   7.0706,   0.0114,   0.1581,   1.4696,   0.0042,  50.0088,   0.0000,   0.0000,   0.0000,
+   0.0125,  -7.0704,  -0.1581,   0.0015,  -1.8767, -50.0123,   0.0000,   0.0000,   0.0000,
+   7.0715,   0.0127,  -0.1581,   1.4697,   0.0044, -49.9967,   0.0000,   0.0000,   0.0000,
+   0.0116,  -7.0717,   0.1581,   0.0014,  -1.8769,  49.9933,   0.0000,   0.0000,   0.0000,
+   0.0000,   0.0000,   0.0000,   0.0000,   0.0000,   0.0000,   0.3679,   0.1767,   0.1000
+}; //roll,    pitch,      yaw,       gx,       gy,       gz,        z,       vz,     zint
 
 static void HoverControl_SetStatus(float error_z);
 static HOVCTRL_MATH_STATUS_T MultiplyMatrix(float* Result, const float* A, const float* B, uint32_t A_rows, uint32_t A_cols, uint32_t B_rows);
@@ -56,7 +59,7 @@ static void ComputeVZ(float z_now);
 static void ExecuteControlStep(TickType_t *last_wake_time);
 static void ResetControls();
 
-static float actuator_input_last[ACTUATION_VECTOR_SIZE];
+
 
 static float lidar_zero = 0.0;
 static float imu_zero[6] = {0.0};
@@ -174,18 +177,20 @@ static void ExecuteControlStep(TickType_t* last_wake_time) {
     curr_state[STATE_IDX_Z] -= lidar_zero;
     
     // zero out IMU
-    for (uint8_t i = 0; i < 6; ++i) {
-        curr_state[i] -= imu_zero[i];
-    }
+    // for (uint8_t i = 0; i < 6; ++i) {
+    //     curr_state[i] -= imu_zero[i];
+    // }
     
-    // convert lidar measurement from cm to m
+    // convert lidar measurement from cm to m and LP filter
     curr_state[STATE_IDX_Z] /= (float)100.0f;
+    curr_state[STATE_IDX_Z] = RateLimit(prev_state[STATE_IDX_Z], curr_state[STATE_IDX_Z], .5);
 
     // start next reading
     ControlsInputs_NotifyStart();
 
     ComputeError(error, ref, curr_state, STATE_VECTOR_SIZE, STATE_VECTOR_SIZE);
-    CorrectYaw(error);
+    // CorrectYaw(error);
+    // FIXME: yaw error flips signs, vanes deflect in opposite direction then reaccumulate
 
     // determine flying mode based on altitude
     HoverControl_SetStatus(error[STATE_IDX_Z]);
@@ -209,8 +214,11 @@ static void ExecuteControlStep(TickType_t* last_wake_time) {
         actuator_input_now[0] *= -1;
         actuator_input_now[3] *= -1;
 
+
+
         // servos are oriented 90 degrees off 0
         for (uint8_t i = 0; i < 4; ++i) {
+            actuator_input_now[i] = Limit(actuator_input_now[i], -45, 45);
             actuator_input_now[i] += 90.0;
         }
 
@@ -222,9 +230,10 @@ static void ExecuteControlStep(TickType_t* last_wake_time) {
             esc_rate_limit = esc_rate_limit_normal;
         }
         
-        actuator_input_now[4] = Limit(actuator_input_now[4], 0.0, 1.0);
+        actuator_input_now[4] = Limit(actuator_input_now[4], 0.0, (MAX_ESC - 1000.0) / 1000.0);
         actuator_input_now[4] = RateLimit(actuator_input_last[4], actuator_input_now[4], esc_rate_limit);
         float esc_output = actuator_input_now[4] / 0.001 + 1000.0;
+        // esc_output = Limit(esc_output, 1000, MAX_ESC);
 
         HwEsc_SetOutputControlBatch(esc_output);
         Hw_UpdatePwm(); 
@@ -234,6 +243,7 @@ static void ExecuteControlStep(TickType_t* last_wake_time) {
 
     z_last = curr_state[STATE_IDX_Z];
     memcpy(actuator_input_last, actuator_input_now, sizeof(actuator_input_last));
+    memcpy(prev_state, curr_state, sizeof(prev_state));
     xTaskDelayUntil(last_wake_time, CONTROL_LOOP_INTERVAL * portTICK_PERIOD_MS); // FIXME: divide not multiply
 }
 
@@ -241,8 +251,8 @@ extern void HoverControl_SetReference(float* setpoints) {
     // force target position to be 0 or above a threshold takeoff height
     // TODO: reset integral if ref z is 0? reset integral when setpoint is reached??
 
-    ref[STATE_IDX_ROLL] = Limit(setpoints[SETPOINT_ROLL], SETPOINT_MIN_ROLL, SETPOINT_MAX_ROLL);
-    ref[STATE_IDX_PITCH] = Limit(setpoints[SETPOINT_PITCH], SETPOINT_MIN_ROLL, SETPOINT_MAX_PITCH);
+    // ref[STATE_IDX_ROLL] = Limit(setpoints[SETPOINT_ROLL], SETPOINT_MIN_ROLL, SETPOINT_MAX_ROLL);
+    // ref[STATE_IDX_PITCH] = Limit(setpoints[SETPOINT_PITCH], SETPOINT_MIN_ROLL, SETPOINT_MAX_PITCH);
     
     if (setpoints[SETPOINT_Z] <= 0) {
         ref[STATE_IDX_Z] = 0;
