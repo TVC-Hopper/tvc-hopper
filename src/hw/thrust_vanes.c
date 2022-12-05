@@ -109,7 +109,7 @@ static void SetPosition(uint8_t idx, float position, bool setldok) {
 
     // caluclate DC from pulse width
     // 50hz -> 20ms period
-    uint32_t duty_cycle = (pulse_width / 20.0) * 0xFFFF;
+    uint32_t duty_cycle = (pulse_width / 5.0) * 0xFFFF;
 
     PWM_UpdatePwmDutycycleHighAccuracy(
             VANE_PWM,

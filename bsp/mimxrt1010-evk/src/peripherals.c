@@ -162,7 +162,7 @@ instance:
         - config:
           - clockSource: 'kPWM_BusClock'
           - prescale: 'kPWM_Prescale_Divide_64'
-          - pwmFreq: '50 Hz'
+          - pwmFreq: '200 Hz'
           - pairOperation: 'kPWM_Independent'
           - operationMode: 'kPWM_EdgeAligned'
           - initializationControl: 'kPWM_Initialize_LocalSync'
@@ -215,7 +215,7 @@ instance:
         - config:
           - clockSource: 'kPWM_BusClock'
           - prescale: 'kPWM_Prescale_Divide_64'
-          - pwmFreq: '50 Hz'
+          - pwmFreq: '200 Hz'
           - pairOperation: 'kPWM_Independent'
           - operationMode: 'kPWM_EdgeAligned'
           - initializationControl: 'kPWM_Initialize_LocalSync'
@@ -278,7 +278,7 @@ instance:
         - config:
           - clockSource: 'kPWM_BusClock'
           - prescale: 'kPWM_Prescale_Divide_64'
-          - pwmFreq: '50 Hz'
+          - pwmFreq: '200 Hz'
           - pairOperation: 'kPWM_Independent'
           - operationMode: 'kPWM_EdgeAligned'
           - initializationControl: 'kPWM_Initialize_LocalSync'
@@ -791,7 +791,7 @@ instance:
     - clockConfig:
       - clockSource: 'kADC_ClockSourceAD'
       - clockSourceFreq: 'custom:10 MHz'
-      - clockDriver: 'kADC_ClockDriver2'
+      - clockDriver: 'kADC_ClockDriver1'
       - samplePeriodMode: 'kADC_SamplePeriodShort2Clocks'
       - enableAsynchronousClockOutput: 'true'
     - conversionConfig:
@@ -837,7 +837,7 @@ const adc_config_t ADC1_config = {
   .referenceVoltageSource = kADC_ReferenceVoltageSourceAlt0,
   .samplePeriodMode = kADC_SamplePeriodShort2Clocks,
   .clockSource = kADC_ClockSourceAD,
-  .clockDriver = kADC_ClockDriver2,
+  .clockDriver = kADC_ClockDriver1,
   .resolution = kADC_Resolution12Bit
 };
 const adc_channel_config_t ADC1_channels_config[1] = {

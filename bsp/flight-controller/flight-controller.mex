@@ -1066,7 +1066,7 @@
                               <struct name="config">
                                  <setting name="clockSource" value="kPWM_BusClock"/>
                                  <setting name="prescale" value="kPWM_Prescale_Divide_64"/>
-                                 <setting name="pwmFreq" value="50 Hz"/>
+                                 <setting name="pwmFreq" value="200 Hz"/>
                                  <setting name="pairOperation" value="kPWM_Independent"/>
                                  <setting name="operationMode" value="kPWM_EdgeAligned"/>
                                  <setting name="initializationControl" value="kPWM_Initialize_LocalSync"/>
@@ -1139,7 +1139,7 @@
                               <struct name="config">
                                  <setting name="clockSource" value="kPWM_BusClock"/>
                                  <setting name="prescale" value="kPWM_Prescale_Divide_64"/>
-                                 <setting name="pwmFreq" value="50 Hz"/>
+                                 <setting name="pwmFreq" value="200 Hz"/>
                                  <setting name="pairOperation" value="kPWM_Independent"/>
                                  <setting name="operationMode" value="kPWM_EdgeAligned"/>
                                  <setting name="initializationControl" value="kPWM_Initialize_LocalSync"/>
@@ -1228,7 +1228,7 @@
                               <struct name="config">
                                  <setting name="clockSource" value="kPWM_BusClock"/>
                                  <setting name="prescale" value="kPWM_Prescale_Divide_64"/>
-                                 <setting name="pwmFreq" value="50 Hz"/>
+                                 <setting name="pwmFreq" value="200 Hz"/>
                                  <setting name="pairOperation" value="kPWM_Independent"/>
                                  <setting name="operationMode" value="kPWM_EdgeAligned"/>
                                  <setting name="initializationControl" value="kPWM_Initialize_LocalSync"/>

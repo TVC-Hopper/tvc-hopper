@@ -11,7 +11,7 @@
 #define ESC_SM              PWM1_SM3
 #define ESC_CH              PWM1_SM3_B
 
-#define ESC_PWM_PERIOD      ((float) 20000.0)
+#define ESC_PWM_PERIOD      ((float) 5000.0)
 
 #define ESC_MAX             ((float) 2000.0)
 #define ESC_MIN             ((float) 1000.0)
