@@ -38,14 +38,18 @@ static float z_last = 0;
 TickType_t last_takeoff_time = 0; // for flight time monitoring
 
 static float K_hover[ACTUATION_VECTOR_SIZE * STATE_VECTOR_SIZE] = {
-   7.0706,   0.0114,   0.1581,   1.4696,   0.0042,  50.0088,   0.0000,   0.0000,   0.0000,
-   0.0125,  -7.0704,  -0.1581,   0.0015,  -1.8767, -50.0123,   0.0000,   0.0000,   0.0000,
-   7.0715,   0.0127,  -0.1581,   1.4697,   0.0044, -49.9967,   0.0000,   0.0000,   0.0000,
-   0.0116,  -7.0717,   0.1581,   0.0014,  -1.8769,  49.9933,   0.0000,   0.0000,   0.0000,
-   0.0000,   0.0000,   0.0000,   0.0000,   0.0000,   0.0000,   0.3679,   0.1767,   0.1000
+  70.6836,   0.0668,   0.1582,   4.1854,   0.0072,   0.4364,   0.0000,   0.0000,   0.0000,
+   0.1475, -70.6568,  -0.1584,   0.0064,  -5.0582,  -0.4367,   0.0000,   0.0000,   0.0000,
+  70.7375,   0.1743,  -0.1580,   4.1885,   0.0147,  -0.4357,   0.0000,   0.0000,   0.0000,
+   0.0936, -70.7643,   0.1579,   0.0033,  -5.0657,   0.4354,   0.0000,   0.0000,   0.0000,
+   0.0000,   0.0000,   0.0000,   0.0000,   0.0000,   0.0000,   0.3679,   0.1768,   0.1000,
 }; //roll,    pitch,      yaw,       gx,       gy,       gz,        z,       vz,     zint
 
 static void HoverControl_SetStatus(float error_z);
+extern void HoverControl_WriteK(float* new_K);
+extern void HoverControl_GetK(float* rowToSend);
+
+
 static HOVCTRL_MATH_STATUS_T MultiplyMatrix(float* Result, const float* A, const float* B, uint32_t A_rows, uint32_t A_cols, uint32_t B_rows);
 static HOVCTRL_MATH_STATUS_T ComputeError(float* Result, float* A, float* B, uint32_t A_size, uint32_t B_size);
 static void CorrectYaw(float* error);
@@ -176,10 +180,10 @@ static void ExecuteControlStep(TickType_t* last_wake_time) {
     // zero out lidar (before cm conversion!)
     curr_state[STATE_IDX_Z] -= lidar_zero;
     
-    // zero out IMU
-    // for (uint8_t i = 0; i < 6; ++i) {
-    //     curr_state[i] -= imu_zero[i];
-    // }
+//    zero out IMU
+    for (uint8_t i = 0; i < 6; ++i) {
+        if (i != STATE_IDX_PITCH) {curr_state[i] -= imu_zero[i];}
+    }
     
     // convert lidar measurement from cm to m and LP filter
     curr_state[STATE_IDX_Z] /= (float)100.0f;
@@ -211,8 +215,8 @@ static void ExecuteControlStep(TickType_t* last_wake_time) {
     if (HOVCTRL_MATH_STATUS_OK == MultiplyMatrix(actuator_input_now, K_hover, error, ACTUATION_VECTOR_SIZE, STATE_VECTOR_SIZE, STATE_VECTOR_SIZE)) {
 
         // flip opposite-facing servos
-        actuator_input_now[0] *= -1;
-        actuator_input_now[3] *= -1;
+        actuator_input_now[1] *= -1;
+        actuator_input_now[2] *= -1;
 
 
 
@@ -391,7 +395,13 @@ static void ComputeVZ(float z_now) {
 
 
 extern void HoverControl_WriteK(float* new_K){
-    memcpy(K_hover, new_K, sizeof(K_hover));
+    int row  = (int)((new_K[0]) * 9);
+    memcpy(K_hover + row, new_K + 1, 36);
+}
+
+extern void HoverControl_GetK(float* rowToSend){
+    int row = ((int)(rowToSend[0])) * 9;
+    memcpy(rowToSend + 1, K_hover + row, 36);
 }
 
 extern void HoverControl_SetSpinupESCRateLimit(float limit) {

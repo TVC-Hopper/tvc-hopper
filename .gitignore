@@ -21,3 +21,7 @@ tools/Matlab/slprj/*
 tools/Matlab/slprj
 *.slxc
 tools/Matlab/Updated Simulation (with our physical parameters)/slprj
+
+support/tvc_ide_build/.settings/language.settings.xml
+support/tvc_ide_build/.cproject
+support/tvc_ide_build/tvc_debug.launch

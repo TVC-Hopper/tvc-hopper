@@ -39,7 +39,7 @@ classdef propertyGui < baseGui
             
 %             obj.ip = ip;
 %             obj.port = port;
-            %obj.tvc = TelemetryViewerClient(ip, port);
+           % obj.tvc = TelemetryViewerClient(ip, port);
             obj.tvc = tvc;
             obj.makeGuiFig();
              
@@ -270,15 +270,51 @@ classdef propertyGui < baseGui
             end
         end
 
+        function Ktx(obj, buf)
+            count = 0;
+            for i = 1:9:45
+                txBuf = single.empty();
+                txBuf(2:10) = buf(i:(i+8));
+                txBuf(1) = single(count);
+                txBuf = typecast(txBuf, 'uint8');
+                obj.tvc.SetProperty(54, txBuf);
+                count = count + 1;
+                pause(0.5);
+            end
+        end
+
+        function Krx(obj, propIdx)
+            for j = 1:5
+                obj.tvc.RequestProperty(54);
+                pause(1);
+                obj.tvc.RequestValue(54);
+                pause(1);
+                [id, sz, t, val] = obj.tvc.ReadValue();
+                castType = obj.propertyStateArray(propIdx).property.type;
+                dataBuf = typecast(uint8(val), castType);
+                
+                row = (double(dataBuf(1)) * 9) + 1;
+                count = 2;
+                for i = row:(row + 8)
+                    obj.propertyStateArray(propIdx).editChildren(i).Value = double(dataBuf(count));
+                    count = count + 1;
+                end
+            end    
+        end
+
         function rx(obj, propIdx)
+            if obj.propertyStateArray(propIdx).property.id == 54
+                obj.Krx(propIdx);
+                return;
+            end
             obj.tvc.RequestProperty(obj.propertyStateArray(propIdx).property.id);
             pause(0.1);
             obj.tvc.RequestValue(obj.propertyStateArray(propIdx).property.id);
             [id, sz, t, val] = obj.tvc.ReadValue();
             castType = obj.propertyStateArray(propIdx).property.type;
-            obj.dataBuf = typecast(uint8(val), castType);
+            dataBuf = typecast(uint8(val), castType);
             for i = 1:obj.propertyStateArray(propIdx).property.numElts
-                obj.propertyStateArray(propIdx).editChildren(i).Value = double(obj.dataBuf(i));
+                obj.propertyStateArray(propIdx).editChildren(i).Value = double(dataBuf(i));
             end
         end
 
@@ -289,11 +325,15 @@ classdef propertyGui < baseGui
             
             if obj.propertyStateArray(propIdx).property.numElts == 0
                 txBuf = uint8(1);
+            
+            elseif obj.propertyStateArray(propIdx).property.id == 54
+                obj.Ktx(txBuf_raw);
+                return;
             else
                 txBuf = typecast(txBuf_raw, 'uint8');
             end
             
-            disp(txBuf);
+            %disp(txBuf);
             
             
             obj.tvc.SetProperty(obj.propertyStateArray(propIdx).property.id, txBuf);

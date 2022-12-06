@@ -141,8 +141,8 @@ static const SppPropertyDefinition_t property_list[SPP_PROP_COUNT] = {
     {
         .id          = PROP_k_matrix_ID,
         .type        = SPP_PROP_T_ARR,
-        .size        = 180,
-        .flags       = {SPP_FLAG_READABLE},
+        .size        = 40,
+        .flags       = {SPP_FLAG_READABLE | SPP_FLAG_WRITEABLE},
         .name        = "k_matrix\0",
         .name_length = 9,
     },

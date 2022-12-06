@@ -1,7 +1,7 @@
 function ss_rep = getStateSpaceRep()
     syms x y z vx vy vz p q u wx wy wz      % States
     syms Ft F1 F2 F3 F4 Fd a1 a2 a3 a4 wt    % Inputs 
-    syms Kt1 Kt2 CL CD CF m Jx Jy Jz r l g       % Constants
+    syms Kt1 Kt2 CL CD CF m Jx Jy Jz Jxz Jxy Jyz r l g       % Constants
     
     %% Definitions
     % Transformation matrix from body angular velocity to Tait-Bryan rates
@@ -18,9 +18,9 @@ function ss_rep = getStateSpaceRep()
      
     
     % Matrix of mass inertia
-    J = [Jx 0  0  ;
-         0  Jy 0  ;
-         0  0  Jz];
+J = [Jx    Jxy  Jxz ;
+     Jxy   Jy   Jyz ;
+     Jxz   Jyz   Jz];
      
     % Forces 
     %Ft = Kt * wt^2;
@@ -138,17 +138,35 @@ function ss_rep = getStateSpaceRep()
     wt = .5430;
     
     % Drone Constants
-    Kt1 = 18.4626;      % N / (1/s^2)
-    Kt2 = 18.4714;
-    CL = .1081 * .0024265 / (2 * .0065698);
-    CD = .0145 * .0024265 / (2 * .0065698);
-    Jx = 0.0041;    % Kg * m^2
-    Jy = 0.0074;    % Kg * m^2
-    Jz = 0.0065;    % Kg * m^2
-    m = 1.578;
-    g = 9.807;          % m/s^2
-    l = 0.0627;     % m
-    r = 0.0128;           % m 
+% Drone Constants
+Kt1 = 18.4626;      % N / (1/s^2)
+Kt2 = 18.4714;
+% CL = 0.008905;      % -
+% CD = 0.001054;      % -
+CL = .1081 * 0.003393542 / (2 * .0065698);
+CD = .0145 * 0.003393542 / (2 * .0065698);
+
+% Jx = 0.01031759;    % Kg * m^2
+% Jy = 0.01031865;    % Kg * m^2
+% Jz = 0.00278832;    % Kg * m^2
+% measured
+% Jx = 0.0041;    % Kg * m^2
+% Jy = 0.0074;    % Kg * m^2
+% Jz = 0.0065;    % Kg * m^2
+% %from CAD
+Jx = .0048;
+Jy = .0079;
+Jz = .0072;
+Jyz = -4.3018e-05;
+Jxz = -2.1655e-05;
+Jxy = -2.1655e-05;
+%m = 0.92;           % Kg
+m = 1.578;
+g = 9.807;          % m/s^2
+% l = 0.09471940;     % m
+% r = 0.04;           % m 
+l = 0.0627;     % m
+r = 0.0375; 
     
     
     % Reduced model 

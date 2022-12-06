@@ -177,6 +177,7 @@ static SPP_STATUS_T SetValue(uint16_t id, void* value, void* instance_data) {
 }
 
 static SPP_STATUS_T GetValue(uint16_t id, void* value, void* instance_data) {
+    static int K_row_count = 0;
     switch(id) {
         case PROP_telem_data_ID:
         {
@@ -233,6 +234,16 @@ static SPP_STATUS_T GetValue(uint16_t id, void* value, void* instance_data) {
         case PROP_esc_pwm_ID:
         {
             HoverControl_GetThrottlePercent(value);
+            break;
+        }
+        case PROP_k_matrix_ID:
+        {   
+            float val[10];
+            val[0] = (K_row_count % 5); 
+            HoverControl_GetK(val);
+            memcpy((uint8_t*)value, val, sizeof(val));
+            ++K_row_count;
+
             break;
         }
         default:

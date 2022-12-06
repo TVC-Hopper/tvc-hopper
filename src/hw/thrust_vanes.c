@@ -27,7 +27,7 @@ static void SetPosition(uint8_t idx, float position, bool setldok);
 
 // current positions
 static float servo_positions[4] = {90.0, 90.0, 90.0, 90.0};
-static float servo_offsets[4] = {0.000, -0.5, 12.600, -3.600};
+static float servo_offsets[4] = {0.000, -0.5, -3.4, -3.600};
 
 // indexed by servo id
 static const pwm_submodule_t vanes[4] = {

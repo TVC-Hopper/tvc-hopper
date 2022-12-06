@@ -20,9 +20,9 @@ R = [cos(q)*cos(u), sin(p)*sin(q)*cos(u)-cos(p)*sin(u), cos(p)*sin(q)*cos(u)+sin
  
 
 % Matrix of mass inertia CAD
-J = [Jx Jxy  Jxz ;
-     0   Jy  Jyz ;
-     0    0   Jz];
+J = [Jx    Jxy  Jxz ;
+     Jxy   Jy   Jyz ;
+     Jxz   Jyz   Jz];
  
 % Matrix of mass inertia MEASURED
 % J = [Jx   0  0 ;
@@ -150,8 +150,8 @@ Kt1 = 18.4626;      % N / (1/s^2)
 Kt2 = 18.4714;
 % CL = 0.008905;      % -
 % CD = 0.001054;      % -
-CL = .1081 * .00201552 / (2 * .0065698);
-CD = .0145 * .00201552 / (2 * .0065698);
+CL = .1081 * 0.003393542 / (2 * .0065698);
+CD = .0145 * 0.003393542 / (2 * .0065698);
 
 % Jx = 0.01031759;    % Kg * m^2
 % Jy = 0.01031865;    % Kg * m^2
@@ -164,16 +164,16 @@ CD = .0145 * .00201552 / (2 * .0065698);
 Jx = .0048;
 Jy = .0079;
 Jz = .0072;
-Jyz = 4.3018e-05;
-Jxz = 2.1655e-05;
-Jxy = 2.1655e-05;
+Jyz = -4.3018e-05;
+Jxz = -2.1655e-05;
+Jxy = -2.1655e-05;
 %m = 0.92;           % Kg
 m = 1.578;
 g = 9.807;          % m/s^2
 % l = 0.09471940;     % m
 % r = 0.04;           % m 
 l = 0.0627;     % m
-r = 0.00798;           % m 
+r = 0.0375;           % m 
 
 
 % Now the A and B matrixes can be evaluted, yield the full linear model
@@ -237,14 +237,14 @@ sys_hint = ss(A_hint, B_hint, C_hint, D_hint);
 %       0        0           0        0      0      0      .1       0       ;  % z
 %       0        0           0        0      0      0      0        1/1^2  ]; % v_z
 
-Q = [ 1        0           0        0      0      0      0        0       ;  % Roll
-      0        1           0        0      0      0      0        0       ;  % Pitch
-      0        0        .001        0      0      0      0        0       ;  % Yaw
-      0        0           0     .001      0      0      0        0       ;  % omega_x
-      0        0           0        0   .001      0      0        0       ;  % omega_y
-      0        0           0        0      0    100      0        0       ;  % omega_z
-      0        0           0        0      0      0      .1       0       ;  % z
-      0        0           0        0      0      0      0     .001      ];  % v_z
+Q = [ 100        0           0        0      0      0      0        0       ;  % Roll
+      0        100           0        0      0      0      0        0       ;  % Pitch
+      0          0        .001        0      0      0      0        0       ;  % Yaw
+      0          0           0       .1      0      0      0        0       ;  % omega_x
+      0          0           0        0     .1      0      0        0       ;  % omega_y
+      0          0           0        0      0   .001      0        0       ;  % omega_z
+      0          0           0        0      0      0     .1        0       ;  % z
+      0          0           0        0      0      0      0     .001      ];  % v_z
 
 
 Q_red = Q;  
