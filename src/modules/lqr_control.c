@@ -216,10 +216,8 @@ static void ExecuteControlStep(TickType_t* last_wake_time) {
     if (actuator_input_last[4] < esc_max_output) { // FIXME: or if error is negative?
         ComputeZInt(error[STATE_IDX_Z]);
     }
-
     error[STATE_IDX_ZINT] = error_zint;
 
-    
     if (HOVCTRL_MATH_STATUS_OK == MultiplyMatrix(actuator_input_now, K_hover, error, ACTUATION_VECTOR_SIZE, STATE_VECTOR_SIZE, STATE_VECTOR_SIZE)) {
 
         // flip opposite-facing servos
@@ -442,8 +440,4 @@ extern void HoverControl_SetPitchOffset(float pitch_offset){
 
 extern void HoverControl_SetRollOffset(float roll_offset){
     imu_zero[STATE_IDX_ROLL] += roll_offset;
-}
-
-extern void HoverControl_GetKfull(float* full_K){
-    memcpy(K_hover, full_K, 180);
 }

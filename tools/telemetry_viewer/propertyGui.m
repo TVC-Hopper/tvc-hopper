@@ -284,32 +284,22 @@ classdef propertyGui < baseGui
         end
 
         function Krx(obj, propIdx)
-            obj.tvc.RequestProperty(61);
-            pause(5);
-            obj.tvc.RequestValue(61);
-            pause(4);
-            [id, sz, t, val] = obj.tvc.ReadValue();
-            castType = obj.propertyStateArray(propIdx).property.type;
-            dataBuf = typecast(uint8(val), castType);
-            for i = 1:45
-                    obj.propertyStateArray(propIdx).editChildren(i).Value = double(dataBuf(i));
-            end
-%             for j = 1:5
-%                 obj.tvc.RequestProperty(54);
-%                 pause(1);
-%                 obj.tvc.RequestValue(54);
-%                 pause(1);
-%                 [id, sz, t, val] = obj.tvc.ReadValue();
-%                 castType = obj.propertyStateArray(propIdx).property.type;
-%                 dataBuf = typecast(uint8(val), castType);
-%                 
-%                 row = (double(dataBuf(1)) * 9) + 1;
-%                 count = 2;
-%                 for i = row:(row + 8)
-%                     obj.propertyStateArray(propIdx).editChildren(i).Value = double(dataBuf(count));
-%                     count = count + 1;
-%                 end
-%             end    
+            for j = 1:5
+                obj.tvc.RequestProperty(54);
+                pause(1);
+                obj.tvc.RequestValue(54);
+                pause(1);
+                [id, sz, t, val] = obj.tvc.ReadValue();
+                castType = obj.propertyStateArray(propIdx).property.type;
+                dataBuf = typecast(uint8(val), castType);
+                
+                row = (double(dataBuf(1)) * 9) + 1;
+                count = 2;
+                for i = row:(row + 8)
+                    obj.propertyStateArray(propIdx).editChildren(i).Value = double(dataBuf(count));
+                    count = count + 1;
+                end
+            end    
         end
 
         function rx(obj, propIdx)

@@ -102,6 +102,4 @@ extern void HoverControl_SetPitchOffset(float pitch_offset);
 
 extern void HoverControl_SetRollOffset(float roll_offset);
 
-extern void HoverControl_GetKfull(float* full_K);
-
 #endif
