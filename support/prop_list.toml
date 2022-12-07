@@ -137,6 +137,14 @@ readable = true
 writeable = true
 
 [[props]]
+name = "k_matrix_rx"
+id = 61
+type = "ARR"
+size = 180
+readable = true
+writeable = true
+
+[[props]]
 name = "z_lim_spinup"
 id = 55
 type = "FLOAT"

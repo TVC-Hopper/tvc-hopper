@@ -257,6 +257,13 @@ static SPP_STATUS_T GetValue(uint16_t id, void* value, void* instance_data) {
 
             break;
         }
+        case PROP_k_matrix_rx_ID:
+        {   
+            float val[180];
+            HoverControl_GetKfull(val);
+            memcpy((uint8_t*)value, val, 180);
+            break;
+        }
         default:
         {
             return SPP_STATUS_UNKNOWN_PROPERTY;

@@ -147,6 +147,14 @@ static const SppPropertyDefinition_t property_list[SPP_PROP_COUNT] = {
         .name_length = 9,
     },
     {
+        .id          = PROP_k_matrix_rx_ID,
+        .type        = SPP_PROP_T_ARR,
+        .size        = 180,
+        .flags       = {SPP_FLAG_READABLE | SPP_FLAG_WRITEABLE},
+        .name        = "k_matrix_rx\0",
+        .name_length = 12,
+    },
+    {
         .id          = PROP_z_lim_spinup_ID,
         .type        = SPP_PROP_T_FLOAT,
         .size        = 4,

@@ -201,7 +201,7 @@ static void ExecuteControlStep(TickType_t* last_wake_time) {
     // start next reading
     ControlsInputs_NotifyStart();
     ComputeVZ(curr_state[STATE_IDX_Z]);
-    curr_state[STATE_IDX_Z] = vz;
+    curr_state[STATE_IDX_VZ] = vz;
 
     ComputeError(error, ref, curr_state, STATE_VECTOR_SIZE, STATE_VECTOR_SIZE);
     // CorrectYaw(error);
@@ -442,4 +442,8 @@ extern void HoverControl_SetPitchOffset(float pitch_offset){
 
 extern void HoverControl_SetRollOffset(float roll_offset){
     imu_zero[STATE_IDX_ROLL] += roll_offset;
+}
+
+extern void HoverControl_GetKfull(float* full_K){
+    memcpy(K_hover, full_K, 180);
 }
