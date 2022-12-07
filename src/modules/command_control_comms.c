@@ -174,7 +174,7 @@ static SPP_STATUS_T SetValue(uint16_t id, void* value, void* instance_data) {
         }
         case PROP_set_roll_offset_ID:
         {
-            HoverControl_SetPitchOffset(*((float*)value));
+            HoverControl_SetRollOffset(*((float*)value));
             break;
         }       
         default:

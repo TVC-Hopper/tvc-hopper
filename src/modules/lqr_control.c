@@ -200,6 +200,8 @@ static void ExecuteControlStep(TickType_t* last_wake_time) {
 
     // start next reading
     ControlsInputs_NotifyStart();
+    ComputeVZ(curr_state[STATE_IDX_Z]);
+    curr_state[STATE_IDX_Z] = vz;
 
     ComputeError(error, ref, curr_state, STATE_VECTOR_SIZE, STATE_VECTOR_SIZE);
     // CorrectYaw(error);
@@ -215,10 +217,7 @@ static void ExecuteControlStep(TickType_t* last_wake_time) {
         ComputeZInt(error[STATE_IDX_Z]);
     }
 
-    ComputeVZ(curr_state[STATE_IDX_Z]);
-
     error[STATE_IDX_ZINT] = error_zint;
-    error[STATE_IDX_VZ] = vz;
 
     
     if (HOVCTRL_MATH_STATUS_OK == MultiplyMatrix(actuator_input_now, K_hover, error, ACTUATION_VECTOR_SIZE, STATE_VECTOR_SIZE, STATE_VECTOR_SIZE)) {
