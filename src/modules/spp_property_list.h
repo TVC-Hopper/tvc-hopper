@@ -14,7 +14,7 @@
 #include <sppclient/defs.h>
 #include <sppclient/api.h>
 
-#define SPP_PROP_COUNT 24
+#define SPP_PROP_COUNT 23
 
 #define PROP_start_ID ((uint16_t) 0)
 #define PROP_stop_ID ((uint16_t) 1)
@@ -33,7 +33,6 @@
 #define PROP_imu_ID ((uint16_t) 52)
 #define PROP_esc_pwm_ID ((uint16_t) 53)
 #define PROP_k_matrix_ID ((uint16_t) 54)
-#define PROP_k_matrix_rx_ID ((uint16_t) 61)
 #define PROP_z_lim_spinup_ID ((uint16_t) 55)
 #define PROP_z_lim_normal_ID ((uint16_t) 56)
 #define PROP_max_zint_ID ((uint16_t) 57)

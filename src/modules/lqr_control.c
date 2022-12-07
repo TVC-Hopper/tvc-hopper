@@ -48,8 +48,8 @@ static float K_hover[ACTUATION_VECTOR_SIZE * STATE_VECTOR_SIZE] = {
 }; //roll,    pitch,      yaw,       gx,       gy,       gz,        z,       vz,     zint
 
 static void HoverControl_SetStatus(float error_z);
-extern void HoverControl_WriteK(float* new_K);
-extern void HoverControl_GetK(float* rowToSend);
+
+
 
 
 static HOVCTRL_MATH_STATUS_T MultiplyMatrix(float* Result, const float* A, const float* B, uint32_t A_rows, uint32_t A_cols, uint32_t B_rows);
@@ -185,10 +185,7 @@ static void ExecuteControlStep(TickType_t* last_wake_time) {
     
 //    zero out IMU
     for (uint8_t i = 0; i < 6; ++i) {
-        if (i != STATE_IDX_PITCH) {curr_state[i] -= imu_zero[i];}
-        else {
-            curr_state[i] -= imu_zero[i] /*- 1.5334*/;
-        }
+        curr_state[i] -= imu_zero[i];
         xSemaphoreTake(imu_zeroed_data_mx, 0xFFFF);
         zeroed_imu_data[i] = curr_state[i];
         xSemaphoreGive(imu_zeroed_data_mx);
@@ -401,7 +398,7 @@ static void ComputeVZ(float z_now) {
 }
 
 
-extern void HoverControl_WriteK(float* new_K){
+extern void HoverControl_SetK(float* new_K){
     int row  = (int)((new_K[0]) * 9);
     memcpy(K_hover + row, new_K + 1, 36);
 }

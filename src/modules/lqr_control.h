@@ -86,7 +86,9 @@ extern void HoverControl_GetThrottlePercent(float* throttle);
 
 extern hovctrl_status_t HoverControl_GetStatus();
 
-extern void HoverControl_WriteK(float* new_K);
+extern void HoverControl_GetK(float* rowToSend);
+
+extern void HoverControl_SetK(float* new_K);
 
 extern void HoverControl_SetSpinupESCRateLimit(float limit);
 

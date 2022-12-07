@@ -144,7 +144,7 @@ static SPP_STATUS_T SetValue(uint16_t id, void* value, void* instance_data) {
         {
             //TODO: FIX
             float* new_K = (float*)value;
-            HoverControl_WriteK(new_K);
+            HoverControl_SetK(new_K);
             break;
         }
         case PROP_z_lim_spinup_ID:
