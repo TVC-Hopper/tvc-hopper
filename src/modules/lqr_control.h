@@ -96,4 +96,10 @@ extern void HoverControl_SetMaxZInt(float i_max);
 
 extern void HoverControl_SetESCMaxOutput(float output);
 
+extern void HoverControl_GetZeroedIMU(float* imu_data);
+
+extern void HoverControl_SetPitchOffset(float pitch_offset);
+
+extern void HoverControl_SetRollOffset(float roll_offset);
+
 #endif

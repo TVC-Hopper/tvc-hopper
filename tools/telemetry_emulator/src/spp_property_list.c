@@ -178,6 +178,22 @@ static const SppPropertyDefinition_t property_list[SPP_PROP_COUNT] = {
         .name        = "max_esc_out\0",
         .name_length = 12,
     },
+    {
+        .id          = PROP_set_pitch_offset_ID,
+        .type        = SPP_PROP_T_FLOAT,
+        .size        = 4,
+        .flags       = {SPP_FLAG_READABLE},
+        .name        = "set_pitch_offset\0",
+        .name_length = 17,
+    },
+    {
+        .id          = PROP_set_roll_offset_ID,
+        .type        = SPP_PROP_T_FLOAT,
+        .size        = 4,
+        .flags       = {SPP_FLAG_READABLE},
+        .name        = "set_roll_offset\0",
+        .name_length = 16,
+    },
 };
 
 

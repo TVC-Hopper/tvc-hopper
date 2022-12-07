@@ -121,7 +121,7 @@ static void ProcessIMU() {
 
     // make corrections for different imu orientation here
 	imu_data_proc[IMU_PROC_IDX_ROLL] = -pitch;
-	imu_data_proc[IMU_PROC_IDX_PITCH] = roll - 1.5334;
+	imu_data_proc[IMU_PROC_IDX_PITCH] = roll;
     imu_data_proc[IMU_PROC_IDX_YAW] = yaw;
 
     // gyro is x, y, z

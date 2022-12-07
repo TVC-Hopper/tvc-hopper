@@ -24,6 +24,8 @@
 #define PROP_z_lim_normal_ID ((uint16_t) 56)
 #define PROP_max_zint_ID ((uint16_t) 57)
 #define PROP_max_esc_out_ID ((uint16_t) 58)
+#define PROP_set_pitch_offset_ID ((uint16_t) 59)
+#define PROP_set_roll_offset_ID ((uint16_t) 60)
 
 
 #endif

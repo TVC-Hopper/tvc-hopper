@@ -166,7 +166,17 @@ static SPP_STATUS_T SetValue(uint16_t id, void* value, void* instance_data) {
         {
             HoverControl_SetESCMaxOutput(*((float*)value));
             break;
-        }        
+        } 
+        case PROP_set_pitch_offset_ID:
+        {
+            HoverControl_SetPitchOffset(*((float*)value));
+            break;
+        }
+        case PROP_set_roll_offset_ID:
+        {
+            HoverControl_SetPitchOffset(*((float*)value));
+            break;
+        }       
         default:
         {
             return SPP_STATUS_UNKNOWN_PROPERTY;
@@ -228,7 +238,8 @@ static SPP_STATUS_T GetValue(uint16_t id, void* value, void* instance_data) {
         case PROP_imu_ID:
         {
             // roll pitch yaw, x, y, z
-            ControlsInputs_GetIMU(value);
+            //ControlsInputs_GetIMU(value);
+            HoverControl_GetZeroedIMU(value);
             break;
         }
         case PROP_esc_pwm_ID:

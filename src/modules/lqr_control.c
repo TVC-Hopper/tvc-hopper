@@ -22,12 +22,14 @@
 
 SemaphoreHandle_t controls_start_sem;
 SemaphoreHandle_t stop_flag_mx;
+SemaphoreHandle_t imu_zeroed_data_mx;
 bool stop_flag;
 
 hovctrl_status_t hover_status;
 static float ref[STATE_VECTOR_SIZE] = {0};
 static float curr_state[STATE_VECTOR_SIZE] = {0};
 static float prev_state[STATE_VECTOR_SIZE] = {0};
+static float zeroed_imu_data[6] = {0};
 
 static float actuator_input_now[ACTUATION_VECTOR_SIZE] = {0};
 static float actuator_input_last[ACTUATION_VECTOR_SIZE] = {0};
@@ -80,6 +82,7 @@ extern void HoverControl_Init() {
     stop_flag = true;
     controls_start_sem = xSemaphoreCreateBinary();
     stop_flag_mx = xSemaphoreCreateMutex();
+    imu_zeroed_data_mx = xSemaphoreCreateMutex();
 
     hover_status = HOVCTRL_STATUS_STATIONARY;
     // reference already initialized to 0, incl roll/pitch/yaw/gyro
@@ -183,6 +186,12 @@ static void ExecuteControlStep(TickType_t* last_wake_time) {
 //    zero out IMU
     for (uint8_t i = 0; i < 6; ++i) {
         if (i != STATE_IDX_PITCH) {curr_state[i] -= imu_zero[i];}
+        else {
+            curr_state[i] -= imu_zero[i] /*- 1.5334*/;
+        }
+        xSemaphoreTake(imu_zeroed_data_mx, 0xFFFF);
+        zeroed_imu_data[i] = curr_state[i];
+        xSemaphoreGive(imu_zeroed_data_mx);
     }
     
     // convert lidar measurement from cm to m and LP filter
@@ -226,6 +235,7 @@ static void ExecuteControlStep(TickType_t* last_wake_time) {
             actuator_input_now[i] += 90.0;
         }
 
+
         // RateLimit_VaneActuation(actuator_input_last, actuator_input_now, 0.3);
         HwThrustVane_SetPositionsControlBatch(actuator_input_now);
         
@@ -234,7 +244,7 @@ static void ExecuteControlStep(TickType_t* last_wake_time) {
             esc_rate_limit = esc_rate_limit_normal;
         }
         
-        actuator_input_now[4] = Limit(actuator_input_now[4], 0.0, (MAX_ESC - 1000.0) / 1000.0);
+        actuator_input_now[4] = Limit(actuator_input_now[4], 0.0, (esc_max_output - 1000.0) / 1000.0);
         actuator_input_now[4] = RateLimit(actuator_input_last[4], actuator_input_now[4], esc_rate_limit);
         float esc_output = actuator_input_now[4] / 0.001 + 1000.0;
         // esc_output = Limit(esc_output, 1000, MAX_ESC);
@@ -418,4 +428,19 @@ extern void HoverControl_SetMaxZInt(float i_max) {
 
 extern void HoverControl_SetESCMaxOutput(float output)  {
     esc_max_output = output;
+}
+
+extern void HoverControl_GetZeroedIMU(float* imu_data){
+    xSemaphoreTake(imu_zeroed_data_mx, 0xFFFF);
+    memcpy(imu_data, zeroed_imu_data, sizeof(zeroed_imu_data));
+    xSemaphoreGive(imu_zeroed_data_mx);
+}
+
+
+extern void HoverControl_SetPitchOffset(float pitch_offset){
+    imu_zero[STATE_IDX_PITCH] += pitch_offset;
+}
+
+extern void HoverControl_SetRollOffset(float roll_offset){
+    imu_zero[STATE_IDX_ROLL] += roll_offset;
 }

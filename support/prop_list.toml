@@ -163,3 +163,17 @@ id = 58
 type = "FLOAT"
 size = 4
 writeable = true
+
+[[props]]
+name = "set_pitch_offset"
+id = 59
+type = "FLOAT"
+size = 4
+writeable = true
+
+[[props]]
+name = "set_roll_offset"
+id = 60
+type = "FLOAT"
+size = 4
+writeable = true
