@@ -9,7 +9,7 @@
 extern void HwLidar_Init();
 
 /**
- *  Read distance
+ *  Read measured istance
  *
  *  @return distance in centimeters
  */

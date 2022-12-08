@@ -68,28 +68,33 @@
 /**
  *  TFL error codes
  */
-#define TFL_READY            0  // no error
-#define TFL_SERIAL           1  // serial timeout
-#define TFL_HEADER           2  // no header found
-#define TFL_CHECKSUM         3  // checksum doesn't match
-#define TFL_TIMEOUT          4  // I2C timeout
-#define TFL_PASS             5  // reply from some system commands
-#define TFL_FAIL             6  //           "
+#define TFL_READY            0  //!< no error
+#define TFL_SERIAL           1  //!< serial timeout
+#define TFL_HEADER           2  //!< no header found
+#define TFL_CHECKSUM         3  //!< checksum doesn't match
+#define TFL_TIMEOUT          4  //!< I2C timeout
+#define TFL_PASS             5  //!< reply from some system commands
+#define TFL_FAIL             6  
 #define TFL_I2CREAD          7
 #define TFL_I2CWRITE         8
 #define TFL_I2CLENGTH        9
-#define TFL_WEAK            10  // Signal Strength ≤ 100
-#define TFL_STRONG          11  // Signal Strength saturation
-#define TFL_FLOOD           12  // Ambient Light saturation
+#define TFL_WEAK            10  //!< Signal Strength ≤ 100
+#define TFL_STRONG          11  //!< Signal Strength saturation
+#define TFL_FLOOD           12  //!< Ambient Light saturation
 #define TFL_MEASURE         13
-#define TFL_INVALID         14  // Invalid operation sent to sendCommand()
+#define TFL_INVALID         14  //!< Invalid operation sent to sendCommand()
 
 /**
  *  Initialization parameters for TFLuna lidar
  */
 typedef struct TfLidarInitParams_s {
+    //! tfluna i2c address
     uint8_t address;
+
+    //! application callback to write to a register
     uint8_t (*onWrite)(uint8_t address, uint8_t subaddress, uint8_t* buffer, uint16_t size);
+
+    //! application callback to read from a register
     uint8_t (*onRead)(uint8_t address, uint8_t subaddress, uint8_t* buffer, uint16_t size);
 } TfLidarInitParams_t;
 

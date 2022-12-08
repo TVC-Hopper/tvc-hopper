@@ -7,7 +7,9 @@
 extern void BattMon_Init();
 
 /**
- *  Return battery voltage
+ *  Get battery voltage
+ *
+ *  @return measured battery voltage (volts)
  */
 extern float BattMon_GetVoltage();
 

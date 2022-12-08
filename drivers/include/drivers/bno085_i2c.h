@@ -23,10 +23,19 @@
  *  Initialization parameters for BNO085
  */
 typedef struct Bno085InitParams_s {
+    //! read/write buffer size available in the application for i2c transactions
     uint16_t buffer_size;
+
+    //! application i2c write callback
     uint8_t (*onWrite)(uint8_t address, uint8_t *buffer, uint16_t len);
+
+    //! application i2c read callback
     uint8_t (*onRead)(uint8_t address, uint8_t *buffer, uint16_t len);
+
+    //! application callback to get current system time in microseconds
     uint32_t (*getTime_us)();
+
+    //! application callback to delay this execution by some number of milliseconds
     void (*onDelay)(uint32_t ms);
 } Bno085InitParams_t;
 
